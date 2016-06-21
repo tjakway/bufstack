@@ -1,10 +1,12 @@
 from __future__ import print_function
 import vim
+import operator
 
 class BufferStackDict(object):
     def __init__(self):
         self.bufdict = dict()
         self.default_key = "default"
+        self.remake_default()
 
     #if the default key isn't in the dictionary,
     #add it with an empty stack
@@ -53,3 +55,66 @@ class BufferStackDict(object):
         else:
             return self._pop_next_valid_buf(self.default_key)
 
+buf_stacks = BufferStackDict()
+
+#returns whichever buffer in a list of size 2 isn't the (passed) current buffer
+def get_other_buf(curr_buf, buf_list):
+    if len(buf_list) != 2:
+        raise "get_other_buf should only be called on a list of 2 buffers!"
+
+    curr_buf_num = curr_buf.number
+    for i in buf_list:
+        if i.number != curr_buf_num:
+            return curr_buf_num
+
+    raise "Current buffer does not exist in passed buffer list!"
+
+def get_buf_numbers(buf_list):
+    nums = list()
+    for i in buf_list:
+        nums.append(i.number)
+    return nums
+
+def cmp_buf_num(curr_buf, buf_list, most, least):
+
+def gt_buf_num(curr_buf, buf_list):
+    buf_numbers = get_buf_numbers(buf_list)
+    this_buf_num = curr_buf.number
+
+    max_num = max(buf_numbers)
+    #if this is the highest-numbered buffer, wrap around to the lowest
+    if this_buf_num == max_num:
+        return min(buf_numbers)
+    else:
+        #if we're not the highest numbered buffer, there's at least one with a higher index
+        #if we sort the list
+        sorted_buf_nums = sorted(buf_list)
+        return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + 1]
+
+def lt_buf_num(curr_buf, buf_list):
+    buf_numbers = get_buf_numbers(buf_list)
+    this_buf_num = curr_buf.number
+
+    max_num = max(buf_numbers)
+    #if this is the highest-numbered buffer, wrap around to the lowest
+    if this_buf_num == max_num:
+        return min(buf_numbers)
+    else:
+        #if we're not the highest numbered buffer, there's at least one with a higher index
+        #if we sort the list
+        sorted_buf_nums = sorted(buf_list)
+        return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + 1]
+
+#get all valid buffers from vim.buffers
+def get_valid_bufs():
+    valid_bufs = list()
+    for i in vim.buffers:
+        if i.valid:
+            valid_bufs.append(i)
+
+def next_buf():
+    b = buf_stacks.pop(vim.current.window)
+    if b is None:
+        valid_bufs = get_valid_bufs()
+        #this window has no valid buffers
+        if len(valid_bufs) > 1:
