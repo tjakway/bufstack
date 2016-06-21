@@ -135,33 +135,34 @@ def prev_buf():
         if vim.current.buffer.number != b.number:
             vim.current.buffer = b.number
 
+#checks if there's more than 1 valid buffer and then performs a comparison and changes the current buffer, optionally pushing
+#it on the stack first
+#cmp_func should be either get_gt_buf_num or get_lt_buf_num
 #should_push_buf is a flag to indicate whether the current buffer should be pushed on the stack before changing
-def _gt_buf_common(should_push_buf):
+def _move_buf_common(cmp_func, should_push_buf):
     valid_bufs = get_valid_bufs()
     if len(valid_bufs) > 1:
         #the buffer we're changing to
-        dest_buf = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
+        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer, valid_bufs))
         #check whether we should push this buffer on the stack
         if should_push_buf:
             buf_stacks.push_buf(vim.current.window, vim.current.buffer)
         #change the current buffer
         vim.current.buffer = dest_buf
 
-#like gt_buf but pushes the new buffer on the stack
+#like gt_buf but pushes the old buffer on the stack
 def next_buf():
-    valid_bufs = get_valid_bufs()
-    if len(valid_bufs) > 1:
-        #the buffer we're changing to
-        dest_buf = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
-        buf_stacks.push_buf(vim.current.window, dest_buf)
-        vim.current.buffer = dest_buf
+    _move_buf_common(get_gt_buf_num, True)
 
-def gt_buf():
-    valid_bufs = get_valid_bufs()
-    if len(valid_bufs) > 1:
-        #the buffer we're changing to
-        dest_buf = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
-        vim.current.buffer = dest_buf
+#move to the next buffer and dont push the current one on the stack
+def gt_buf_no_push():
+    _move_buf_common(get_gt_buf_num, False)
 
+#push the current buffer on the stack and move to the next lowest buffer
 def lt_buf():
+    _move_buf_common(get_lt_buf_num, True)
+
+#like lt_buf but don't push the current buffer
+def lt_buf_no_push():
+    _move_buf_common(get_lt_buf_num, False)
 
