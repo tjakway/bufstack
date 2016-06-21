@@ -13,6 +13,12 @@ class BufferStackDict(object):
         if not self.default_key in self.bufdict:
             self.bufdict[self.default_key] = list()
 
+    #delete all stacks except the default and 
+    #clear the default stack
+    def remove_all_stacks(self):
+        self.bufdict = dict()
+        self.remake_default()
+
     #returns None if the stack for the passed window has no valid buffers
     #***WARNING:*** assumes the window is a valid key in the dictionary
     #explicitly pass self.default_key if this is not the case
@@ -165,4 +171,7 @@ def lt_buf():
 #like lt_buf but don't push the current buffer
 def lt_buf_no_push():
     _move_buf_common(get_lt_buf_num, False)
+
+def remove_all_stacks():
+    buf_stacks.remove_all_stacks()
 
