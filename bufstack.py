@@ -1,6 +1,5 @@
 from __future__ import print_function
 import vim
-import operator
 
 class BufferStackDict(object):
     def __init__(self):
@@ -75,35 +74,34 @@ def get_buf_numbers(buf_list):
         nums.append(i.number)
     return nums
 
-def cmp_buf_num(curr_buf, buf_list, most, least):
+#"op_most" and "op_least" mean functions that return the most extreme value for that type of comparison
+#for less than, op_least=min because the min is the most extremely less value
+#vice-versa for greater than
+#
+#single_step is -1 for min and 1 for max
+def _cmp_buf_num(curr_buf, buf_list, op_most, op_least, single_step):
+    buf_numbers = get_buf_numbers(buf_list)
+    this_buf_num = curr_buf.number
+
+    most_num = op_most(buf_numbers)
+    #if this is the highest-numbered buffer, wrap around to the lowest
+    if this_buf_num == most_num:
+        return op_least(buf_numbers)
+    else:
+        #(for max): if we're not the highest numbered buffer, there's at least one with a higher index
+        #(for min): if we're not the lowest numbered buffer, there's at least one with a lower idnex
+        sorted_buf_nums = sorted(buf_list)
+        #note that this works for a negative index
+        return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + single_step]
 
 def gt_buf_num(curr_buf, buf_list):
-    buf_numbers = get_buf_numbers(buf_list)
-    this_buf_num = curr_buf.number
-
-    max_num = max(buf_numbers)
-    #if this is the highest-numbered buffer, wrap around to the lowest
-    if this_buf_num == max_num:
-        return min(buf_numbers)
-    else:
-        #if we're not the highest numbered buffer, there's at least one with a higher index
-        #if we sort the list
-        sorted_buf_nums = sorted(buf_list)
-        return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + 1]
+    _cmp_buf_num(curr_buf, buf_list, max, min, 1)
 
 def lt_buf_num(curr_buf, buf_list):
-    buf_numbers = get_buf_numbers(buf_list)
-    this_buf_num = curr_buf.number
+    _cmp_buf_num(curr_buf, buf_list, min, max -1)
 
-    max_num = max(buf_numbers)
-    #if this is the highest-numbered buffer, wrap around to the lowest
-    if this_buf_num == max_num:
-        return min(buf_numbers)
-    else:
-        #if we're not the highest numbered buffer, there's at least one with a higher index
-        #if we sort the list
-        sorted_buf_nums = sorted(buf_list)
-        return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + 1]
+def get_buf_with_number(buf_number, buf_list):
+    get_buf_numbers(buf_list)[buf_number]
 
 #get all valid buffers from vim.buffers
 def get_valid_bufs():
