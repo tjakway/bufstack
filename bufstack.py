@@ -117,7 +117,7 @@ def get_valid_bufs():
         if i.valid:
             valid_bufs.append(i)
 
-#state modifying commands
+#state modifying functions
 #******************************************************
 
 
