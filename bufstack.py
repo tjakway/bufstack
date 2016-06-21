@@ -1,5 +1,5 @@
 from __future__ import print_function
-import vim 
+import vim
 
 class BufferStackDict(object):
     def __init__(self):
@@ -29,9 +29,15 @@ class BufferStackDict(object):
         if window not in self.bufdict:
             self.bufdict[window] = list()
 
+    #deletes the windows stack from the dictionary if it has one
     def del_window_stack(self, window):
         if window in self.bufdict:
             del self.bufdict[window]
+
+    #checks if the window is invalid AND has its own stack and if so deletes that stack
+    def remove_if_invalid(self, window):
+        if not window.valid:
+            self.del_window_stack(window)
         
     def push_buf(self, window, buf):
         if window in self.bufdict:
