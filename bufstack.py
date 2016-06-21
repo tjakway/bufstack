@@ -23,6 +23,7 @@ class BufferStackDict(object):
             if return_buf.valid:
                 return return_buf
 
+        #no valid buffers
         return None
              
 
@@ -94,11 +95,17 @@ def _cmp_buf_num(curr_buf, buf_list, op_most, op_least, single_step):
         #note that this works for a negative index
         return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + single_step]
 
-def gt_buf_num(curr_buf, buf_list):
+def get_gt_buf_num(curr_buf, buf_list):
     _cmp_buf_num(curr_buf, buf_list, max, min, 1)
 
-def lt_buf_num(curr_buf, buf_list):
+def get_lt_buf_num(curr_buf, buf_list):
     _cmp_buf_num(curr_buf, buf_list, min, max -1)
+
+def get_gt_buf(curr_buf, buf_list):
+    get_buf_with_number(get_gt_buf_num(curr_buf, buf_list))
+
+def get_lt_buf(curr_buf, buf_list):
+    get_buf_with_number(get_lt_buf_num(curr_buf, buf_list))
 
 def get_buf_with_number(buf_number, buf_list):
     get_buf_numbers(buf_list)[buf_number]
@@ -110,9 +117,51 @@ def get_valid_bufs():
         if i.valid:
             valid_bufs.append(i)
 
-def next_buf():
+#state modifying commands
+#******************************************************
+
+
+def prev_buf():
     b = buf_stacks.pop(vim.current.window)
     if b is None:
         valid_bufs = get_valid_bufs()
-        #this window has no valid buffers
+        #if this window has no valid buffers
+        #do nothing
+        #otherwise, switch to the next one
         if len(valid_bufs) > 1:
+            vim.current.buffer = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
+    else:
+        #switch to this buffer if we're not already viewing it
+        if vim.current.buffer.number != b.number:
+            vim.current.buffer = b.number
+
+#should_push_buf is a flag to indicate whether the current buffer should be pushed on the stack before changing
+def _gt_buf_common(should_push_buf):
+    valid_bufs = get_valid_bufs()
+    if len(valid_bufs) > 1:
+        #the buffer we're changing to
+        dest_buf = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
+        #check whether we should push this buffer on the stack
+        if should_push_buf:
+            buf_stacks.push_buf(vim.current.window, vim.current.buffer)
+        #change the current buffer
+        vim.current.buffer = dest_buf
+
+#like gt_buf but pushes the new buffer on the stack
+def next_buf():
+    valid_bufs = get_valid_bufs()
+    if len(valid_bufs) > 1:
+        #the buffer we're changing to
+        dest_buf = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
+        buf_stacks.push_buf(vim.current.window, dest_buf)
+        vim.current.buffer = dest_buf
+
+def gt_buf():
+    valid_bufs = get_valid_bufs()
+    if len(valid_bufs) > 1:
+        #the buffer we're changing to
+        dest_buf = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
+        vim.current.buffer = dest_buf
+
+def lt_buf():
+
