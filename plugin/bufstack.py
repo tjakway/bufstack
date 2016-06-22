@@ -172,7 +172,7 @@ def _move_buf_common(cmp_func, should_push_buf):
     valid_bufs = get_current_valid_bufs()
     if len(valid_bufs) > 1:
         #the buffer we're changing to
-        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer.number, get_buf_numbers(valid_bufs)), valid_bufs)
+        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer, valid_bufs), valid_bufs)
         #check whether we should push this buffer on the stack
         if should_push_buf:
             buf_stacks.push_buf(vim.current.window, vim.current.buffer)
