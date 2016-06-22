@@ -8,7 +8,7 @@ endif
 let g:bufstack_loaded = 1
 
 function! s:bufstack_init()
-   pyfile bufstack.py 
+   pyfile bufstack.py
    python initialize_bufstack()
 endfunc
 
@@ -28,6 +28,10 @@ function! s:bufstack_lt_buf()
     python lt_buf()
 endfunc
 
+function! s:bufstack_lt_buf_no_push()
+    python lt_buf_no_push()
+endfunc
+
 function! s:bufstack_remove_all_stacks()
     python remove_all_stacks()
 endfunc
@@ -40,4 +44,16 @@ function! s:bufstack_push_current_buffer()
     python push_current_buffer()
 endfunc
 
-command! -bar  BufstackInit call s:bufstack_init
+" initialize the plugin
+call s:bufstack_init()
+
+" define commands
+command! BufstackPrevBuf call s:bufstack_prev_buf()
+command! BufstackNextBuf call s:bufstack_next_buf()
+command! BufstackGtBuf call s:bufstack_next_buf() " same as BufstackNextBuf
+command! BufstackGtBufNoPush call s:bufstack_gt_buf_no_push()
+command! BufstackLtBuf call s:bufstack_lt_buf()
+command! BufstackLtBufNoPush call s:bufstack_lt_buf_no_push()
+command! BufstackRemoveAllStacks call s:bufstack_remove_all_stacks()
+command! BufstackShowBufferStack call s:bufstack_show_buffer_stack()
+command! BufstackPushCurrentBuffer call s:bufstack_push_current_buffer()
