@@ -122,7 +122,7 @@ def get_gt_buf_num(curr_buf, buf_list):
     return _cmp_buf_num(curr_buf, buf_list, max, min, 1)
 
 def get_lt_buf_num(curr_buf, buf_list):
-    return _cmp_buf_num(curr_buf, buf_list, min, max -1)
+    return _cmp_buf_num(curr_buf, buf_list, min, max, -1)
 
 def get_gt_buf(curr_buf, buf_list):
     return get_buf_with_number(get_gt_buf_num(curr_buf, buf_list))
