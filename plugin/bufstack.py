@@ -201,7 +201,7 @@ def remove_all_stacks():
 #print the buffer stack for the current window
 def show_buffer_stack():
     def buf_str(buf):
-        return str(buf.name + "\t #" + b.number)
+        return str(buf.name + "\t #" + str(buf.number))
 
     output_str = ""
     current_buf_stack = get_valid_bufs(buf_stacks.get_stack_for_window(vim.current.window))
