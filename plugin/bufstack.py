@@ -119,19 +119,19 @@ def _cmp_buf_num(curr_buf, buf_list, op_most, op_least, single_step):
         return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + single_step]
 
 def get_gt_buf_num(curr_buf, buf_list):
-    _cmp_buf_num(curr_buf, buf_list, max, min, 1)
+    return _cmp_buf_num(curr_buf, buf_list, max, min, 1)
 
 def get_lt_buf_num(curr_buf, buf_list):
-    _cmp_buf_num(curr_buf, buf_list, min, max -1)
+    return _cmp_buf_num(curr_buf, buf_list, min, max -1)
 
 def get_gt_buf(curr_buf, buf_list):
-    get_buf_with_number(get_gt_buf_num(curr_buf, buf_list))
+    return get_buf_with_number(get_gt_buf_num(curr_buf, buf_list))
 
 def get_lt_buf(curr_buf, buf_list):
-    get_buf_with_number(get_lt_buf_num(curr_buf, buf_list))
+    return get_buf_with_number(get_lt_buf_num(curr_buf, buf_list))
 
 def get_buf_with_number(buf_number, buf_list):
-    buf_list[get_buf_numbers(buf_list).index(buf_number)]
+    return buf_list[get_buf_numbers(buf_list).index(buf_number)]
 
 #get all valid buffers from the passed list
 def get_valid_bufs(buf_list):
