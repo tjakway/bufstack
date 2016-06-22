@@ -74,7 +74,9 @@ class BufferStackDict(object):
 
     def get_stack_for_window(self, window):
         if window.number in self.bufdict:
-            return bufdict[window]
+            return self.bufdict[window]
+        else:
+            return self.bufdict[self.default_key]
 
 #returns whichever buffer in a list of size 2 isn't the (passed) current buffer
 def get_other_buf(curr_buf, buf_list):
@@ -105,6 +107,7 @@ def _cmp_buf_num(curr_buf, buf_list, op_most, op_least, single_step):
 
     most_num = op_most(buf_numbers)
     #if this is the highest-numbered buffer, wrap around to the lowest
+    print(str(vim.buffers))
     if this_buf_num == most_num:
         return op_least(buf_numbers)
     else:
@@ -129,13 +132,18 @@ def get_lt_buf(curr_buf, buf_list):
 def get_buf_with_number(buf_number, buf_list):
     get_buf_numbers(buf_list)[buf_number]
 
-#get all valid buffers from vim.buffers
-def get_valid_bufs():
+#get all valid buffers from the passed list
+def get_valid_bufs(buf_list):
     valid_bufs = list()
-    for i in vim.buffers:
+    for i in buf_list:
         if i.valid:
             valid_bufs.append(i)
     return valid_bufs
+
+#get all valid buffers from vim.buffers
+def get_current_valid_bufs():
+    return get_valid_bufs(vim.buffers)
+
 
 #state modifying functions
 #******************************************************
@@ -144,7 +152,7 @@ def get_valid_bufs():
 def prev_buf():
     b = buf_stacks.pop(vim.current.window)
     if b is None:
-        valid_bufs = get_valid_bufs()
+        valid_bufs = get_current_valid_bufs()
         #if this window has no valid buffers
         #do nothing
         #otherwise, switch to the next one
@@ -160,7 +168,7 @@ def prev_buf():
 #cmp_func should be either get_gt_buf_num or get_lt_buf_num
 #should_push_buf is a flag to indicate whether the current buffer should be pushed on the stack before changing
 def _move_buf_common(cmp_func, should_push_buf):
-    valid_bufs = get_valid_bufs()
+    valid_bufs = get_current_valid_bufs()
     if len(valid_bufs) > 1:
         #the buffer we're changing to
         dest_buf = get_buf_with_number(cmp_func(vim.current.buffer, valid_bufs))
