@@ -106,14 +106,15 @@ def _cmp_buf_num(curr_buf, buf_list, op_most, op_least, single_step):
     this_buf_num = curr_buf.number
 
     most_num = op_most(buf_numbers)
+    print(most_num)
     #if this is the highest-numbered buffer, wrap around to the lowest
-    print(str(vim.buffers))
     if this_buf_num == most_num:
         return op_least(buf_numbers)
     else:
         #(for max): if we're not the highest numbered buffer, there's at least one with a higher index
         #(for min): if we're not the lowest numbered buffer, there's at least one with a lower idnex
-        sorted_buf_nums = sorted(buf_list)
+        #sort the buf NUMBERS, not the vim buffer objects
+        sorted_buf_nums = sorted(buf_numbers)
         #note that this works for a negative index
         return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + single_step]
 
@@ -171,7 +172,7 @@ def _move_buf_common(cmp_func, should_push_buf):
     valid_bufs = get_current_valid_bufs()
     if len(valid_bufs) > 1:
         #the buffer we're changing to
-        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer, valid_bufs))
+        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer, valid_bufs), valid_bufs)
         #check whether we should push this buffer on the stack
         if should_push_buf:
             buf_stacks.push_buf(vim.current.window, vim.current.buffer)
