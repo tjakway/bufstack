@@ -131,7 +131,7 @@ def get_lt_buf(curr_buf, buf_list):
     get_buf_with_number(get_lt_buf_num(curr_buf, buf_list))
 
 def get_buf_with_number(buf_number, buf_list):
-    get_buf_numbers(buf_list)[buf_number]
+    buf_list[get_buf_numbers(buf_list).index(buf_number)]
 
 #get all valid buffers from the passed list
 def get_valid_bufs(buf_list):
@@ -172,7 +172,7 @@ def _move_buf_common(cmp_func, should_push_buf):
     valid_bufs = get_current_valid_bufs()
     if len(valid_bufs) > 1:
         #the buffer we're changing to
-        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer, valid_bufs), valid_bufs)
+        dest_buf = get_buf_with_number(cmp_func(vim.current.buffer.number, get_buf_numbers(valid_bufs)), valid_bufs)
         #check whether we should push this buffer on the stack
         if should_push_buf:
             buf_stacks.push_buf(vim.current.window, vim.current.buffer)
