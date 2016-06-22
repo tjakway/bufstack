@@ -23,6 +23,7 @@ class BufferStackDict(object):
     #***WARNING:*** assumes the window is a valid key in the dictionary
     #explicitly pass self.default_key if this is not the case
     def _pop_next_valid_buf(self, window):
+        win_stack = self.bufdict[window.number]
         while len(win_stack) > 0:
             #python's pop() with no args returns the _last_ item in the list...
             return_buf = win_stack.pop(0)
@@ -34,13 +35,13 @@ class BufferStackDict(object):
              
 
     def new_window_stack(self, window):
-        if window not in self.bufdict:
-            self.bufdict[window] = list()
+        if window.number not in self.bufdict:
+            self.bufdict[window.number] = list()
 
     #deletes the windows stack from the dictionary if it has one
     def del_window_stack(self, window):
-        if window in self.bufdict:
-            del self.bufdict[window]
+        if window.number in self.bufdict:
+            del self.bufdict[window.number]
 
     #checks if the window is invalid AND has its own stack and if so deletes that stack
     def remove_if_invalid(self, window):
@@ -48,18 +49,22 @@ class BufferStackDict(object):
             self.del_window_stack(window)
         
     def push_buf(self, window, buf):
-        if window in self.bufdict:
-            self.bufdict[window].insert(0, buf)
+        if window.number in self.bufdict:
+            self.bufdict[window.number].insert(0, buf)
         else:
             self.bufdict[self.default_key].insert(0, buf)
 
     def pop_buf(self, window):
         #if this window has its own non-empty stack, pop that buffer
-        if window in self.bufdict and len(self.bufdict[window]) > 0:
+        if window.number in self.bufdict and len(self.bufdict[window.number]) > 0:
             return self._pop_next_valid_buf(window)
         #if this window doesn't have its own stack, pop from the default stack
         else:
             return self._pop_next_valid_buf(self.default_key)
+
+    def get_stack_for_window(self, window):
+        if window.number in self.bufdict:
+            return bufdict[window]
 
 buf_stacks = BufferStackDict()
 
@@ -175,3 +180,23 @@ def lt_buf_no_push():
 def remove_all_stacks():
     buf_stacks.remove_all_stacks()
 
+#print the buffer stack for the current window
+def show_buffer_stack():
+    def buf_str(buf):
+        return str(buf.name + "\t #" + b.number)
+
+    output_str = ""
+    current_buf_stack = get_valid_bufs(buf_stacks.get_stack_for_window(vim.current.window))
+    if len(current_buf_stack) <= 0:
+        print("Empty buffer stack.")
+    else:
+        copied_buf_stack = current_buf_stack[:]
+        #format the first line specially
+        #the pop is safe because we checked that the list has at least 1 item
+        output_str += buf_str(copied_buf_stack.pop()) + "\t<------- TOP" + "\n"
+
+        #add the rest of the buffers to the string
+        for i in copied_buf_stack:
+            output_str += buf_str(i) + "\n"
+
+        print(output_str)
