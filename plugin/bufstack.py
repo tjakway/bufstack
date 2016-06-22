@@ -29,8 +29,8 @@ class BufferStackDict(object):
     #returns None if the stack for the passed window has no valid buffers
     #***WARNING:*** assumes the window is a valid key in the dictionary
     #explicitly pass self.default_key if this is not the case
-    def _pop_next_valid_buf(self, window):
-        win_stack = self.bufdict[window.number]
+    def _pop_next_valid_buf_for_key(self, window_key):
+        win_stack = self.bufdict[window_key]
         while len(win_stack) > 0:
             #python's pop() with no args returns the _last_ item in the list...
             return_buf = win_stack.pop(0)
@@ -64,10 +64,10 @@ class BufferStackDict(object):
     def pop_buf(self, window):
         #if this window has its own non-empty stack, pop that buffer
         if window.number in self.bufdict and len(self.bufdict[window.number]) > 0:
-            return self._pop_next_valid_buf(window)
+            return self._pop_next_valid_buf(window.number)
         #if this window doesn't have its own stack, pop from the default stack
         else:
-            return self._pop_next_valid_buf(self.default_key, window)
+            return self._pop_next_valid_buf(self.default_key)
 
     def pop(self, window):
         return self.pop_buf(window)
