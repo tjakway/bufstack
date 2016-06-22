@@ -69,6 +69,9 @@ class BufferStackDict(object):
         else:
             return self._pop_next_valid_buf(self.default_key)
 
+    def pop(self, window):
+        self.pop_buf(self, window)
+
     def get_stack_for_window(self, window):
         if window.number in self.bufdict:
             return bufdict[window]
@@ -132,6 +135,7 @@ def get_valid_bufs():
     for i in vim.buffers:
         if i.valid:
             valid_bufs.append(i)
+    return valid_bufs
 
 #state modifying functions
 #******************************************************
