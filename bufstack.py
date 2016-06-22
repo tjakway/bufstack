@@ -1,6 +1,13 @@
 from __future__ import print_function
 import vim
 
+buf_stacks = None
+
+def initialize_bufstack():
+    global buf_stacks
+    buf_stacks = BufferStackDict()
+
+
 class BufferStackDict(object):
     def __init__(self):
         self.bufdict = dict()
@@ -65,8 +72,6 @@ class BufferStackDict(object):
     def get_stack_for_window(self, window):
         if window.number in self.bufdict:
             return bufdict[window]
-
-buf_stacks = BufferStackDict()
 
 #returns whichever buffer in a list of size 2 isn't the (passed) current buffer
 def get_other_buf(curr_buf, buf_list):
