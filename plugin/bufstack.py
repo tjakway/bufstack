@@ -64,10 +64,10 @@ class BufferStackDict(object):
     def pop_buf(self, window):
         #if this window has its own non-empty stack, pop that buffer
         if window.number in self.bufdict and len(self.bufdict[window.number]) > 0:
-            return self._pop_next_valid_buf(window.number)
+            return self._pop_next_valid_buf_for_key(window.number)
         #if this window doesn't have its own stack, pop from the default stack
         else:
-            return self._pop_next_valid_buf(self.default_key)
+            return self._pop_next_valid_buf_for_key(self.default_key)
 
     def pop(self, window):
         return self.pop_buf(window)
