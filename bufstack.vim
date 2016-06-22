@@ -36,5 +36,8 @@ function! s:bufstack_show_buffer_stack()
     python show_buffer_stack()
 endfunc
 
+function! s:bufstack_push_current_buffer()
+    python push_current_buffer()
+endfunc
 
 command! -bar  BufstackInit call s:bufstack_init

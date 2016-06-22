@@ -205,3 +205,7 @@ def show_buffer_stack():
             output_str += buf_str(i) + "\n"
 
         print(output_str)
+
+#useful in vimscript as a primitive combinator
+def push_current_buffer():
+    buf_stacks.push_buf(vim.current.window, vim.current.buffer)
