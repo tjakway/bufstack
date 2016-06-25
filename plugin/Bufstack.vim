@@ -3,11 +3,13 @@ if exists('g:bufstack_pluginfile_loaded')
 endif
 let g:bufstack_pluginfile_loaded = 1
 
-
+" warn the user about python if the warning hasn't been suppressed
 if !exists("g:BufstackNoPythonWarning")
-    echohl WarningMsg
-    echom  "Bufstack requires python"
-    echohl None
+    if !has('python')
+        echohl WarningMsg
+        echom  "Bufstack requires python"
+        echohl None
+    endif
 endif
 
 " define commands

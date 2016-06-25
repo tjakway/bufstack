@@ -7,11 +7,12 @@ if exists('g:bufstack_autoloadfile_loaded')
 endif
 let g:bufstack_autoloadfile_loaded = 1
 
-let Bufstack#plugindir = expand('<sfile>:p:h:h')
-let Bufstack#python_file = s:bufstack_plugindir . "/python/Bufstack.py"
+let s:bufstack_plugindir = expand('<sfile>:p:h:h')
+let s:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
 
+" TODO: add python function! prefixes
 function! Bufstack#init()
-   execute 'pyfile' Bufstack#python_file
+   execute 'pyfile' s:bufstack_python_file
    python initialize_bufstack()
 endfunc
 
@@ -46,7 +47,3 @@ endfunc
 function! Bufstack#push_current_buffer()
     python push_current_buffer()
 endfunc
-
-" initialize the plugin
-call Bufstack#init()
-
