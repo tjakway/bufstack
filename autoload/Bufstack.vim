@@ -10,7 +10,7 @@ let g:bufstack_autoloadfile_loaded = 1
 let s:bufstack_plugindir = expand('<sfile>:p:h:h')
 let s:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
 
-" TODO: add python function! prefixes
+" TODO: add python function prefixes
 function! Bufstack#init()
    execute 'pyfile' s:bufstack_python_file
    python initialize_bufstack()
