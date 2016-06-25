@@ -61,6 +61,9 @@ class BufferStackDict(object):
         else:
             self.bufdict[self.default_key].insert(0, buf)
 
+    def push(self, window, buf):
+        self.push_buf(window, buf)
+
     def pop_buf(self, window):
         #if this window has its own non-empty stack, pop that buffer
         if window.number in self.bufdict and len(self.bufdict[window.number]) > 0:
@@ -94,7 +97,7 @@ class BufferStackDict(object):
         if len(valid_bufs) <= 0 or num_to_copy <= 0:
             return
         #recurse if we don't have enough items to copy
-        else if len(valid_bufs) < num_to_copy:
+        elif len(valid_bufs) < num_to_copy:
             self.dup(window, len(valid_bufs))
         else:
             duplicated_items = valid_bufs[0:num_to_copy]
