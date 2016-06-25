@@ -7,8 +7,11 @@ if exists('g:bufstack_loaded')
 endif
 let g:bufstack_loaded = 1
 
+let s:bufstack_plugindir = expand('<sfile>:p:h:h')
+let s:bufstack_python_file = s:bufstack_plugindir . "/python/bufstack.py"
+
 function! s:bufstack_init()
-   pyfile bufstack.py
+   execute 'pyfile' s:bufstack_python_file
    python initialize_bufstack()
 endfunc
 

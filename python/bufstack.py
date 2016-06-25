@@ -74,7 +74,7 @@ class BufferStackDict(object):
 
     def get_stack_for_window(self, window):
         if window.number in self.bufdict:
-            return self.bufdict[window]
+            return self.bufdict[window.number]
         else:
             return self.bufdict[self.default_key]
 
