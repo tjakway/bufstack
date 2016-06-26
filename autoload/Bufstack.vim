@@ -13,7 +13,7 @@ let s:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
 " TODO: add python function prefixes
 function! Bufstack#init()
    execute 'pyfile' s:bufstack_python_file
-   python initialize_bufstack()
+   python "initialize_bufstack()"
 endfunc
 
 function! Bufstack#prev_buf()
