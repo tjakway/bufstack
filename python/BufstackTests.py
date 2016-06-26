@@ -1,5 +1,5 @@
 import unittest
-import Bufstack
+from Bufstack import BufferStackDict
 from random import randint
 
 #emulate a vim buffer's members
@@ -9,7 +9,7 @@ class MockBuffer:
         self.valid = valid
 
     @classmethod
-    def RandBuffers(num):
+    def RandBuffers(cls, num):
         #arbitrary, but highly unlikely we'll have >100 buffers
         upper_bound = 100
 
@@ -36,22 +36,19 @@ class BufstackTest(unittest.TestCase):
     def setUp(self):
         self.bufstack = BufferStackDict()
 
-class PushValidBufsTest(unittest.TestCase):
+class PushValidBufsTest(BufstackTest):
     def setUp(self): 
-        BufstackTest.setUp()
+        BufstackTest.setUp(self)
 
     def runTest(self):
         num_rand_buffers = 100
         for i in MockBuffer.RandBuffers(num_rand_buffers):
-            self.bufstack.push(self, self.bufstack.default_key, i)
+            self.bufstack.push(MockWindow(-1), i)
 
-        assertEqual(len(self.bufstack.get_stack_for_window(self.bufstack.default_key)), num_rand_buffers)
+        self.assertEqual(len(self.bufstack.get_stack_for_window(MockWindow(-1))), num_rand_buffers)
 
 
-
-class DefaultIndexTests(unittest.TestCase):
-    def setUp(self): 
-        BufstackTest.setUp()
+#class DefaultIndexTests(BufstackTest):
+#    def setUp(self): 
+#        BufstackTest.setUp(self)
 #    def runTest(self):
-        
-    
