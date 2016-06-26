@@ -1,5 +1,9 @@
 from __future__ import print_function
-import vim
+#tests shouldn't fail if vim can't be imported
+try:
+    import vim
+except:
+    pass
 
 buf_stacks = None
 
