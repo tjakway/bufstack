@@ -12,16 +12,31 @@ def initialize_bufstack():
     buf_stacks = BufferStackDict()
 
 class BufferStackDict(object):
-    def __init__(self):
+    #max_stack_depth = -1 means the stack has no maximum size
+    def __init__(self, max_stack_depth=-1):
         self.bufdict = dict()
         self.default_key = "default"
+        self.max_stack_depth = max_stack_depth
+
         self.remake_default()
+
+    def set_max_stack_depth(depth):
+        if depth < 1:
+            raise "Stack depth must be >0!"
+        self.max_stack_depth = depth
 
     #if the default key isn't in the dictionary,
     #add it with an empty stack
     def remake_default(self):
         if not self.default_key in self.bufdict:
             self.bufdict[self.default_key] = list()
+
+    #truncate the stack if it's greater than max_stack_depth
+    def drop_if_too_large(self, key):
+        if self.max_stack_depth > 1:
+            if len(self.bufdict[key]) > self.max_stack_depth:
+                #truncate buffer numbers over the limit
+                self.bufdict[key] = value[0:self.max_stack_depth]
 
     #delete all stacks except the default and 
     #clear the default stack
@@ -57,10 +72,11 @@ class BufferStackDict(object):
             self.del_window_stack(window)
         
     def push_buf(self, window, buf):
-        if window.number in self.bufdict:
-            self.bufdict[window.number].insert(0, buf)
-        else:
-            self.bufdict[self.default_key].insert(0, buf)
+        key = self._get_window_key(window)
+        self.bufdict[key].insert(0, buf)
+
+        #check if any stacks are too large
+        self.drop_if_too_large(key)
 
     def push(self, window, buf):
         self.push_buf(window, buf)
@@ -76,6 +92,11 @@ class BufferStackDict(object):
 
     def pop(self, window):
         return self.pop_buf(window)
+
+    def peek_top(self, window):
+        stack = get_stack_for_window(window)
+        if len(stack) > 0:
+            return stack[0]
 
     def get_stack_for_window(self, window):
         if window.number in self.bufdict:
@@ -256,3 +277,17 @@ def show_buffer_stack():
 #useful in vimscript as a primitive combinator
 def push_current_buffer():
     buf_stacks.push_buf(vim.current.window, vim.current.buffer)
+
+#VimL binding for bufstack class method
+def set_max_stack_depth(depth):
+    buf_stacks.set_max_stack_depth(depth)
+
+#push the current buffer if it isn't on top of the current stack
+def push_current_buffer_if_not_top():
+    curr_buf = vim.current.buffer
+    top = buf_stacks.peek_top(vim.current.window)
+
+    #push if it's a valid buffer and not already on top of the stack
+    if (curr_buf.valid and top is not None and top.number != curr_buf.number) \
+            or (curr_buf.valid and top is None):
+        push_current_buffer()
