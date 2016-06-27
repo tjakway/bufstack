@@ -1,9 +1,13 @@
 from __future__ import print_function
+import eprint
+
 #tests shouldn't fail if vim can't be imported
 try:
     import vim
 except:
     pass
+
+#*********************************************
 
 buf_stacks = None
 
@@ -291,3 +295,17 @@ def push_current_buffer_if_not_top():
     if (curr_buf.valid and top is not None and top.number != curr_buf.number) \
             or (curr_buf.valid and top is None):
         push_current_buffer()
+
+#ARG: which 
+def switch_buffer():
+    #argument passed through viml
+    which_buf = int(vim.eval("a:which"))
+
+    #check if the buffer exists
+    #buffwinnr returns -1 if the buffer DNE
+    if int(vim.eval("buffwinnr({})".format(str(which_buf)))) == -1:
+        eprint("Buffer #{} does not exist!".format(str(which_buf)))
+    else:
+        #push the current buffer and switch to the new one
+        push_current_buffer_if_not_top()
+        vim.current.buffer = get_buf_with_number(which_buf)
