@@ -1,7 +1,3 @@
-if !has('python')
-	finish
-endif
-
 if exists('g:bufstack_autoloadfile_loaded')
     finish
 endif
@@ -24,8 +20,24 @@ function! Bufstack#init()
     endif
     let g:bufstack_init_called = 1
 
-   execute 'pyfile' s:bufstack_python_file
-   python initialize_bufstack()
+    " we check for python in init so we don't bother the user if they're not
+    " using this plugin
+    call Bufstack#warn_python()
+    call Bufstack#set_global_defaults()
+
+    execute 'pyfile' s:bufstack_python_file
+    python initialize_bufstack()
+endfunc
+
+function! Bufstack#warn_python()
+    " warn the user about python if the warning hasn't been suppressed
+    if !exists("g:bufstack_python_no_warning")
+        if !has('python')
+            echohl WarningMsg
+            echom  "Bufstack requires python"
+            echohl None
+        endif
+    endif
 endfunc
 
 function! Bufstack#prev_buf()
@@ -76,9 +88,15 @@ function! Bufstack#push_current_buffer_if_not_top()
     endif
 endfunction
 
+function! Bufstack#switch_buffer(which)
+    " argument is retrieved in python via vim.eval
+    call Bufstack#init()
+    python switch_buffer()
+endfunction
+
 function! Bufstack#remap_b_number()
     let l:i = 1
-    while c <= 99
+    while l:i <= g:bufstack_max_b_remappings
     execute "nnoremap " . l:i . "gb :" . l:i . "b\<CR>"
     let l:i += 1
     endwhile
@@ -107,8 +125,8 @@ function! Bufstack#switch_to_next_buffer(incr)
     endif
   endwhile
 endfunction
-nnoremap <silent> <C-n> :call SwitchToNextBuffer(1)<CR>
-nnoremap <silent> <C-p> :call SwitchToNextBuffer(-1)<CR>
+"nnoremap <silent> <C-n> :call SwitchToNextBuffer(1)<CR>
+"nnoremap <silent> <C-p> :call SwitchToNextBuffer(-1)<CR>
 
 function! Bufstack#map_default_keybindings()
 
