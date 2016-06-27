@@ -3,13 +3,6 @@ if exists('g:bufstack_autoloadfile_loaded')
 endif
 let g:bufstack_autoloadfile_loaded = 1
 
-let s:bufstack_plugindir = expand('<sfile>:p:h:h')
-let s:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
-
-function! Bufstack#set_global_defaults()
-    let g:bufstack_max_depth = get(g:, "bufstack_max_depth", 20)
-    let g:bufstack_max_b_remappings = get(g:, "bufstack_max_b_remappings", 100)
-endfunction
 
 
 " TODO: add python function prefixes
@@ -24,10 +17,11 @@ function! Bufstack#init()
     " using this plugin
     call Bufstack#warn_python()
     call Bufstack#set_global_defaults()
+    call Bufstack#initialize_python()
+endfunction
 
-    execute 'pyfile' s:bufstack_python_file
-    python initialize_bufstack()
-endfunc
+let s:bufstack_plugindir = expand('<sfile>:p:h:h')
+
 
 function! Bufstack#warn_python()
     " warn the user about python if the warning hasn't been suppressed
@@ -39,6 +33,16 @@ function! Bufstack#warn_python()
         endif
     endif
 endfunc
+
+function! Bufstack#set_global_defaults()
+    let g:bufstack_max_depth = get(g:, "bufstack_max_depth", 20)
+    let g:bufstack_max_b_remappings = get(g:, "bufstack_max_b_remappings", 100)
+endfunction
+
+function! Bufstack#initialize_python()
+    let l:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
+    execute 'pyfile' l:bufstack_python_file
+endfunction
 
 function! Bufstack#prev_buf()
     call Bufstack#init()
@@ -129,6 +133,7 @@ endfunction
 "nnoremap <silent> <C-p> :call SwitchToNextBuffer(-1)<CR>
 
 function! Bufstack#map_default_keybindings()
-
+    " re-exporting for convenience
+    call mappings#Bufstack#map_default_keybindings()
 endfunction
 
