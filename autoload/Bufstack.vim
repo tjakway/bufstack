@@ -10,6 +10,12 @@ let g:bufstack_autoloadfile_loaded = 1
 let s:bufstack_plugindir = expand('<sfile>:p:h:h')
 let s:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
 
+function! Bufstack#set_global_defaults()
+    let g:bufstack_max_depth = get(g:, "bufstack_max_depth", 20)
+    let g:bufstack_max_b_remappings = get(g:, "bufstack_max_b_remappings", 100)
+endfunction
+
+
 " TODO: add python function prefixes
 function! Bufstack#init()
     "calling multiple times has no effect
@@ -61,3 +67,50 @@ function! Bufstack#push_current_buffer()
     call Bufstack#init()
     python push_current_buffer()
 endfunc
+
+function! Bufstack#push_current_buffer_if_not_top()
+    call Bufstack#init()
+    " set this variable to allow repeats on top of the stack
+    if !exists("g:bufstack_allow_top_repeats")
+        python push_current_if_not_top()
+    endif
+endfunction
+
+function! Bufstack#remap_b_number()
+    let l:i = 1
+    while c <= 99
+    execute "nnoremap " . l:i . "gb :" . l:i . "b\<CR>"
+    let l:i += 1
+    endwhile
+endfunction
+
+" see http://stackoverflow.com/questions/5559029/quickly-switching-buffers-in-vim-normal-mode
+function! Bufstack#switch_to_next_buffer(incr)
+  let help_buffer = (&filetype == 'help')
+  let current = bufnr("%")
+  let last = bufnr("$")
+  let new = current + a:incr
+  while 1
+    if new != 0 && bufexists(new) && ((getbufvar(new, "&filetype") == 'help') == help_buffer)
+      execute ":buffer ".new
+      break
+    else
+      let new = new + a:incr
+      if new < 1
+        let new = last
+      elseif new > last
+        let new = 1
+      endif
+      if new == current
+        break
+      endif
+    endif
+  endwhile
+endfunction
+nnoremap <silent> <C-n> :call SwitchToNextBuffer(1)<CR>
+nnoremap <silent> <C-p> :call SwitchToNextBuffer(-1)<CR>
+
+function! Bufstack#map_default_keybindings()
+
+endfunction
+
