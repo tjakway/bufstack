@@ -51,12 +51,3 @@ class RandPushPopsTest(BufstackTest):
 
     def runTest(self):
         pass
-
-
-class DefaultIndexTests(BufstackTest):
-    def setUp(self): 
-        BufstackTest.setUp(self)
-
-    def runTest(self):
-         
-        for buf, win in (MockBuffer.RandBuffers(100, self.max_rand_buffers), )

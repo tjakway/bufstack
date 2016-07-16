@@ -29,7 +29,7 @@ class BufferStackDict(object):
 
         self.remake_default()
 
-    def set_max_stack_depth(depth):
+    def set_max_stack_depth(self, depth):
         if depth < 1:
             raise "Stack depth must be >0!"
         self.max_stack_depth = depth
@@ -37,7 +37,7 @@ class BufferStackDict(object):
     #if the default key isn't in the dictionary,
     #add it with an empty stack
     def remake_default(self):
-        if not self.default_key in self.bufdict:
+        if self.default_key not in self.bufdict:
             self.bufdict[self.default_key] = list()
 
     #truncate the stack if it's greater than max_stack_depth
@@ -45,7 +45,7 @@ class BufferStackDict(object):
         if self.max_stack_depth > 1:
             if len(self.bufdict[key]) > self.max_stack_depth:
                 #truncate buffer numbers over the limit
-                self.bufdict[key] = value[0:self.max_stack_depth]
+                self.bufdict[key] = self.bufdict[key][0:self.max_stack_depth]
 
     #delete all stacks except the default and 
     #clear the default stack
@@ -103,7 +103,7 @@ class BufferStackDict(object):
         return self.pop_buf(window)
 
     def peek_top(self, window):
-        stack = get_stack_for_window(window)
+        stack = self.get_stack_for_window(window)
         if len(stack) > 0:
             return stack[0]
 
@@ -114,17 +114,17 @@ class BufferStackDict(object):
             return self.bufdict[self.default_key]
 
     def remove_invalid_buffers(self, window):
-        stack = get_stack_for_window(window)
+        stack = self.get_stack_for_window(window)
         #filter the stack for valid buffers
         valid_bufs = [x for x in stack if not x.valid]
         #replace the old stack
-        self.bufdict[_get_window_key(window)] = valid_bufs
+        self.bufdict[self._get_window_key(window)] = valid_bufs
         #return as a convenience
         return valid_bufs
 
     def dup(self, window, num_to_copy):
-        window_key = _get_window_key(window)
-        valid_bufs = remove_invalid_buffers(window)
+        window_key = self._get_window_key(window)
+        valid_bufs = self.remove_invalid_buffers(window)
         #do nothing if the stack is empty or we'll only copy 1 thing
         if len(valid_bufs) <= 0 or num_to_copy <= 0:
             return
