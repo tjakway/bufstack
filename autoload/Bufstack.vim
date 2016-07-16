@@ -133,8 +133,12 @@ endfunction
 "nnoremap <silent> <C-n> :call SwitchToNextBuffer(1)<CR>
 "nnoremap <silent> <C-p> :call SwitchToNextBuffer(-1)<CR>
 
+
+" re-exporting functions for convenience
 function! Bufstack#map_default_keybindings()
-    " re-exporting for convenience
     call mappings#Bufstack#map_default_keybindings()
 endfunction
 
+function! Bufstack#map_autocmds()
+    call mappings#Bufstack#map_autocmds()
+endfunction

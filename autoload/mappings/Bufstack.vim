@@ -23,3 +23,11 @@ function! mappings#Bufstack#map_default_keybindings()
     call mappings#Bufstack#remap_bn()
     call mappings#Bufstack#remap_bp()
 endfunction
+
+function! mappings#Bufstack#map_autocmds()
+    " have autocommands in here
+    " *SHOULD NOT* be called by default!
+    " Only use this if you want Bufstack to automatically fire on ALL buffer
+    " switches
+
+endfunction
