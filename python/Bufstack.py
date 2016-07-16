@@ -226,7 +226,7 @@ def prev_buf():
     else:
         #switch to this buffer if we're not already viewing it
         if vim.current.buffer.number != b.number:
-            vim.current.buffer = b.number
+            vim.current.buffer = b
 
 #checks if there's more than 1 valid buffer and then performs a comparison and changes the current buffer, optionally pushing
 #it on the stack first
