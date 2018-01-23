@@ -22,6 +22,9 @@ def initialize_bufstack():
     global buf_stacks
     buf_stacks = BufferStackDict()
 
+class BufstackException(BaseException):
+    pass
+
 class BufferStackDict(object):
     #max_stack_depth = -1 means the stack has no maximum size
     def __init__(self, 
@@ -37,7 +40,7 @@ class BufferStackDict(object):
 
     def set_max_stack_depth(self, depth):
         if depth < 1:
-            raise "Stack depth must be >0!"
+            raise BufstackException("Stack depth must be >0!")
         self.max_stack_depth = depth
 
     #if the default key isn't in the dictionary,
@@ -151,14 +154,14 @@ class BufferStackDict(object):
 #returns whichever buffer in a list of size 2 isn't the (passed) current buffer
 def get_other_buf(curr_buf, buf_list):
     if len(buf_list) != 2:
-        raise "get_other_buf should only be called on a list of 2 buffers!"
+        raise BufstackException("get_other_buf should only be called on a list of 2 buffers!")
 
     curr_buf_num = curr_buf.number
     for i in buf_list:
         if i.number != curr_buf_num:
             return curr_buf_num
 
-    raise "Current buffer does not exist in passed buffer list!"
+    raise BufstackException("Current buffer does not exist in passed buffer list!")
 
 def get_buf_numbers(buf_list):
     nums = list()
