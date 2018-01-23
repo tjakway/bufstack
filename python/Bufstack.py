@@ -51,7 +51,8 @@ class BufferStackDict(object):
         if self.max_stack_depth > 1:
             if len(self.bufdict[key]) > self.max_stack_depth:
                 #truncate buffer numbers over the limit
-                self.bufdict[key] = self.bufdict[key][0:self.max_stack_depth]
+                truncated_buffer_list = self.bufdict[key][0:self.max_stack_depth]
+                self.bufdict[key] = truncated_buffer_list
 
     #delete all stacks except the default and 
     #clear the default stack
