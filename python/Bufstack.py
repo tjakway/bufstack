@@ -10,7 +10,7 @@ except:
 
 #print to stderr
 #see http://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
-def eprint(*args, **kwargs):
+def errprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 #*********************************************
 
@@ -309,7 +309,7 @@ def switch_buffer():
     #check if the buffer exists
     #buffwinnr returns -1 if the buffer DNE
     if int(vim.eval("buffwinnr({})".format(str(which_buf)))) == -1:
-        eprint("Buffer #{} does not exist!".format(str(which_buf)))
+        errprint("Buffer #{} does not exist!".format(str(which_buf)))
     else:
         #push the current buffer and switch to the new one
         push_current_buffer_if_not_top()
