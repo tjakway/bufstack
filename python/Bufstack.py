@@ -171,28 +171,27 @@ def get_buf_numbers(buf_list):
 #vice-versa for greater than
 #
 #single_step is -1 for min and 1 for max
-def _cmp_buf_num(curr_buf, buf_list, op_most, op_least, single_step):
+def _next_buf_num_cmp(curr_buf, buf_list, op_most, op_least, single_step):
     buf_numbers = get_buf_numbers(buf_list)
     this_buf_num = curr_buf.number
 
-    most_num = op_most(buf_numbers)
-    print(most_num)
     #if this is the highest-numbered buffer, wrap around to the lowest
-    if this_buf_num == most_num:
+    if this_buf_num == op_most(buf_numbers):
         return op_least(buf_numbers)
     else:
         #(for max): if we're not the highest numbered buffer, there's at least one with a higher index
-        #(for min): if we're not the lowest numbered buffer, there's at least one with a lower idnex
+        #(for min): if we're not the lowest numbered buffer, there's at least one with a lower index 
         #sort the buf NUMBERS, not the vim buffer objects
         sorted_buf_nums = sorted(buf_numbers)
         #note that this works for a negative index
         return sorted_buf_nums[sorted_buf_nums.index(this_buf_num) + single_step]
 
+#TODO: double check these aren't called on windows
 def get_gt_buf_num(curr_buf, buf_list):
-    return _cmp_buf_num(curr_buf, buf_list, max, min, 1)
+    return _next_buf_num_cmp(curr_buf, buf_list, max, min, 1)
 
 def get_lt_buf_num(curr_buf, buf_list):
-    return _cmp_buf_num(curr_buf, buf_list, min, max, -1)
+    return _next_buf_num_cmp(curr_buf, buf_list, min, max, -1)
 
 def get_gt_buf(curr_buf, buf_list):
     return get_buf_with_number(get_gt_buf_num(curr_buf, buf_list))
