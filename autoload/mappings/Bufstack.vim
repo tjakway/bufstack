@@ -25,6 +25,7 @@ function! mappings#Bufstack#map_default_keybindings()
 endfunction
 
 function! mappings#Bufstack#map_autocmds()
+    " TODO
     " have autocommands in here
     " *SHOULD NOT* be called by default!
     " Only use this if you want Bufstack to automatically fire on ALL buffer
