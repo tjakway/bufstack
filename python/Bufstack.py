@@ -39,9 +39,8 @@ class BufferStackDict(object):
         self.remake_default()
 
     def set_max_stack_depth(self, depth):
-        if depth < 1:
-            raise BufstackException("Stack depth must be >0!")
         self.max_stack_depth = depth
+        self.truncate_all_if_too_large()
 
     #if the default key isn't in the dictionary,
     #add it with an empty stack
@@ -56,6 +55,10 @@ class BufferStackDict(object):
                 #truncate buffer numbers over the limit
                 truncated_buffer_list = self.bufdict[key][0:self.max_stack_depth]
                 self.bufdict[key] = truncated_buffer_list
+
+    def truncate_all_if_too_large(self):
+        for key,_ in self.bufdict.items():
+            self.truncate_if_too_large(key)
 
     #delete all stacks except the default and 
     #clear the default stack
