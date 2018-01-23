@@ -1,6 +1,9 @@
 PYDIR=python/
 TESTS=BufstackTests
 
+.PHONY: all
+all: check
+
 clean:
 	rm -r -f $(PYDIR)/*.pyc
 
