@@ -50,7 +50,7 @@ class BufferStackDict(object):
             self.bufdict[self.default_key] = list()
 
     #truncate the stack if it's greater than max_stack_depth
-    def drop_if_too_large(self, key):
+    def truncate_if_too_large(self, key):
         if self.max_stack_depth > 1:
             if len(self.bufdict[key]) > self.max_stack_depth:
                 #truncate buffer numbers over the limit
@@ -95,7 +95,7 @@ class BufferStackDict(object):
         self.bufdict[key].insert(0, buf)
 
         #check if any stacks are too large
-        self.drop_if_too_large(key)
+        self.truncate_if_too_large(key)
 
     def push(self, window, buf):
         self.push_buf(window, buf)
