@@ -24,10 +24,14 @@ def initialize_bufstack():
 
 class BufferStackDict(object):
     #max_stack_depth = -1 means the stack has no maximum size
-    def __init__(self, max_stack_depth=-1):
+    def __init__(self, 
+            max_stack_depth=-1, 
+            separate_window_stacks=False):
+
         self.bufdict = dict()
         self.default_key = "default"
-        self.max_stack_depth = max_stack_depth
+        self.set_max_stack_depth(max_stack_depth)
+        self.separate_window_stacks = separate_window_stacks
 
         self.remake_default()
 
