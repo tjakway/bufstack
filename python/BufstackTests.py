@@ -43,7 +43,7 @@ class PushValidBufsTest(BufstackTest):
 
     def runTest(self):
         self.push_rand_bufs(100)
-        self.assertEqual(len(self.bufstack.get_stack_for_window(MockWindow(-1))), 100)
+        self.assertEqual(len(self.bufstack.public_get_stack_for_window(MockWindow(-1))), 100)
 
 class RandPushPopsTest(BufstackTest):
     def setUp(self): 

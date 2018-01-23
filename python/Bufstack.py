@@ -68,7 +68,7 @@ class BufferStackDict(object):
 
     #returns None if the stack for the passed window has no valid buffers
     def _pop_next_valid_buf_for_window(self, window):
-        win_stack = self.get_stack_for_window(window)
+        win_stack = self.bufdict[self._get_window_key(window)]
         while len(win_stack) > 0:
             #python's pop() with no args returns the _last_ item in the list...
             return_buf = win_stack.pop(0)
@@ -153,6 +153,9 @@ class BufferStackDict(object):
         else:
             self.new_window_stack(window.number)
             return window.number
+
+    def public_get_stack_for_window(self, window):
+        return self.bufdict[self._get_window_key(window)]
 
 #returns whichever buffer in a list of size 2 isn't the (passed) current buffer
 def get_other_buf(curr_buf, buf_list):
@@ -278,7 +281,7 @@ def show_buffer_stack():
         return str(buf.name + "\t #" + str(buf.number))
 
     output_str = ""
-    current_buf_stack = get_valid_bufs(buf_stacks.get_stack_for_window(vim.current.window))
+    current_buf_stack = get_valid_bufs(buf_stacks.public_get_stack_for_window(vim.current.window))
     if len(current_buf_stack) <= 0:
         print("Empty buffer stack.")
     else:
