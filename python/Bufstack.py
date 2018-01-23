@@ -128,7 +128,7 @@ class BufferStackDict(object):
     def dup(self, window, num_to_copy):
         window_key = self._get_window_key(window)
         valid_bufs = self.remove_invalid_buffers(window)
-        #do nothing if the stack is empty or we'll only copy 1 thing
+        #do nothing if the stack is empty
         if len(valid_bufs) <= 0 or num_to_copy <= 0:
             return
         #recurse if we don't have enough items to copy
@@ -140,10 +140,13 @@ class BufferStackDict(object):
             self.bufdict[window_key] = duplicated_items ++ valid_bufs
 
     def _get_window_key(self, window):
-        if window.number in self.bufdict:
+        if not self.separate_window_stacks:
+            return self.default_key
+        elif window.number in self.bufdict:
             return window.number
         else:
-            return self.default_key
+            self.new_window_stack(window.number)
+            return window.number
 
 #returns whichever buffer in a list of size 2 isn't the (passed) current buffer
 def get_other_buf(curr_buf, buf_list):
