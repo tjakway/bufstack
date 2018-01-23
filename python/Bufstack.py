@@ -164,7 +164,7 @@ def get_buf_numbers(buf_list):
     nums = list()
     for i in buf_list:
         nums.append(i.number)
-    return nums
+    return sorted(nums)
 
 #"op_most" and "op_least" mean functions that return the most extreme value for that type of comparison
 #for less than, op_least=min because the min is the most extremely less value
