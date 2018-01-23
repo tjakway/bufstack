@@ -123,7 +123,7 @@ class BufferStackDict(object):
     def remove_invalid_buffers(self, window):
         stack = self.get_stack_for_window(window)
         #filter the stack for valid buffers
-        valid_bufs = [x for x in stack if not x.valid]
+        valid_bufs = [x for x in stack if x.valid]
         #replace the old stack
         self.bufdict[self._get_window_key(window)] = valid_bufs
         #return as a convenience
