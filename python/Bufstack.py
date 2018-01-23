@@ -1,3 +1,5 @@
+# TODO:
+#   -implement a BufferStackDict meethod merge_window_stacks(window_one, window_two) to allow bufstacks to be merged at runtime, e.g. when a window is closed (would also allow easy implementation of a runtime toggle for separate_window_stacks
 from __future__ import print_function
 import sys
 
