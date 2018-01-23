@@ -93,9 +93,11 @@ class BufferStackDict(object):
         if not window.valid:
             self.del_window_stack(window)
         
+    #push the buffer if it's valid
     def push_buf(self, window, buf):
         key = self._get_window_key(window)
-        self.bufdict[key].insert(0, buf)
+        if buf.valid:
+            self.bufdict[key].insert(0, buf)
 
         #check if any stacks are too large
         self.truncate_if_too_large(key)
