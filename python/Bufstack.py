@@ -110,18 +110,14 @@ class BufferStackDict(object):
         return self.pop_buf(window)
 
     def peek_top(self, window):
-        stack = self.get_stack_for_window(window)
+        stack = self.bufdict[self._get_window_key(window)]
         if len(stack) > 0:
             return stack[0]
-
-    def get_stack_for_window(self, window):
-        if window.number in self.bufdict:
-            return self.bufdict[window.number]
         else:
-            return self.bufdict[self.default_key]
+            return None
 
     def remove_invalid_buffers(self, window):
-        stack = self.get_stack_for_window(window)
+        stack = self.bufdict[self._get_window_key(window)]
         #filter the stack for valid buffers
         valid_bufs = [x for x in stack if x.valid]
         #replace the old stack
