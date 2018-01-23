@@ -41,8 +41,11 @@ endfunction
 
 function! Bufstack#initialize_python()
     let l:bufstack_python_file = s:bufstack_plugindir . "/python/Bufstack.py"
-    execute 'pyfile' l:bufstack_python_file
-    python initialize_bufstack()
+    " don't give error messages after the warning
+    if has('python')
+        execute 'pyfile' l:bufstack_python_file
+        python initialize_bufstack()
+    endif
 endfunction
 
 function! Bufstack#prev_buf()
