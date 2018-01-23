@@ -223,11 +223,10 @@ def prev_buf():
     b = buf_stacks.pop(vim.current.window)
     if b is None:
         valid_bufs = get_current_valid_bufs()
-        #if this window has no valid buffers
-        #do nothing
+        #if this window has no other valid buffers, do nothing
         #otherwise, switch to the next one
         if len(valid_bufs) > 1:
-            vim.current.buffer = get_buf_with_number(get_gt_buf_num(vim.current.buffer, valid_bufs))
+            vim.current.buffer = get_buf_with_number(get_lt_buf_num(vim.current.buffer, valid_bufs))
     else:
         #switch to this buffer if we're not already viewing it
         if vim.current.buffer.number != b.number:
