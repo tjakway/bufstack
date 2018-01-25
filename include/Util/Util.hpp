@@ -17,7 +17,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 }
 
 template<class T> 
-const T& min(const T& a, const T& b)
+T min(T a, T b)
 {
     return (b < a) ? b : a;
 }
