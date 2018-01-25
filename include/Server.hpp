@@ -78,7 +78,8 @@ private:
     void doSend(int, Buffer);
 
 
-    void sendAll(int, char* buf, ssize_t bufLen);
+protected:
+    static void sendAll(int, char* buf, ssize_t bufLen);
 };
 
 class MsgpackServer : public SingleConnectionServer, public AsyncWriteServer
