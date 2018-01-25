@@ -29,6 +29,6 @@ else()
 
     target_include_directories(${MAIN_TARGET} SYSTEM PRIVATE 
         ${CMAKE_SOURCE_DIR}/lib/msgpack-c/include)
-    target_link_libraries(${MAIN_TARGET} SYSTEM PRIVATE msgpackc-static)
+    target_link_libraries(${MAIN_TARGET} PRIVATE msgpackc-static)
 endif()
 
