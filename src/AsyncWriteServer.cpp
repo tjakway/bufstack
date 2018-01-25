@@ -108,7 +108,6 @@ void AsyncWriteServer::sendAll(int sockFd, char* buf, ssize_t bufLen)
         }
         else
         {
-            //check for an overflow
             remaining -= amountWritten;
             if(remaining < 0)
             {
