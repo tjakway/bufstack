@@ -14,7 +14,7 @@ OPTION(USE_SYSTEM_MSGPACK OFF)
 
 FILE(GLOB MAIN_TARGET_SRCS src/*.cpp src/*.c src/*.cxx)
 add_executable(${MAIN_TARGET} ${MAIN_TARGET_SRCS})
-target_include_directories(${MAIN_TARGET} SYSTEM PRIVATE ${CMAKE_SOURCE_DIR})
+target_include_directories(${MAIN_TARGET} SYSTEM PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 if(USE_SYSTEM_MSGPACK)
     find_package(Msgpack 1.0.0 REQUIRED)
