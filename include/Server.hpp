@@ -5,6 +5,13 @@
 
 #include <memory>
 #include <mutex>
+#include <deque>
+#include <future>
+#include <utility>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -15,9 +22,11 @@ protected:
             sockaddr_in server, 
             int backlogSize = Config::Defaults::defaultBacklogSize);
 
+    using Buffer = std::unique_ptr<std::pair<char*, long>>;
+
     virtual void onConnect(int clientFd) = 0;
-    virtual std::unique_ptr<char*> onRecv(std::unique_ptr<char*>) = 0;
-    virtual void send(std::unique_ptr<char*>) = 0;
+    virtual Buffer onRecv(Buffer) = 0;
+    virtual void send(Buffer) = 0;
 
 public:
     void startListening();
@@ -38,11 +47,18 @@ protected:
 class AsyncWriteServer : public Server
 {
 protected:
-    virtual void send(std::unique_ptr<char*>) override;
+    AsyncWriteServer(bool _forceAsync);
+    virtual void send(Buffer) override;
 
 private:
+    /** determines whether or not to pass std::launch::async */
+    bool forceAsync;
+
     std::mutex writeLock;
-    void doSend(std::unique_ptr<char*>);
+
+    //newest futures will be at the front of the queue
+    std::deque<std::future<void>> futures;
+    void doSend(Buffer);
 };
 
 class MsgpackServer : public SingleConnectionServer, public AsyncWriteServer
@@ -51,7 +67,7 @@ protected:
     virtual void onRecvMsg(msgpack::object_handle) = 0;
 
 private:
-    msgpack::object_handle decode(std::unique_ptr<char*>);
+    msgpack::object_handle decode(Buffer);
 };
 
 BUFSTACK_END_NAMESPACE

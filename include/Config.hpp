@@ -6,8 +6,12 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class Config
 {
+public:
+    bool forceAsyncWrites;
+
     class Defaults
     {
+    public:
         static const int defaultBacklogSize;
     };
 };
