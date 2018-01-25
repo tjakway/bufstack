@@ -4,6 +4,7 @@ project(bufstack)
 
 set(MAIN_LIB_TARGET bufstack)
 set(MAIN_EXE_TARGET bufstack_server)
+set(MAIN_TEST_TARGET bufstack_test)
 
 #need to use our FindMsgpack.cmake script
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
