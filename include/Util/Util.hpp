@@ -22,19 +22,3 @@ const T& min(const T& a, const T& b)
     return (b < a) ? b : a;
 }
 
-
-//needs make_unique
-template <typename T>
-std::unique_ptr<T> Util::copyUniquePtrIfNotNull(const std::unique_ptr<T>& p)
-{
-    if(p)
-    {
-        return make_unique<T>(*p);
-    }
-    else
-    {
-        //return nullptr
-        return std::unique_ptr<T>();
-    }
-}
-
