@@ -102,8 +102,7 @@ void AsyncWriteServer::sendAll(int sockFd, char* buf, ssize_t bufLen)
                         << ".  Retrying..." << std::endl;
                     continue;
                 default:
-                    throw AsyncWriteServer(
-                            STRCAT("Error in sendAll: ", 
+                    throw AsyncWriteServerError(STRCAT("Error in sendAll: ", 
                                 strerror(errno)));
             }
         }
@@ -115,7 +114,7 @@ void AsyncWriteServer::sendAll(int sockFd, char* buf, ssize_t bufLen)
             {
                 throw AsyncWriteServerError(
                         STRCAT("Error while writing to socket file descriptor ", 
-                            sockFd, ": remaining < 0 (actual:", remaining, ")");
+                            sockFd, ": remaining < 0 (actual:", remaining, ")"));
             }
 
             currentBufPosition += amountWritten;
