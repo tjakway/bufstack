@@ -10,6 +10,7 @@
 #include <deque>
 #include <future>
 #include <utility>
+#include <atomic>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -48,6 +49,7 @@ public:
 class SingleConnectionServer : public Server
 {
 protected:
+    std::atomic_bool connected {false};
     virtual void onConnect(int clientFd) override;
 };
 
