@@ -24,7 +24,9 @@ flags = [
 '-x',
 'c++',
 '-I', 'include/',
-'-I', 'include/lib/msgpack-c/include',
+'-isystem', 'lib/msgpack-c/include',
+'-isystem', 'lib/googletest/googletest/include'
+'-isystem', 'lib/googletest/googlemock/include'
 '-isystem',
 '/usr/include',
 '-isystem',
