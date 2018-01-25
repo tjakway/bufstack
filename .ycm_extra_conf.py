@@ -23,13 +23,10 @@ flags = [
 # For a C project, you would set this to 'c' instead of 'c++'.
 '-x',
 'c++',
-'-std=c++11',
 '-I', 'include/',
 '-I', 'include/lib/msgpack-c/include',
 '-isystem',
 '/usr/include',
-'-isystem',
-'/usr/include/gtkmm-3.0',
 '-isystem',
 '/usr/local/include',
 ]
