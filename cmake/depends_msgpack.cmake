@@ -9,7 +9,7 @@ function(depends_msgpack TARGET_NAME_PARAM)
         set(MSGPACK_CXX11 ON CACHE BOOL "Require C++11" FORCE)
 
         if(NOT AddedMsgpackSubdirectory)
-            add_subdirectory(${CMAKE_SOURCE_DIR}/lib/msgpack-c)
+            add_subdirectory(${CMAKE_SOURCE_DIR}/lib/msgpack-c ${CMAKE_BINARY_DIR}/msgpack-c)
             #see https://cmake.org/pipermail/cmake/2010-March/035763.html
             set(AddedMsgpackSubdirectory "TRUE" CACHE INTERNAL "")
         endif()
