@@ -36,6 +36,9 @@ protected:
 
     NEW_EXCEPTION_TYPE(ServerError);
 
+    static void sendAll(int, char* buf, ssize_t bufLen, Loggable&);
+    static Buffer readFd(int, Loggable&);
+
 public:
     void startListening();
 
@@ -76,10 +79,6 @@ private:
     //newest futures will be at the front of the queue
     std::deque<std::future<void>> futures;
     void doSend(int, Buffer);
-
-
-protected:
-    static void sendAll(int, char* buf, ssize_t bufLen);
 };
 
 class MsgpackServer : public SingleConnectionServer, public AsyncWriteServer
