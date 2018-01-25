@@ -31,7 +31,7 @@ protected:
 
     virtual void onConnect(int clientFd) = 0;
     virtual Buffer onRecv(Buffer) = 0;
-    virtual void send(Buffer) = 0;
+    virtual void send(int, Buffer) = 0;
 
     NEW_EXCEPTION_TYPE(ServerError);
 
@@ -59,7 +59,7 @@ protected:
             sockaddr_in server, 
             int backlogSize = Config::Defaults::defaultBacklogSize,
             bool _forceAsync = false);
-    virtual void send(Buffer) override;
+    virtual void send(int, Buffer) override;
 
     NEW_EXCEPTION_TYPE_WITH_BASE(AsyncWriteServerError, ServerError);
 
@@ -71,10 +71,10 @@ private:
 
     //newest futures will be at the front of the queue
     std::deque<std::future<void>> futures;
-    void doSend(Buffer);
+    void doSend(int, Buffer);
 
 
-    void sendAll(int sockFd, char* buf, ssize_t bufLen);
+    void sendAll(int, char* buf, ssize_t bufLen);
 };
 
 class MsgpackServer : public SingleConnectionServer, public AsyncWriteServer

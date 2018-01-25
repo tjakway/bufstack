@@ -25,21 +25,23 @@ AsyncWriteServer::AsyncWriteServer(
     forceAsync(_forceAsync)
 {}
 
-void AsyncWriteServer::send(Server::Buffer buf)
+void AsyncWriteServer::send(int clientFd, Server::Buffer buf)
 {
     //the function object to pass to std::async
-    const auto doSendF = std::bind(&AsyncWriteServer::doSend, this, std::placeholders::_1);
+    const auto doSendF = 
+        std::bind(&AsyncWriteServer::doSend, this, 
+                std::placeholders::_1, std::placeholders::_2);
 
     std::future<void> result;
     //if forceAsync == true, force the use of a separate write thread
     if(forceAsync)
     {
-        result = std::async(doSendF, std::move(buf), std::launch::async);
+        result = std::async(doSendF, clientFd, std::move(buf), std::launch::async);
     }
     else
     {
         //otherwise use default launch flags
-        result = std::async(doSendF, std::move(buf));
+        result = std::async(doSendF, clientFd, std::move(buf));
     }
 
     //***NEED*** to keep the returned std::future, otherwise its destructor
@@ -49,23 +51,22 @@ void AsyncWriteServer::send(Server::Buffer buf)
 }
 
 
-void AsyncWriteServer::doSend(Server::Buffer buf)
+void AsyncWriteServer::doSend(int clientFd, Server::Buffer buf)
 {
     std::unique_lock<std::mutex> {writeMutex};
 
-
-
+    sendAll(clientFd, buf->first, buf->second);
 }
 
 
 //low level socket write function with error checking
-void AsyncWriteServer::sendAll(int sockFd, char* buf, ssize_t bufLen)
+void AsyncWriteServer::sendAll(int clientFd, char* buf, ssize_t bufLen)
 {
     if(bufLen <= 0)
     {
         throw AsyncWriteServerError(
                 STRCAT("Could not write to socket file descriptor ", 
-                    sockFd, ": buffer length <= 0 (actual: ", bufLen, ")"));
+                    clientFd, ": buffer length <= 0 (actual: ", bufLen, ")"));
     }
     else if(bufLen == std::numeric_limits<ssize_t>::max())
     {
@@ -90,7 +91,7 @@ void AsyncWriteServer::sendAll(int sockFd, char* buf, ssize_t bufLen)
                         maxWriteCycle), 
                     static_cast<decltype(maxWriteCycle)>(SSIZE_MAX));
 
-        ssize_t amountWritten = write(sockFd, currentBufPosition, amountToWrite);
+        ssize_t amountWritten = write(clientFd, currentBufPosition, amountToWrite);
 
         if(amountWritten < 0)
         {
@@ -113,7 +114,7 @@ void AsyncWriteServer::sendAll(int sockFd, char* buf, ssize_t bufLen)
             {
                 throw AsyncWriteServerError(
                         STRCAT("Error while writing to socket file descriptor ", 
-                            sockFd, ": remaining < 0 (actual:", remaining, ")"));
+                            clientFd, ": remaining < 0 (actual:", remaining, ")"));
             }
 
             currentBufPosition += amountWritten;
