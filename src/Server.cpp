@@ -3,10 +3,15 @@
 #include "NamespaceDefines.hpp"
 #include "Util/Strcat.hpp"
 
+#include <string>
+#include <memory>
+
+#define BUFFER_READ_SIZE 2048
+
 BUFSTACK_BEGIN_NAMESPACE
 
 //low level socket write function with error checking
-void Server::sendAll(int clientFd, char* buf, ssize_t bufLen)
+void Server::sendAll(int clientFd, char* buf, ssize_t bufLen, Loggable& log)
 {
     if(bufLen <= 0)
     {
@@ -16,7 +21,7 @@ void Server::sendAll(int clientFd, char* buf, ssize_t bufLen)
     }
     else if(bufLen == std::numeric_limits<ssize_t>::max())
     {
-        warn() << "bufLen == std::numeric_limits<ssize_t>::max()" << std::endl;
+        log.warn() << "bufLen == std::numeric_limits<ssize_t>::max()" << std::endl;
     }
 
     //don't write more than this at once
@@ -44,7 +49,7 @@ void Server::sendAll(int clientFd, char* buf, ssize_t bufLen)
             switch(errno)
             {
                 case EINTR:
-                    warn() << "encountered EINTR, indicating the write call was "
+                    log.warn() << "encountered EINTR, indicating the write call was "
                         << "interrupted by a signal before any data was rewritten"
                         << ".  Retrying..." << std::endl;
                     continue;
@@ -66,6 +71,14 @@ void Server::sendAll(int clientFd, char* buf, ssize_t bufLen)
             currentBufPosition += amountWritten;
         }
     }
+}
+
+Server::Buffer Server::readFd(int fd, Loggable&)
+{
+    std::unique_ptr<char[]> buf = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
+
+    assert(BUFFER_READ_SIZE < SSIZE_MAX);
+    ssize_t amountRead = read(fd, , BUFFER_READ_SIZE);
 }
 
 BUFSTACK_END_NAMESPACE
