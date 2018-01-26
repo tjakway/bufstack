@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <string>
 #include <cassert>
 
@@ -26,6 +27,9 @@ public:
         assert(ret == 0);
         readFd = pipeFds[0];
         writeFd = pipeFds[1];
+
+        //make the read end non blocking
+        fcntl(readFd, F_SETFL, O_NONBLOCK);
     }
 };
 
