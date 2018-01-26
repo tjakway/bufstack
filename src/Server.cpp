@@ -12,11 +12,16 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include <chrono>
+#include <thread>
 
 #include <cassert>
 
 //how much to read at once
 #define BUFFER_READ_SIZE 2048
+
+//TODO: move to Config
+#define SLEEP_MS 90
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -93,15 +98,21 @@ std::vector<char> Server::readFd(int fd)
     while(amtRead != 0)
     {
         amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
-        if(amtRead < 0)
+        if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
         {
-            throw SocketError(STRCAT("Error in ", __func__, ": ", strerror(errno)));
+            std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MS));
+
         }
         //if we read data copy into the result buffer
         else if(amtRead > 0)
         {
             data.reserve(data.size() + amtRead);
             std::copy_n(buf.get(), amtRead, std::back_inserter(data));
+
+        }
+        else if(amtRead != 0)
+        {
+            throw SocketError(STRCAT("Error in ", __func__, ": ", strerror(errno)));
         }
     }
 
