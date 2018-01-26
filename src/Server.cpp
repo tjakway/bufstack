@@ -3,9 +3,16 @@
 #include "NamespaceDefines.hpp"
 #include "Util/Strcat.hpp"
 
+
+#include <msgpack.hpp>
+
 #include <string>
 #include <memory>
+#include <vector>
+#include <algorithm>
+#include <cassert>
 
+//how much to read at once
 #define BUFFER_READ_SIZE 2048
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -73,12 +80,30 @@ void Server::sendAll(int clientFd, char* buf, ssize_t bufLen, Loggable& log)
     }
 }
 
-Server::Buffer Server::readFd(int fd, Loggable&)
+std::vector<char> Server::readFd(int fd)
 {
     std::unique_ptr<char[]> buf = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
+    std::vector<char> data;
 
-    assert(BUFFER_READ_SIZE < SSIZE_MAX);
-    ssize_t amountRead = read(fd, , BUFFER_READ_SIZE);
+    int amtRead = -1;
+
+    while(amtRead != 0)
+    {
+        amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
+        if(amtRead < 0)
+        {
+            throw SocketError(STRCAT("Error in ", __func__, ": ", strerror(errno)));
+        }
+        //if we read data copy into the result buffer
+        else if(amtRead > 0)
+        {
+            data.reserve(data.size() + amtRead);
+            auto newEnd = std::copy_n(buf.get(), amtRead, data.end());
+            assert(newEnd == data.end());
+        }
+    }
+
+    return data;
 }
 
 BUFSTACK_END_NAMESPACE

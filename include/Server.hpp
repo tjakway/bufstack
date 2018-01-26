@@ -11,6 +11,8 @@
 #include <future>
 #include <utility>
 #include <atomic>
+#include <fstream>
+#include <vector>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -38,7 +40,7 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
 
     static void sendAll(int, char* buf, ssize_t bufLen, Loggable&);
-    static Buffer readFd(int, Loggable&);
+    static std::vector<char> readFd(int);
 
 public:
     void startListening();
