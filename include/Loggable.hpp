@@ -11,7 +11,8 @@ BUFSTACK_BEGIN_NAMESPACE
 class Loggable
 {
     std::ostream outstream, errstream;
-protected:
+
+public:
         Loggable() 
         : outstream(std::cout.rdbuf()), 
         errstream(std::cerr.rdbuf())

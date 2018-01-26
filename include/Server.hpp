@@ -39,7 +39,7 @@ protected:
     NEW_EXCEPTION_TYPE(ServerError);
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
 
-    static void sendAll(int, char* buf, ssize_t bufLen, Loggable&);
+    static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
     static std::vector<char> readFd(int);
 
 public:

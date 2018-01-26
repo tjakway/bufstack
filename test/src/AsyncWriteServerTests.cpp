@@ -1,10 +1,18 @@
 #include <gtest/gtest.h>
 
 #include <unistd.h>
+#include <string>
+#include <cassert>
 
+#include "NamespaceDefines.hpp"
 #include "Server.hpp"
+#include "Loggable.hpp"
 
-class AsyncWriteServerTests
+#include "MockServer.hpp"
+
+BUFSTACK_BEGIN_NAMESPACE
+
+class AsyncWriteServerTests : public ::testing::Test, public Loggable
 {
 public:
     int readFd, writeFd;
@@ -14,13 +22,27 @@ public:
         //test reading and writing across a pipe
         int pipeFds[2];
         
-        ASSERT_EQ(pipe(pipeFds, 0));
+        auto ret = pipe(pipeFds);
+        assert(ret == 0);
         readFd = pipeFds[0];
         writeFd = pipeFds[1];
     }
+};
+
+
+TEST_F(AsyncWriteServerTests, TestWriteBasicString)
+{
+    std::string toWrite {"hello, world"};
+
+    MockServer::sendAll(writeFd, toWrite.c_str(), toWrite.size(), *this);
+    std::vector<char> readData = MockServer::readFd(readFd);
+
+    ASSERT_EQ(toWrite, std::string(readData.cbegin(), readData.cend()));
 }
 
 TEST_F(AsyncWriteServerTests, TestWriteNothing)
 {
 
 }
+
+BUFSTACK_END_NAMESPACE

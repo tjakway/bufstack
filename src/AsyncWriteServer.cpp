@@ -69,7 +69,7 @@ void AsyncWriteServer::doSend(int clientFd, Server::Buffer buf)
 {
     std::unique_lock<std::mutex> {writeMutex};
 
-    Server::sendAll(clientFd, buf->first, buf->second);
+    Server::sendAll(clientFd, buf->first, buf->second, *this);
 }
 
 BUFSTACK_END_NAMESPACE

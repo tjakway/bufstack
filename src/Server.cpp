@@ -2,6 +2,7 @@
 
 #include "NamespaceDefines.hpp"
 #include "Util/Strcat.hpp"
+#include "Util/Util.hpp"
 
 
 #include <msgpack.hpp>
@@ -18,7 +19,7 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 //low level socket write function with error checking
-void Server::sendAll(int clientFd, char* buf, ssize_t bufLen, Loggable& log)
+void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& log)
 {
     if(bufLen <= 0)
     {
@@ -33,7 +34,7 @@ void Server::sendAll(int clientFd, char* buf, ssize_t bufLen, Loggable& log)
 
     //don't write more than this at once
     auto maxWriteCycle = sizeof(size_t) - 1;
-    char* currentBufPosition = buf;
+    char* currentBufPosition = (char*)buf;
 
     long remaining = bufLen;
     while(remaining > 0)
