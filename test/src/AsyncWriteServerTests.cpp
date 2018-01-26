@@ -30,14 +30,16 @@ public:
 };
 
 
-TEST_F(AsyncWriteServerTests, TestWriteBasicString)
+TEST_F(AsyncWriteServerTests, TestWriteBasicStringSynchronous)
 {
     std::string toWrite {"hello, world"};
 
     MockServer::sendAll(writeFd, toWrite.c_str(), toWrite.size(), *this);
+    close(writeFd);
     std::vector<char> readData = MockServer::readFd(readFd);
-
     ASSERT_EQ(toWrite, std::string(readData.cbegin(), readData.cend()));
+
+    close(readFd);
 }
 
 TEST_F(AsyncWriteServerTests, TestWriteNothing)

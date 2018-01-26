@@ -7,10 +7,12 @@
 
 #include <msgpack.hpp>
 
+#include <iterator>
 #include <string>
 #include <memory>
 #include <vector>
 #include <algorithm>
+
 #include <cassert>
 
 //how much to read at once
@@ -99,8 +101,7 @@ std::vector<char> Server::readFd(int fd)
         else if(amtRead > 0)
         {
             data.reserve(data.size() + amtRead);
-            auto newEnd = std::copy_n(buf.get(), amtRead, data.end());
-            assert(newEnd == data.end());
+            std::copy_n(buf.get(), amtRead, std::back_inserter(data));
         }
     }
 
