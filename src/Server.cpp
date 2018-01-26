@@ -14,8 +14,10 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <functional>
 
 #include <cassert>
+#include <ctime> //for ctime()
 
 //how much to read at once
 #define BUFFER_READ_SIZE 2048
@@ -88,14 +90,14 @@ void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& lo
     }
 }
 
-std::vector<char> Server::readFd(int fd)
+void Server::readFd(int fd, std::function<void(msgpack::object_handle&)> callback)
 {
     std::unique_ptr<char[]> buf = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
     std::vector<char> data;
 
     int amtRead = -1;
 
-    while(amtRead != 0)
+    while(amtRead != 0 && !done.load())
     {
         amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
         if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
@@ -114,9 +116,28 @@ std::vector<char> Server::readFd(int fd)
         {
             throw SocketError(STRCAT("Error in ", __func__, ": ", strerror(errno)));
         }
+
+        bool decodeError = false;
+        while(!decodeError)
+        {
+            try
+            {
+
+                ; //TODO
+            }
+            catch(msgpack::type_error& e)
+            {
+                const time_t now = std::chrono::system_clock::to_time_t(
+                                std::chrono::system_clock::now());
+                info() << "failed to decode msgpack object at " << 
+                    ctime(&now) << ";\tException info: " << 
+                    e.what() << std::endl;
+
+                decodeError = true;
+            }
+        }
     }
 
-    return data;
 }
 
 BUFSTACK_END_NAMESPACE
