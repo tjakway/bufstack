@@ -35,6 +35,7 @@ protected:
     virtual void send(int, Buffer) = 0;
 
     NEW_EXCEPTION_TYPE(ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
 
     static void sendAll(int, char* buf, ssize_t bufLen, Loggable&);
     static Buffer readFd(int, Loggable&);
