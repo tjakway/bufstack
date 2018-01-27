@@ -43,7 +43,7 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
 
     static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
-    void readFd(int, std::function<void(msgpack::object_handle&)>);
+    void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
 
 public:
     void startListening();
