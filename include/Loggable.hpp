@@ -19,6 +19,7 @@ public:
         {}
 
         std::ostream& log() { return outstream; }
+        std::ostream& info() { return outstream; }
         std::ostream& warn() 
         {  
             errstream << "WARNING:\t";

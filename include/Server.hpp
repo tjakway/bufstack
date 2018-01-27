@@ -13,6 +13,7 @@
 #include <atomic>
 #include <fstream>
 #include <vector>
+#include <functional>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -25,6 +26,8 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class Server : public Loggable
 {
+private:
+    std::atomic_bool done {false};
 protected:
     Server(int serverFd, 
             sockaddr_in server, 
@@ -40,7 +43,7 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
 
     static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
-    static std::vector<char> readFd(int);
+    void readFd(int, std::function<void(msgpack::object_handle&)>);
 
 public:
     void startListening();

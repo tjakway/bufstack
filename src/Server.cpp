@@ -103,7 +103,6 @@ void Server::readFd(int fd, std::function<void(msgpack::object_handle&)> callbac
         if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MS));
-
         }
         //if we read data copy into the result buffer
         else if(amtRead > 0)
@@ -118,6 +117,7 @@ void Server::readFd(int fd, std::function<void(msgpack::object_handle&)> callbac
         }
 
         bool decodeError = false;
+        //decode as many objects as we can then pass them to the callback
         while(!decodeError)
         {
             try
