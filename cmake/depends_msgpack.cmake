@@ -10,7 +10,7 @@ function(depends_msgpack TARGET_NAME_PARAM)
 
         add_subdirectory(${CMAKE_SOURCE_DIR}/lib/msgpack-c ${CMAKE_BINARY_DIR}/msgpack-c)
 
-        target_include_directories(${TARGET_NAME_PARAM} SYSTEM INTERFACE 
+        target_include_directories(${TARGET_NAME_PARAM} SYSTEM PUBLIC
             ${CMAKE_SOURCE_DIR}/lib/msgpack-c/include)
         target_link_libraries(${TARGET_NAME_PARAM} INTERFACE msgpackc-static)
     endif()
