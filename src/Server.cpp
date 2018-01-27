@@ -150,7 +150,8 @@ void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& lo
     }
 }
 
-void Server::readFd(int fd, std::function<void(const std::vector<msgpack::object_handle>&)> callback)
+void Server::readFd(int fd, 
+        std::function<void(const std::vector<msgpack::object_handle>&)> callback)
 {
     std::unique_ptr<char[]> buf 
         = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
