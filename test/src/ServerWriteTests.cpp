@@ -2,8 +2,11 @@
 
 #include <unistd.h>
 #include <fcntl.h>
-#include <string>
 #include <cassert>
+
+#include <string>
+#include <sstream>
+#include <msgpack.hpp>
 
 #include "NamespaceDefines.hpp"
 #include "Server.hpp"
@@ -17,6 +20,25 @@ class ServerWriteTests : public ::testing::Test, public Loggable
 {
 public:
     int readFd, writeFd;
+    
+    template <typename T>
+    class MsgpackTestObject
+    {
+    public:
+        T expected;
+        std::stringstream buf;
+        msgpack::object_handle obj;
+
+        MsgpackTestObject(T _expected)
+            : expected(_expected)
+        {
+            msgpack::pack(buf, expected);
+
+            std::string bufStr(buf.str());
+            obj = msgpack::unpack(bufStr.data(), bufStr.size());
+        }
+    };
+    
 
     ServerWriteTests()
     {
@@ -38,9 +60,14 @@ TEST_F(ServerWriteTests, TestWriteBasicStringSynchronous)
 {
     std::string toWrite {"hello, world"};
 
+    MockServer server;
     MockServer::sendAll(writeFd, toWrite.c_str(), toWrite.size(), *this);
     close(writeFd);
-    std::vector<char> readData = MockServer::readFd(readFd);
+    const auto callback = [&server](const std::vector<msgpack::object_handle>& )
+    {
+
+    };
+    std::vector<char> readData = server.readFd(readFd);
     ASSERT_EQ(toWrite, std::string(readData.cbegin(), readData.cend()));
 
     close(readFd);
