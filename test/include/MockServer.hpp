@@ -13,9 +13,9 @@ public:
         Server::sendAll(fd, buf, bufLen, log);
     }
 
-    static std::vector<char> readFd(int fd)
+    void readFd(int fd, std::function<void(const std::vector<msgpack::object_handle>&)> callback)
     {
-        return Server::readFd(fd);
+        Server::readFd(fd, callback);
     }
 };
 

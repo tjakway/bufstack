@@ -15,7 +15,10 @@
 #include <chrono>
 #include <thread>
 #include <functional>
+#include <deque>
+#include <utility>
 
+#include <cstdlib>
 #include <cassert>
 #include <ctime> //for ctime()
 
@@ -24,6 +27,63 @@
 
 //TODO: move to Config
 #define SLEEP_MS 90
+
+namespace {
+
+//NOTE: can't read directly into the unpacker buffer because we might need to 
+//include data in it from the last read
+//returns the unconsumed buffer via a pointer into buf 
+//thus, ***THE LIFETIME OF THE UNCONSUMED BUFFER IS THE SAME AS THE ORIGINAL BUF***
+std::vector<msgpack::object_handle> decode(
+        char* buf,
+        std::size_t length,
+        char** unconsumedBuffer,
+        std::size_t* amountNotConsumed,
+        bufstack::Loggable& log)
+{
+
+    //copy the buffer we read into the unpacker so it can use it
+    msgpack::unpacker unpacker;
+    unpacker.reserve_buffer(length);
+    memcpy(unpacker.buffer(), buf, length);
+    unpacker.buffer_consumed(length);
+
+    std::vector<msgpack::object_handle> handles;
+
+    //decode as many objects as we can, record how much memory they take up,
+    //then return the handles to the objects in that memory region
+    bool decodeDone = false;
+    while(!decodeDone)
+    {
+        try
+        {
+            msgpack::object_handle oh;
+            if(!unpacker.next(oh))
+            {
+                decodeDone = true;
+            }
+            else
+            {
+                handles.emplace_back(std::move(oh));
+            }
+        }
+        catch(msgpack::type_error& e)
+        {
+            const time_t now = std::chrono::system_clock::to_time_t(
+                            std::chrono::system_clock::now());
+            log.warn() << "failed to decode msgpack object at " << 
+                ctime(&now) << ";\tException info: " << 
+                e.what() << std::endl;
+
+            throw e;
+        }
+    }
+
+    *unconsumedBuffer = unpacker.nonparsed_buffer();
+    *amountNotConsumed = unpacker.nonparsed_size();
+    return handles;
+}
+}
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -90,9 +150,12 @@ void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& lo
     }
 }
 
-void Server::readFd(int fd, std::function<void(msgpack::object_handle&)> callback)
+void Server::readFd(int fd, 
+        std::function<void(const std::vector<msgpack::object_handle>&)> callback)
 {
-    std::unique_ptr<char[]> buf = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
+    std::unique_ptr<char[]> buf 
+        = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
+
     std::vector<char> data;
 
     int amtRead = -1;
@@ -116,28 +179,30 @@ void Server::readFd(int fd, std::function<void(msgpack::object_handle&)> callbac
             throw SocketError(STRCAT("Error in ", __func__, ": ", strerror(errno)));
         }
 
-        bool decodeError = false;
-        //decode as many objects as we can then pass them to the callback
-        while(!decodeError)
+        //try and decode this message, recording how much we found
+        char* unconsumedBuffer;
+        std::size_t amountNotConsumed = -1;
+        std::vector<msgpack::object_handle> handles = 
+            decode(data.data(), data.size(),
+                    &unconsumedBuffer, &amountNotConsumed, *this);
+
+        //invoke the callback if we decoded anything
+        if(!handles.empty())
         {
-            try
-            {
+            callback(handles);
+        }
 
-                ; //TODO
-            }
-            catch(msgpack::type_error& e)
-            {
-                const time_t now = std::chrono::system_clock::to_time_t(
-                                std::chrono::system_clock::now());
-                info() << "failed to decode msgpack object at " << 
-                    ctime(&now) << ";\tException info: " << 
-                    e.what() << std::endl;
-
-                decodeError = true;
-            }
+        //if there was any data left over make sure we prepend any subsequent messages
+        //to it
+        if(amountNotConsumed > 0)
+        {
+            data = std::vector<char>(unconsumedBuffer, 
+                    unconsumedBuffer + amountNotConsumed);
         }
     }
 
 }
+
+
 
 BUFSTACK_END_NAMESPACE
