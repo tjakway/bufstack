@@ -13,12 +13,12 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class AsyncWriteServerTests : public ::testing::Test, public Loggable
+class ServerWriteTests : public ::testing::Test, public Loggable
 {
 public:
     int readFd, writeFd;
 
-    AsyncWriteServerTests()
+    ServerWriteTests()
     {
         //test reading and writing across a pipe
         int pipeFds[2];
@@ -34,7 +34,7 @@ public:
 };
 
 
-TEST_F(AsyncWriteServerTests, TestWriteBasicStringSynchronous)
+TEST_F(ServerWriteTests, TestWriteBasicStringSynchronous)
 {
     std::string toWrite {"hello, world"};
 
@@ -46,7 +46,7 @@ TEST_F(AsyncWriteServerTests, TestWriteBasicStringSynchronous)
     close(readFd);
 }
 
-TEST_F(AsyncWriteServerTests, TestWriteNothing)
+TEST_F(ServerWriteTests, TestWriteNothing)
 {
 
 }
