@@ -8,11 +8,14 @@
 #include <sstream>
 #include <msgpack.hpp>
 
+#include <iostream>
+
 #include "NamespaceDefines.hpp"
 #include "Server.hpp"
 #include "Loggable.hpp"
 
 #include "MockServer.hpp"
+#include "MsgpackTestObject.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -20,9 +23,9 @@ class ServerWriteTests : public ::testing::Test, public Loggable
 {
 public:
     int readFd, writeFd;
-    
-    
 
+    MsgpackTestObject<std::string> helloWorld {std::string("hello, world!")}; 
+    
     ServerWriteTests()
     {
         //test reading and writing across a pipe
@@ -39,19 +42,43 @@ public:
 };
 
 
-TEST_F(ServerWriteTests, TestWriteBasicStringSynchronous)
+TEST_F(ServerWriteTests, TestWriteHelloWorld)
 {
-    std::string toWrite {"hello, world"};
-
     MockServer server;
-    MockServer::sendAll(writeFd, toWrite.c_str(), toWrite.size(), *this);
+    MockServer::sendAll(writeFd, helloWorld.original.c_str(), 
+            helloWorld.original.size(), *this);
     close(writeFd);
-    const auto callback = [&server](const std::vector<msgpack::object_handle>& )
-    {
 
+    bool foundTestObject = false;
+    int vecSize;
+    const msgpack::object_handle& expectedHandle = this->helloWorld.obj;
+    const auto callback = [&expectedHandle, &server, &foundTestObject, &vecSize](
+            const std::vector<msgpack::object_handle>& vecH)
+    {
+        vecSize = vecH.size();
+        //can't compare object_handles for equality, need to compare
+        //the references to the underlying objects
+        std::string a, b;
+        vecH.front().get().convert(a);
+        expectedHandle.get().convert(b);
+        if(a == b)
+        {
+            foundTestObject = true;
+        }
+        else
+        {
+            std::cout << "equality check failed.  printing objects:" << std::endl;
+            for(const auto& o: vecH)
+            {
+                std::cout << "\t" << o.get() << std::endl;
+            }
+        }
     };
-    std::vector<char> readData = server.readFd(readFd);
-    ASSERT_EQ(toWrite, std::string(readData.cbegin(), readData.cend()));
+
+    server.readFd(readFd, callback);
+
+    ASSERT_EQ(vecSize, 1);
+    ASSERT_TRUE(foundTestObject);
 
     close(readFd);
 }

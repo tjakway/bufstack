@@ -28,7 +28,7 @@
 //TODO: move to Config
 #define SLEEP_MS 90
 
-namespace {
+//namespace {
 
 //NOTE: can't read directly into the unpacker buffer because we might need to 
 //include data in it from the last read
@@ -83,7 +83,7 @@ std::vector<msgpack::object_handle> decode(
     *amountNotConsumed = unpacker.nonparsed_size();
     return handles;
 }
-}
+//}
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -203,6 +203,14 @@ void Server::readFd(int fd,
 
 }
 
+void Server::interrupt()
+{
+    done.store(true);
+}
+bool Server::interrupted()
+{
+    return done.load();
+}
 
 
 BUFSTACK_END_NAMESPACE

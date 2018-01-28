@@ -29,6 +29,7 @@ class Server : public Loggable
 private:
     std::atomic_bool done {false};
 protected:
+    Server() {}
     Server(int serverFd, 
             sockaddr_in server, 
             int backlogSize = Config::Defaults::defaultBacklogSize);
@@ -43,13 +44,18 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
 
     static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
-    void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
+    virtual void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
 
 public:
+    virtual ~Server() {}
+
     void startListening();
 
+    void interrupt();
+    bool interrupted();
+
     //basically call join()
-    virtual void waitUntilDone();
+    virtual void waitUntilDone() = 0;
 };
 
 /**
