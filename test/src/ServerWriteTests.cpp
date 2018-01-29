@@ -10,6 +10,7 @@
 
 #include <iostream>
 
+#include "Util/Util.hpp"
 #include "NamespaceDefines.hpp"
 #include "Server.hpp"
 #include "Loggable.hpp"
@@ -38,6 +39,18 @@ public:
 
         //make the read end non blocking
         //fcntl(readFd, F_SETFL, O_NONBLOCK);
+    }
+
+    ~ServerWriteTests()
+    {
+        if(fd_is_valid(readFd))
+        {
+            close(readFd);
+        }
+        if(fd_is_valid(writeFd))
+        {
+            close(writeFd);
+        }
     }
 };
 

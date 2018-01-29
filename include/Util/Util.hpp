@@ -6,6 +6,9 @@
 #include <functional>
 #include <memory>
 
+#include <unistd.h>
+#include <fcntl.h>
+
 #include "Util/NewExceptionType.hpp"
 #include "Util/Strcat.hpp"
 
@@ -41,3 +44,8 @@ T min(T a, T b)
     return (b < a) ? b : a;
 }
 
+//see https://stackoverflow.com/questions/12340695/how-to-check-if-a-given-file-descriptor-stored-in-a-variable-is-still-valid
+int fd_is_valid(int fd)
+{
+    return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+}
