@@ -15,14 +15,13 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class ServerReadTests : public ::testing::Test
+class ReadApiInfoTests : public ::testing::Test
 {
 public:
     const std::string apiInfoFilename {"api_info"};
 };
 
-/*
-TEST_F(ServerReadTests, TestReadApiInfo)
+TEST_F(ReadApiInfoTests, TestReadApiInfo)
 {
     int readFd = open(apiInfoFilename.c_str(), O_RDONLY);
     ASSERT_GT(readFd, 0) << strerror(errno);
@@ -39,6 +38,5 @@ TEST_F(ServerReadTests, TestReadApiInfo)
     server.readFd(readFd, callback);
     ASSERT_TRUE(receivedMessage);
 }
-*/
 
 BUFSTACK_END_NAMESPACE
