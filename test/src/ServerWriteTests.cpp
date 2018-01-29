@@ -37,7 +37,7 @@ public:
         writeFd = pipeFds[1];
 
         //make the read end non blocking
-        fcntl(readFd, F_SETFL, O_NONBLOCK);
+        //fcntl(readFd, F_SETFL, O_NONBLOCK);
     }
 };
 
