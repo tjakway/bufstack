@@ -15,43 +15,16 @@
 #include "Server.hpp"
 #include "Loggable.hpp"
 
+#include "PipeTest.hpp"
 #include "MockServer.hpp"
 #include "MsgpackTestObject.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class ServerWriteTests : public ::testing::Test, public Loggable
+class ServerWriteTests : public PipeTest
 {
 public:
-    int readFd, writeFd;
-
-    MsgpackTestObject<std::string> helloWorld {std::string("hello, world!")}; 
-    
-    ServerWriteTests()
-    {
-        //test reading and writing across a pipe
-        int pipeFds[2];
-        
-        auto ret = pipe(pipeFds);
-        assert(ret == 0);
-        readFd = pipeFds[0];
-        writeFd = pipeFds[1];
-
-        //make the read end non blocking
-        //fcntl(readFd, F_SETFL, O_NONBLOCK);
-    }
-
-    ~ServerWriteTests()
-    {
-        if(fd_is_valid(readFd))
-        {
-            close(readFd);
-        }
-        if(fd_is_valid(writeFd))
-        {
-            close(writeFd);
-        }
-    }
+    MsgpackTestObject<std::string> helloWorld {std::string("hello, world!")};
 };
 
 
