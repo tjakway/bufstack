@@ -71,7 +71,8 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
     DIR* dir = opendir(dirPath.c_str());
     if(dir == nullptr)
     {
-        std::cerr << "Warning: opendir returned NULL in " << __func__ << ", skipping this path entry."
+        std::cerr << "Warning: opendir returned NULL in " << __func__ << " for " << dirPath
+            << ", skipping this path entry."
             << std::endl << "Reason for error: "
             << strerror(errno) << std::endl;
 
