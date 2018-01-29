@@ -59,7 +59,8 @@ std::vector<std::string> FindNeovim::getPathEntries()
 
         //filter bad path entries
         std::remove_if(pathEntries.begin(), pathEntries.end(), [](const std::string& p){
-                return p.empty() || !isDirectory(p);
+                const auto x = Util::StringTrim::trim_copy(p);
+                return x.empty() || !isDirectory(x);
                 });
 
         return pathEntries;
