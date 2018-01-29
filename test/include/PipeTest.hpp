@@ -4,12 +4,13 @@
 
 
 #include "Util/Util.hpp"
+#include "Loggable.hpp"
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <cassert>
 
-class PipeTest : public ::testing::Test, public Loggable
+class PipeTest : public ::testing::Test, public bufstack::Loggable
 {
 public:
     int readFd, writeFd;
@@ -30,11 +31,11 @@ public:
 
     ~PipeTest()
     {
-        if(fd_is_valid(readFd))
+        if(Util::fd_is_valid(readFd))
         {
             close(readFd);
         }
-        if(fd_is_valid(writeFd))
+        if(Util::fd_is_valid(writeFd))
         {
             close(writeFd);
         }
