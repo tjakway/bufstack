@@ -19,7 +19,7 @@ TEST(ServerReadTests, TestReadApiInfo)
     int writeFd = pipeFds[1];
 
     auto ret = FindNeovim::getFirstOnPath();
-    ASSERT_NE(ret, nullptr);
+    ASSERT_NE(ret.get(), nullptr);
     std::string neovimLoc = *ret;
 
     pid_t pid = fork();
