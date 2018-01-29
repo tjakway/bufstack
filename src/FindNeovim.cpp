@@ -13,9 +13,12 @@
 
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
+#include "Util/SplitString.hpp"
+
 #include "CommonDefines.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 #include <cstdlib>
 #include <cstring>
@@ -52,22 +55,12 @@ std::vector<std::string> FindNeovim::getPathEntries()
     else
     {
         std::string pathStr(path);
-        std::vector<std::string> pathEntries;
+        std::vector<std::string> pathEntries = split(pathStr, PATH_VAR_SEPARATOR);
 
-        auto pos = pathStr.find(PATH_VAR_SEPARATOR);
-        while(pos != std::string::npos)
-        {
-            //this substring includes the path separator
-            //need to remove it manually
-            std::string thisEntry = pathStr.substr(0, pos);
-            auto endOfEntrySeparatorPos = thisEntry.find(PATH_VAR_SEPARATOR);
-            if(endOfEntrySeparatorPos != std::string::npos)
-            {
-                thisEntry.erase(thisEntry.begin() + endOfEntrySeparatorPos, thisEntry.end());
-            }
-
-            pathEntries.push_back(thisEntry);
-        }
+        //filter bad path entries
+        std::remove_if(pathEntries.begin(), pathEntries.end(), [](const std::string& p){
+                return p.empty() || !isDirectory(p);
+                });
 
         return pathEntries;
     }
@@ -78,8 +71,11 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
     DIR* dir = opendir(dirPath.c_str());
     if(dir == nullptr)
     {
-        throw DirectoryException(STRCAT("Error in ", __func__, " in call to opendir: ", 
-                    strerror(errno)));
+        std::cerr << "Warning: opendir returned NULL in " << __func__ << ", skipping this path entry."
+            << std::endl << "Reason for error: "
+            << strerror(errno) << std::endl;
+
+        return std::vector<std::string>();
     }
     else
     {
@@ -95,6 +91,9 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
                 throw DirectoryException(STRCAT("Error in ", __func__, " in call to readdir: ",
                         strerror(errno)));
             }
+            //readdir returns null when done
+            //no more entries left
+            else if(ent == nullptr) {}
             else
             {
                 //make sure this entry is a file and not another directory
