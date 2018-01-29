@@ -9,6 +9,8 @@ set(TEST_TARGET bufstack_test)
 #need to use our FindMsgpack.cmake script
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/depends_msgpack.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/default_build_type.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/process_warnings.cmake")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)

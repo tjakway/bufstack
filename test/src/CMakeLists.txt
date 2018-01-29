@@ -24,3 +24,5 @@ add_custom_target(check COMMAND ${TEST_TARGET}
     WORKING_DIRECTORY ${TESTS_BIN_DIR})
 
 add_custom_target(check-all COMMAND check)
+
+process_warnings(${TEST_TARGET})
