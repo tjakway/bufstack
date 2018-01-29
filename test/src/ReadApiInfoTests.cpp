@@ -18,7 +18,7 @@ BUFSTACK_BEGIN_NAMESPACE
 class ReadApiInfoTests : public ::testing::Test
 {
 public:
-    const std::string apiInfoFilename {"api_info"};
+    const std::string apiInfoFilename {"resources/api_info"};
 };
 
 TEST_F(ReadApiInfoTests, TestReadApiInfo)
