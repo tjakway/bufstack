@@ -21,7 +21,8 @@ public:
     const std::string apiInfoFilename {"resources/api_info"};
 };
 
-TEST_F(ReadApiInfoTests, TestReadApiInfo)
+//make sure we can decode it without crashing
+TEST_F(ReadApiInfoTests, TestCallbackInvoked)
 {
     int readFd = open(apiInfoFilename.c_str(), O_RDONLY);
     ASSERT_GT(readFd, 0) << strerror(errno);
