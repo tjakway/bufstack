@@ -29,6 +29,13 @@ public:
         static std::string rtrim_copy(std::string);
         static std::string trim_copy(std::string);
     };
+
+
+    //see https://stackoverflow.com/questions/12340695/how-to-check-if-a-given-file-descriptor-stored-in-a-variable-is-still-valid
+    static int fd_is_valid(int fd)
+    {
+        return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+    }
 };
 
 //these functions are included in C++14 but not C++11
@@ -44,8 +51,3 @@ T min(T a, T b)
     return (b < a) ? b : a;
 }
 
-//see https://stackoverflow.com/questions/12340695/how-to-check-if-a-given-file-descriptor-stored-in-a-variable-is-still-valid
-int fd_is_valid(int fd)
-{
-    return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
-}
