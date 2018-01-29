@@ -26,3 +26,6 @@ add_custom_target(check COMMAND ${TEST_TARGET}
 add_custom_target(check-all COMMAND check)
 
 process_warnings(${TEST_TARGET})
+
+#copy the test resources dir to the same directory as the test executable
+file(COPY ${TEST_RESOURCES_DIRECTORY} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
