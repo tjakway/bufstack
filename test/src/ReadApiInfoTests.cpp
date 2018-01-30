@@ -3,6 +3,7 @@
 #include <msgpack.hpp>
 #include <functional>
 #include <ostream>
+#include <map>
 
 #include "NamespaceDefines.hpp"
 #include "Server.hpp"
@@ -76,6 +77,42 @@ TEST_F(ReadApiInfoTests, TestCallbackInvoked)
     readExpect([](const std::vector<msgpack::object_handle>&){ return true; });
 }
 
+TEST_F(ReadApiInfoTests, TestReadTypeCodes)
+{
+    const auto isMapWithTypesKey = [](const msgpack::object_handle& h)
+    {
+        if(h.get().type == msgpack::type::MAP)
+        {
+            std::map<std::string, msgpack::object> apiKeyMap;
+            h.get().convert(apiKeyMap);
 
+            return true;
+            //for(int i = 0; i < apiKeyMap.size; i++)
+           // {
+                //if(apiKeyMap[i].)
+           // }
+        }
+        return false;
+    };
+
+    readExpect([isMapWithTypesKey](const std::vector<msgpack::object_handle>& vecH){
+            std::find_if(vecH.begin(), vecH.end(), isMapWithTypesKey);
+            return true;
+            });
+}
+
+/*
+TEST_F(ReadApiInfoTests, TestHasBufferMethods)
+{
+    const auto isFunctionArray = [](const msgpack::object_handle& h) -> bool
+    {
+        
+    };
+
+    readExpect([](const std::vector<msgpack::object_handle>& vecH){
+            std::find_if(vecH.begin(), vecH.end(), );
+            });
+}
+*/
 
 BUFSTACK_END_NAMESPACE
