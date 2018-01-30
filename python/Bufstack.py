@@ -46,16 +46,21 @@ class BufferStackDict(object):
     #max_stack_depth = -1 means the stack has no maximum size
     def __init__(self, 
             entity_key_fn,
+            logger
             max_stack_depth=-1):
 
         self.bufdict = dict()
         self.set_max_stack_depth(max_stack_depth)
         self.entity_key_fn = get_entity_key_fn
+        self.logger = logger
 
 
     def set_max_stack_depth(self, depth):
         self.max_stack_depth = depth
         self.truncate_all_if_too_large()
+
+    def check_entity_stack_depth(self, window=None, tab_page=None):
+        self.truncate_if_too_large(self.entity_key_fn(window, tab_page))
 
     #truncate the stack if it's greater than max_stack_depth
     def truncate_if_too_large(self, key):
@@ -96,24 +101,36 @@ class BufferStackDict(object):
 
         return self.bufdict[key]
 
-    #deletes the windows stack from the dictionary if it has one
-    def del_window_stack(self, window):
-        if window.number in self.bufdict:
-            del self.bufdict[window.number]
+    def set_entity_stack(self, new_stack, window=None, tab_page=None):
+        key = self.entity_key_fn(window, tab_page)
+        self.bufdict[key] = new_stack
 
-    #checks if the window is invalid AND has its own stack and if so deletes that stack
-    def remove_if_invalid(self, window):
-        if not window.valid:
-            self.del_window_stack(window)
+
+    def delete_entity_stack(self, window=None, tab_page=None):
+        key = self.entity_key_fn(window, tab_page)
+        if key in self.bufdict:
+            del self.bufdict[key]
+
+
+    #checks if the entity is invalid AND has its own stack and if so deletes that stack
+    #no-op if we're we're using the default key (since it can't be invalid)
+    def remove_if_invalid(self, window=None, tab_page=None):
+        if window is not None or tab_page is not None: #if both are none we're using the default key
+            self.delete_entity_stack(window, tab_page)
         
     #push the buffer if it's valid
-    def push_buf(self, window, buf):
-        key = self._get_window_key(window)
+    def push_buf(self, buf, window=None, tab_page=None):
         if buf.valid:
-            self.bufdict[key].insert(0, buf)
+            #modify and replace the entity's buf stack
+            buf_stack = self.get_entity_stack(window, tab_page)
+            buf_stack.insert(0, buf)
+            self.set_entity_stack(bufstack, window, tab_page)
 
-        #check if any stacks are too large
-        self.truncate_if_too_large(key)
+            #check if this stack is too big
+            self.check_entity_stack_depth(window, tab_page)
+
+        else:
+            logger.warn("Tried to push an invalid buf: {}".format(buf))
 
     def push(self, window, buf):
         self.push_buf(window, buf)
