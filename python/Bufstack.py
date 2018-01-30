@@ -26,7 +26,7 @@ class BufstackException(BaseException):
 def make_entity_key_function(identify_windows, identify_tab_pages):
     default_key = "default"
 
-    def entity_key_fn(window_object, tab_page_object):
+    def entity_key_fn(window_object=None, tab_page_object=None):
         identifiers = []
         if identify_windows:
             identifiers.append("win_{}".format(window_object.number))
