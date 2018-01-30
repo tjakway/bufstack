@@ -1,5 +1,3 @@
-# TODO:
-#   -implement a BufferStackDict meethod merge_window_stacks(window_one, window_two) to allow bufstacks to be merged at runtime, e.g. when a window is closed (would also allow easy implementation of a runtime toggle for separate_window_stacks
 from __future__ import print_function
 import sys
 
@@ -25,16 +23,35 @@ def initialize_bufstack():
 class BufstackException(BaseException):
     pass
 
+def make_entity_key_function(identify_windows, identify_tab_pages):
+    default_key = "default"
+
+    def entity_key_fn(window_object, tab_page_object):
+        identifiers = []
+        if identify_windows:
+            identifiers.append("win_{}".format(window_object.number))
+        if identify_tab_pages:
+            identifiers.append("tab_{}".format(tab_page_object.number))
+
+        if len(identifiers) == 0:
+            identifiers = [default_key]
+
+        return "_".join(identifiers)
+
+    return entity_key_fn
+
+
+
 class BufferStackDict(object):
     #max_stack_depth = -1 means the stack has no maximum size
     def __init__(self, 
-            max_stack_depth=-1, 
-            separate_window_stacks=False):
+            get_entity_key_fn,
+            max_stack_depth=-1):
 
         self.bufdict = dict()
-        self.default_key = "default"
         self.set_max_stack_depth(max_stack_depth)
-        self.separate_window_stacks = separate_window_stacks
+        self.get_entity_key_fn = get_entity_key_fn
+
 
         self.remake_default()
 
