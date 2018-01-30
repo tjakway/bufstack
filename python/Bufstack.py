@@ -53,17 +53,9 @@ class BufferStackDict(object):
         self.entity_key_fn = get_entity_key_fn
 
 
-        self.remake_default()
-
     def set_max_stack_depth(self, depth):
         self.max_stack_depth = depth
         self.truncate_all_if_too_large()
-
-    #if the default key isn't in the dictionary,
-    #add it with an empty stack
-    def remake_default(self):
-        if self.default_key not in self.bufdict:
-            self.bufdict[self.default_key] = list()
 
     #truncate the stack if it's greater than max_stack_depth
     def truncate_if_too_large(self, key):
@@ -82,7 +74,6 @@ class BufferStackDict(object):
     #clear the default stack
     def remove_all_stacks(self):
         self.bufdict = dict()
-        self.remake_default()
 
     #returns None if the stack for the passed window has no valid buffers
     def _pop_next_valid_buf_for_entity(self, window=None, tab_page=None):
