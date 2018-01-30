@@ -68,6 +68,7 @@ class BufferStackDict(object):
     #truncate the stack if it's greater than max_stack_depth
     def truncate_if_too_large(self, key):
         if self.max_stack_depth > 1:
+            #TODO: print a warning that we're truncating
             if len(self.bufdict[key]) > self.max_stack_depth:
                 #truncate buffer numbers over the limit
                 truncated_buffer_list = self.bufdict[key][0:self.max_stack_depth]
@@ -84,21 +85,25 @@ class BufferStackDict(object):
         self.remake_default()
 
     #returns None if the stack for the passed window has no valid buffers
-    def _pop_next_valid_buf_for_window(self, window):
-        win_stack = self.bufdict[self._get_window_key(window)]
-        while len(win_stack) > 0:
+    def _pop_next_valid_buf_for_entity(self, window=None, tab_page=None):
+        this_stack = get_entity_stack(window, tab_page)
+        while len(this_stack) > 0:
             #python's pop() with no args returns the _last_ item in the list...
-            return_buf = win_stack.pop(0)
+            return_buf = this_stack.pop(0)
             if return_buf.valid:
                 return return_buf
 
         #no valid buffers
         return None
              
+    #get the stack associated with this entity, creating a stack if it doesn't exist
+    def get_entity_stack(self, window=None, tab_page=None):
+        key = self.entity_key_fn(window, tab_page)
 
-    def new_window_stack(self, window):
-        if window.number not in self.bufdict:
-            self.bufdict[window.number] = list()
+        if key not in self.bufdict:
+            self.bufdict[key] = list()
+
+        return self.bufdict[key]
 
     #deletes the windows stack from the dictionary if it has one
     def del_window_stack(self, window):
