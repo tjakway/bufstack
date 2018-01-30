@@ -45,12 +45,12 @@ def make_entity_key_function(identify_windows, identify_tab_pages):
 class BufferStackDict(object):
     #max_stack_depth = -1 means the stack has no maximum size
     def __init__(self, 
-            get_entity_key_fn,
+            entity_key_fn,
             max_stack_depth=-1):
 
         self.bufdict = dict()
         self.set_max_stack_depth(max_stack_depth)
-        self.get_entity_key_fn = get_entity_key_fn
+        self.entity_key_fn = get_entity_key_fn
 
 
         self.remake_default()
