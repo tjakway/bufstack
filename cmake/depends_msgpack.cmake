@@ -1,6 +1,6 @@
 function(depends_msgpack TARGET_NAME_PARAM)
     if(USE_SYSTEM_MSGPACK)
-        find_package(Msgpack 1.0.0 REQUIRED)
+        find_package(Msgpack 5.0.0 REQUIRED)
 
         target_include_directories(${TARGET_NAME_PARAM} SYSTEM INTERFACE ${MSGPACK_INCLUDE_DIRS})
         target_link_libraries(${TARGET_NAME_PARAM} INTERFACE ${MSGPACK_LIBRARIES})
