@@ -1,4 +1,35 @@
 import neovim
+import logging
+from Bufstack import *
+
+@neovim.plugin
+class BufstackPlugin(object):
+    def __init__(self, nvim):
+        self.nvim = nvim
+        self.identify_windows=False
+        self.identify_tab_pages=False
+        self.new_bufstack()
+
+    def new_bufstack():
+        self.bufstack = BufferStackDict(
+                make_entity_key_function(self.identify_windows, self.identify_tab_pages),
+                logging)
+
+    @neovim.function("BufstackPerWindowStacks")
+    def per_window_stacks():
+        self.identify_windows = True
+        self.new_bufstack()
+
+    @neovim.function("BufstackPerTabPageStacks")
+    def per_tab_page_stacks():
+        self.identify_tab_pages = True
+        self.new_bufstack()
+
+
+    #TODO
+    @neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")', sync=True)
+    def on_bufenter(self, filename):
+        pass
 
 
 
