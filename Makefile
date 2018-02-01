@@ -1,7 +1,7 @@
 SRCS := $(shell find . -name "*.py" -type f)
 
 .PHONY: all
-all: check tags
+all: check
 
 .PHONY: clean
 clean:
