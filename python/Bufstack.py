@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 
+#TODO: remove after replacing tests with nosetests framework
 #tests shouldn't fail if vim can't be imported
 try:
     import vim
@@ -43,7 +44,11 @@ def make_entity_key_function(identify_windows, identify_tab_pages):
 
 
 class BufferStackDict(object):
-    #max_stack_depth = -1 means the stack has no maximum size
+    """Note that for our purposes "top" means index 0 and "bottom" means the last index
+    max_stack_depth = -1 means the stack has no maximum size
+    """
+
+
     def __init__(self, 
             entity_key_fn,
             logger
@@ -132,23 +137,18 @@ class BufferStackDict(object):
         else:
             logger.warn("Tried to push an invalid buf: {}".format(buf))
 
-    def push(self, window, buf):
-        self.push_buf(window, buf)
+    def pop_buf(self, window=None, tab_page=None):
+        stack = self.get_entity_stack(window, tab_page)
 
-    def pop_buf(self, window):
-        #if this window has its own non-empty stack, pop that buffer
-        if window.number in self.bufdict and len(self.bufdict[window.number]) > 0:
-            return self._pop_next_valid_buf_for_window(window)
-        #if this window doesn't have its own stack, pop from the default stack
+        if len(stack) <= 0:
+            return None
         else:
-            #TODO: refactor
-            return self._pop_next_valid_buf_for_window(window)
+            popped_buf = stack.pop()
+            self.set_entity_stack(stack)
+            return popped_buf
 
-    def pop(self, window):
-        return self.pop_buf(window)
-
-    def peek_top(self, window):
-        stack = self.bufdict[self._get_window_key(window)]
+    def peek_top(self, window=None, tab_page=None):
+        stack = self.get_entity_stack(window, tab_page)
         if len(stack) > 0:
             return stack[0]
         else:
