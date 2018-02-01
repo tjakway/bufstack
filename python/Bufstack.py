@@ -181,17 +181,6 @@ class BufferStackDict(object):
             entity = self.entity_key_fn(window, tab_page)
             raise DupException("Cannot copy more items than exist in the bufstack for entity {}".format(entity))
 
-    def _get_window_key(self, window):
-        if not self.separate_window_stacks:
-            return self.default_key
-        elif window.number in self.bufdict:
-            return window.number
-        else:
-            self.new_window_stack(window.number)
-            return window.number
-
-    def public_get_stack_for_window(self, window):
-        return self.bufdict[self._get_window_key(window)]
 
 #returns whichever buffer in a list of size 2 isn't the (passed) current buffer
 def get_other_buf(curr_buf, buf_list):
