@@ -6,7 +6,8 @@ import neovim
 
 from nose.tools import eq_ as eq
 
-neovim.setup_logging("test")
+#neovim.setup_logging("test")
+neovim.setup_logging()
 
 child_argv = os.environ.get('NVIM_CHILD_ARGV')
 listen_address = os.environ.get('NVIM_LISTEN_ADDRESS')
