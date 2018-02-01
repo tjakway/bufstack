@@ -54,7 +54,7 @@ class BufferStackDict(object):
 
     def __init__(self, 
             entity_key_fn,
-            logger
+            logger,
             max_stack_depth=-1):
 
         self.bufdict = dict()
