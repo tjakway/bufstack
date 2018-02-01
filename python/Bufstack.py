@@ -142,14 +142,7 @@ class BufferStackDict(object):
             logger.warn("Tried to push an invalid buf: {}".format(buf))
 
     def pop_buf(self, window=None, tab_page=None):
-        stack = self.get_entity_stack(window, tab_page)
-
-        if len(stack) <= 0:
-            return None
-        else:
-            popped_buf = stack.pop()
-            self.set_entity_stack(stack)
-            return popped_buf
+        return self._pop_next_valid_buf_for_entity(window, tab_page)
 
     def peek_top(self, window=None, tab_page=None):
         stack = self.get_entity_stack(window, tab_page)
