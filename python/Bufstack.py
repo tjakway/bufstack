@@ -110,6 +110,9 @@ class BufferStackDict(object):
 
         if key not in self.bufdict:
             self.bufdict[key] = list()
+        else:
+            self.remove_invalid_buffers(window, tab_page)
+            self.truncate_if_too_large(window, tab_page)
 
         return self.bufdict[key]
 
