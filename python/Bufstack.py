@@ -9,11 +9,11 @@ except:
     pass
 
 
-#print to stderr
-#see http://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
 def errprint(*args, **kwargs):
+    """print to stderr
+    see http://stackoverflow.com/questions/5574702/how-to-print-to-stderr-in-python
+    """
     print(*args, file=sys.stderr, **kwargs)
-#*********************************************
 
 buf_stacks = None
 
