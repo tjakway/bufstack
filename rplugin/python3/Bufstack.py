@@ -59,7 +59,7 @@ class BufferStackDict(object):
 
         self.bufdict = dict()
         self.set_max_stack_depth(max_stack_depth)
-        self.entity_key_fn = get_entity_key_fn
+        self.entity_key_fn = entity_key_fn
         self.logger = logger
 
 
