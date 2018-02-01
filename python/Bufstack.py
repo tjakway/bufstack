@@ -90,7 +90,7 @@ class BufferStackDict(object):
         this_stack = get_entity_stack(window, tab_page)
         while len(this_stack) > 0:
             #python's pop() with no args returns the _last_ item in the list...
-            return_buf = this_stack.pop(0)
+            return_buf = this_stack.pop()
             if return_buf.valid:
                 return return_buf
 
