@@ -24,6 +24,9 @@ def initialize_bufstack():
 class BufstackException(BaseException):
     pass
 
+class DupException(BufstackException):
+    pass
+
 def make_entity_key_function(identify_windows, identify_tab_pages):
     default_key = "default"
 
@@ -151,28 +154,32 @@ class BufferStackDict(object):
         else:
             return None
 
-    def remove_invalid_buffers(self, window):
-        stack = self.bufdict[self._get_window_key(window)]
+    def remove_invalid_buffers(self, window=None, tab_page=None):
+        stack = self.get_entity_stack(window, tab_page)
+
         #filter the stack for valid buffers
         valid_bufs = [x for x in stack if x.valid]
+
         #replace the old stack
-        self.bufdict[self._get_window_key(window)] = valid_bufs
+        self.set_entity_stack(valid_bufs, window, tab_page)
+
         #return as a convenience
         return valid_bufs
 
-    def dup(self, window, num_to_copy):
-        window_key = self._get_window_key(window)
-        valid_bufs = self.remove_invalid_buffers(window)
-        #do nothing if the stack is empty
-        if len(valid_bufs) <= 0 or num_to_copy <= 0:
-            return
-        #recurse if we don't have enough items to copy
-        elif len(valid_bufs) < num_to_copy:
-            self.dup(window, len(valid_bufs))
-        else:
-            duplicated_items = valid_bufs[0:num_to_copy]
+    def dup(self, num_to_copy, window=None, tab_page=None):
+        stack = self.get_entity_stack(window, tab_page)
+
+        if num_to_copy <= len(stack):
+            #copy the first n items off the top of the stack
+            stack = self.get_entity_stack(window, tab_page)
+            duplicated_items = stack[0:num_to_copy]
+
             #mutate the old stack
-            self.bufdict[window_key] = duplicated_items ++ valid_bufs
+            new_stack = duplicated_items ++ valid_bufs
+            self.set_entity_stack(new_stack, window, tab_page)
+        else:
+            entity = self.entity_key_fn(window, tab_page)
+            raise DupException("Cannot copy more items than exist in the bufstack for entity {}".format(entity))
 
     def _get_window_key(self, window):
         if not self.separate_window_stacks:
