@@ -1,5 +1,7 @@
+SRCS := $(shell find . -name "*.py" -type f)
+
 .PHONY: all
-all: check
+all: check tags
 
 .PHONY: clean
 clean:
@@ -9,5 +11,5 @@ clean:
 check:
 	PYTHONPATH="./rplugin/python3:$$PYTHONPATH" nosetests
 
-tags:
+tags: $(SRCS)
 	ctags -R . || /bin/true
