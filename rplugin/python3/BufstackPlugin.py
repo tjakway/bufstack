@@ -10,18 +10,18 @@ class BufstackPlugin(object):
         self.identify_tab_pages=False
         self.new_bufstack()
 
-    def new_bufstack():
+    def new_bufstack(self):
         self.bufstack = BufferStackDict(
                 make_entity_key_function(self.identify_windows, self.identify_tab_pages),
                 logging)
 
     @neovim.function("BufstackPerWindowStacks")
-    def per_window_stacks():
+    def per_window_stacks(self):
         self.identify_windows = True
         self.new_bufstack()
 
     @neovim.function("BufstackPerTabPageStacks")
-    def per_tab_page_stacks():
+    def per_tab_page_stacks(self):
         self.identify_tab_pages = True
         self.new_bufstack()
 
