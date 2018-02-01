@@ -1,6 +1,3 @@
-PYDIR=python/
-TESTS=BufstackTests
-
 .PHONY: all
 all: check
 
@@ -8,4 +5,4 @@ clean:
 	find . -name "*.pyc" -type f -delete
 
 check:
-	cd $(PYDIR) && python -m unittest $(TESTS)
+	PYTHONPATH="./rplugin/python3:$$PYTHONPATH" nosetests
