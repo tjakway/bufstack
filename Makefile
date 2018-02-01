@@ -5,7 +5,7 @@ TESTS=BufstackTests
 all: check
 
 clean:
-	rm -r -f $(PYDIR)/*.pyc
+	find . -name "*.pyc" -type f -delete
 
 check:
 	cd $(PYDIR) && python -m unittest $(TESTS)
