@@ -87,11 +87,15 @@ class BufferStackDict(object):
 
     #returns None if the stack for the passed window has no valid buffers
     def _pop_next_valid_buf_for_entity(self, window=None, tab_page=None):
-        this_stack = get_entity_stack(window, tab_page)
+        this_stack = self.get_entity_stack(window, tab_page)
+
         while len(this_stack) > 0:
             #python's pop() with no args returns the _last_ item in the list...
             return_buf = this_stack.pop()
+
             if return_buf.valid:
+                #found a valid buf--need to modify the underlying stack before we return
+                self.set_entity_stack(this_stack)
                 return return_buf
 
         #no valid buffers
