@@ -6,8 +6,8 @@ import neovim
 
 from nose.tools import eq_ as eq
 
-#neovim.setup_logging("test")
-neovim.setup_logging()
+neovim.setup_logging("test")
+#neovim.setup_logging()
 
 vim = None
 
