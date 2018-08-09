@@ -24,7 +24,16 @@ def bufstack_assert_rpc_call(rpc_function_name, before_state, after_state):
         vim.stop_loop()
         after_state(plugin)
 
-    vim.run_loop(request_cb, None, setup_cb)
+    def err_cb(err_msg):
+        class BufstackTestException(BaseException):
+            pass
+
+        raise BufstackTestException(
+                ("Error while testing rpc function << {} >> with message {}" +
+                    "\nbefore_state: {},\nafter_state: {}")
+                    .format(rpc_function_name, err_msg, before_state, after_state))
+
+    vim.run_loop(request_cb, None, setup_cb, err_cb)
 
 @with_setup(setup=cleanup)
 def test_identify_tab_pages():
