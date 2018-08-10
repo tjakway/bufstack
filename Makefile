@@ -27,7 +27,7 @@ clean-pycache:
 	find . -name "__pycache__" -type d -exec rm -r -f {} +
 
 .PHONY: check
-check:
+check: pip_install_reqs
 	$(ACTIVATE) && PYTHONPATH="./rplugin/python3:$$PYTHONPATH" nosetests -v
 
 tags: $(SRCS)
