@@ -16,18 +16,26 @@ class BufstackPlugin(object):
                 logging)
 
     @neovim.function("BufstackPerWindowStacks")
-    def per_window_stacks(self):
+    def per_window_stacks(self, args):
         self.identify_windows = True
         self.new_bufstack()
 
     @neovim.function("BufstackPerTabPageStacks")
-    def per_tab_page_stacks(self):
+    def per_tab_page_stacks(self, args):
         self.identify_tab_pages = True
         self.new_bufstack()
 
+    #without sync=True return values are ignored
+    @neovim.function("GetBufstackPerWindowStacks", sync=True)
+    def get_per_window_stacks(self, args):
+        return self.identify_windows
+
+    @neovim.function("GetBufstackPerTabPageStacks", sync=True)
+    def get_per_tab_page_stacks(self, args):
+        return self.identify_tab_pages
 
     #TODO
-    @neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")', sync=True)
+    #@neovim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")', sync=True)
     def on_bufenter(self, filename):
         pass
 
