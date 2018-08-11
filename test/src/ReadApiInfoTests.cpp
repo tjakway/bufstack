@@ -2,6 +2,7 @@
 
 #include <msgpack.hpp>
 #include <functional>
+#include <fstream>
 #include <ostream>
 #include <map>
 
@@ -32,7 +33,8 @@ public:
     virtual void SetUp()
     {
         readFd = open(ReadApiInfoTests::apiInfoFilename.c_str(), O_RDONLY);
-        ASSERT_GT(readFd, 0) << std::string(strerror(errno));
+        ASSERT_GT(readFd, 0) << "Could not access " << ReadApiInfoTests::apiInfoFilename <<
+                ", strerror(errno): " << std::string(strerror(errno));
         return;
     }
 
