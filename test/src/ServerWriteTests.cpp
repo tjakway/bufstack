@@ -31,8 +31,16 @@ public:
 TEST_F(ServerWriteTests, TestWriteHelloWorld)
 {
     MockServer server;
-    MockServer::sendAll(writeFd, helloWorld.original.c_str(), 
-            helloWorld.original.size(), *this);
+    std::stringstream buf;
+    std::string original = "hello, world!";
+
+    msgpack::packer<std::stringstream> p(buf);
+    p.pack_str(original.size());
+    p.pack_str_body(original.c_str(), original.size());
+
+    const std::string bufStr = buf.str();
+    MockServer::sendAll(writeFd, bufStr.c_str(), 
+            bufStr.size(), *this);
     close(writeFd);
 
     bool foundTestObject = false;
@@ -45,7 +53,20 @@ TEST_F(ServerWriteTests, TestWriteHelloWorld)
         //can't compare object_handles for equality, need to compare
         //the references to the underlying objects
         std::string a, b;
+        //vecH.front().get().convert(x);
         vecH.front().get().convert(a);
+
+        /*int i = 0;
+        char msg[vecSize];
+        for(auto& x : vecH) {
+            int q;
+            x.get().convert(q);
+            msg[i] = (char)q;
+            i++;
+        }
+        std::cout << "MSG: " << msg << std::endl;
+        */
+
         expectedHandle.get().convert(b);
         if(a == b)
         {

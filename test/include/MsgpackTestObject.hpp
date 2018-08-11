@@ -26,6 +26,7 @@ public:
         obj.get().convert(x);
         assert(x == original);
     }
+
 };
 
 /*
@@ -41,6 +42,7 @@ public:
         : original(_original)
     {
         msgpack::packer<std::stringstream> p(buf);
+        p.pack_str(original.size());
         p.pack_str_body(original.c_str(), original.size());
 
         std::string bufStr(buf.str());
