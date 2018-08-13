@@ -1,3 +1,7 @@
 TODO:
 
 -support TCP/IP sockets in addition to unix domain sockets
+
+-----------------------------------------
+
+use MSGPACK_DEFINE_MAP to unpack api info (see https://stackoverflow.com/questions/46978096/how-to-serialize-nested-message-with-msg-pack-in-cpp)
