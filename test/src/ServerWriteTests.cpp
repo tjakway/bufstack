@@ -56,17 +56,6 @@ TEST_F(ServerWriteTests, TestWriteHelloWorld)
         //vecH.front().get().convert(x);
         vecH.front().get().convert(a);
 
-        /*int i = 0;
-        char msg[vecSize];
-        for(auto& x : vecH) {
-            int q;
-            x.get().convert(q);
-            msg[i] = (char)q;
-            i++;
-        }
-        std::cout << "MSG: " << msg << std::endl;
-        */
-
         expectedHandle.get().convert(b);
         if(a == b)
         {

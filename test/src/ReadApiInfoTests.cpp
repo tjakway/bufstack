@@ -11,6 +11,7 @@
 #include "FindNeovim.hpp"
 #include "MockServer.hpp"
 #include "Util/Util.hpp"
+#include "ApiParser.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -46,7 +47,6 @@ public:
         }
     }
 
-
     void readExpect(std::function<bool(const std::vector<msgpack::object_handle>&)> expect)
     {
         bool receivedMessage = false;
@@ -79,8 +79,25 @@ TEST_F(ReadApiInfoTests, TestCallbackInvoked)
     readExpect([](const std::vector<msgpack::object_handle>&){ return true; });
 }
 
+TEST_F(ReadApiInfoTests, TestExtractFunctionNames)
+{
+    readExpect([](const std::vector<msgpack::object_handle>& handles){ 
+            //EXPECT_EQ(handles.size(), 1);
+
+            //std::vector<std::string> keys = ApiParser::extractFunctionNames(handles.at(0));
+            //return keys.size() > 0;
+            std::cout << "Received vector of size " << handles.size() << std::endl;
+            for(auto& h : handles)
+            {
+                std::cout << "object: " << h.get() << std::endl;
+            }
+            return true;
+        });
+}
+
 TEST_F(ReadApiInfoTests, TestReadTypeCodes)
 {
+    /*
     const auto isMapWithTypesKey = [](const msgpack::object_handle& h)
     {
         if(h.get().type == msgpack::type::MAP)
@@ -98,23 +115,25 @@ TEST_F(ReadApiInfoTests, TestReadTypeCodes)
     };
 
     readExpect([isMapWithTypesKey](const std::vector<msgpack::object_handle>& vecH){
-            std::find_if(vecH.begin(), vecH.end(), isMapWithTypesKey);
+            return std::find_if(vecH.begin(), vecH.end(), 
+                    [isMapWithTypesKey](std::vector<msgpack::object_handle>::iterator it){
+                        return isMapWithTypesKey(*it); });
+            });*/
+}
+
+
+TEST_F(ReadApiInfoTests, TestHasBufferMethods)
+{
+    const auto isFunctionList = [](const msgpack::object_handle& h) -> bool
+    {
+        return true;
+    };
+
+    readExpect([](const std::vector<msgpack::object_handle>& vecH){
+            //std::find_if(vecH.begin(), vecH.end(), );
             return true;
             });
 }
 
-/*
-TEST_F(ReadApiInfoTests, TestHasBufferMethods)
-{
-    const auto isFunctionArray = [](const msgpack::object_handle& h) -> bool
-    {
-        
-    };
-
-    readExpect([](const std::vector<msgpack::object_handle>& vecH){
-            std::find_if(vecH.begin(), vecH.end(), );
-            });
-}
-*/
 
 BUFSTACK_END_NAMESPACE
