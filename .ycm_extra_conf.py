@@ -34,6 +34,16 @@ flags = [
 '/usr/local/include',
 ]
 
+#from https://github.com/Valloric/YouCompleteMe/issues/174
+def FindCompilationDB (): 
+    import glob
+    DB = glob.glob ('*/compile_commands.json')
+    if len (DB) == 0:
+        return ''
+
+    # return the first one we see
+    path = os.getcwd() + '/' + DB[0]
+    return os.path.dirname (path)
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
 # compile_commands.json file to use that instead of 'flags'. See here for
@@ -41,7 +51,9 @@ flags = [
 #
 # Most projects will NOT need to set this to anything; you can just change the
 # 'flags' list of compilation flags.
-compilation_database_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin")
+compilation_database_folder = FindCompilationDB()
+
+print(compilation_database_folder)
 
 if os.path.exists( compilation_database_folder ):
   database = ycm_core.CompilationDatabase( compilation_database_folder )
@@ -87,8 +99,10 @@ def FlagsForFile( filename, **kwargs ):
     }
 
   compilation_info = GetCompilationInfoForFile( filename )
-  if not compilation_info:
-    return None
+  #use the flags list for headers
+  if not compilation_info and IsHeaderFile(filename):
+      return flags
+
 
   # Bear in mind that compilation_info.compiler_flags_ does NOT return a
   # python list, but a "list-like" StringVec object.
