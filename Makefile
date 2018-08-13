@@ -12,7 +12,7 @@ DEFAULT_CMAKE_COMPILERS=$(shell command -v clang 1> /dev/null 2>&1 \
 				&& echo -n "-DCMAKE_CXX_COMPILER=clang++ " \
 				|| echo -n "-DCMAKE_C_COMPILER=g++ " )
 
-EXPORT_COMPILE_COMMANDS=-DCMAKE_EXPORT_COMPILER_COMMANDS=ON
+EXPORT_COMPILE_COMMANDS=-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 DEFAULT_CMAKE_BUILD_TARGET=Debug
 DEFAULT_CMAKE_ARGS=$(DEFAULT_CMAKE_COMPILERS) -DCMAKE_BUILD_TYPE=$(DEFAULT_CMAKE_BUILD_TARGET) $(EXPORT_COMPILE_COMMANDS)
@@ -61,7 +61,7 @@ $(BIN_DIR)/compile_commands.json: cmake_gen
 
 .PHONY: build
 build: cmake_gen
-	cmake --build $(BIN_DIR)
+	cmake --build $(BIN_DIR) -- -j$$(nproc)
 
 .PHONY: check
 check: build
