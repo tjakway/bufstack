@@ -24,7 +24,7 @@ TESTS=BufstackTests
 all: $(BIN_DIR)/Makefile $(BIN_DIR)/compile_commands.json build
 
 clean:
-	rm -r -f $(PYDIR)/*.pyc
+	rm -r -f $(BIN_DIR)
 
 .PHONY: tags
 tags:
@@ -50,7 +50,7 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 .PHONY: cmake_gen
-cmake_gen: check_cmake_src_dir
+cmake_gen: $(BIN_DIR) check_cmake_src_dir
 	cd $(BIN_DIR) && cmake $(DEFAULT_CMAKE_ARGS) $(CMAKE_SRC_DIR)
 
 $(BIN_DIR)/Makefile: cmake_gen
@@ -61,7 +61,7 @@ $(BIN_DIR)/compile_commands.json: cmake_gen
 
 .PHONY: build
 build: cmake_gen
-	cmake --build $(BIN_DIR) -- -j$$(nproc)
+	cmake --build $(BIN_DIR)
 
 .PHONY: check
 check: build
