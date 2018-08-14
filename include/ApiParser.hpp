@@ -95,6 +95,7 @@ class ApiParser : public Loggable
 
 protected:
     NEW_EXCEPTION_TYPE(ApiParserException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ParseFunctionException, ApiParserException);
 
 public:
     static bool isFunctionObject(const msgpack::object_handle& h)

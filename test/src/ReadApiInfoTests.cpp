@@ -166,6 +166,27 @@ TEST_F(ReadApiInfoTests, TestReadTypeCodes)
             });*/
 }
 
+TEST_F(ReadApiInfoTests, TestParseFunctions)
+{
+    readExpect([](const std::vector<msgpack::object_handle>& vecH) -> bool {
+            std::map<std::string, msgpack::object> top;
+
+            vecH.at(0).get().convert(top);
+
+            std::vector<msgpack::object_handle> handles;
+            handles.reserve(top.size());
+
+            for(auto it : top)
+            {
+                handles.emplace_back(msgpack::object_handle(it.second));
+            }
+
+            std::unordered_set<NvimFunction> functions = ApiParser::parseFunctions(handles);
+            ASSERT_GT(functions.size(), 0);
+            return true;
+    });
+}
+
 
 TEST_F(ReadApiInfoTests, TestHasBufferMethods)
 {
