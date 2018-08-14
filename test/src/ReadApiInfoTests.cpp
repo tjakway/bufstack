@@ -83,16 +83,10 @@ TEST_F(ReadApiInfoTests, TestCallbackInvoked)
 TEST_F(ReadApiInfoTests, TestExtractFunctionNames)
 {
     readExpect([](const std::vector<msgpack::object_handle>& handles){ 
-            //EXPECT_EQ(handles.size(), 1);
+            EXPECT_EQ(handles.size(), 1);
 
-            //std::vector<std::string> keys = ApiParser::extractFunctionNames(handles.at(0));
-            //return keys.size() > 0;
-            std::cout << "Received vector of size " << handles.size() << std::endl;
-            for(auto& h : handles)
-            {
-                std::cout << "object: " << h.get() << std::endl;
-            }
-            return true;
+            std::vector<std::string> keys = ApiParser::extractFunctionNames(handles.at(0));
+            return keys.size() > 0;
         });
 }
 

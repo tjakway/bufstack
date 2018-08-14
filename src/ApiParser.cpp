@@ -21,5 +21,22 @@ std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object_h
     return keys;
 }
 
+std::unordered_set<NvimFunction> ApiParser::parseFunctions(const std::vector<msgpack::object_handle>& handles)
+{
+    std::unordered_set<NvimFunction> parsedFunctions;
+    parsedFunctions.reserve(handles.size());
+
+    for(const auto& h : handles)
+    {
+        //parsedFunctions.
+    }
+
+    return parsedFunctions;
+}
+
+NvimFunction ApiParser::parseFunction(const msgpack::object_handle& h)
+{
+
+}
 
 BUFSTACK_END_NAMESPACE

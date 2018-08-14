@@ -63,6 +63,18 @@ size_t hash_combine( size_t lhs, size_t rhs ) {
   return lhs;
 }
 
+//hash all items in a vector and return them
+template<typename T> size_t hash_vector(std::vector<T> v)
+{
+    size_t acc = 0;
+    for(const T& t : v)
+    {
+        acc = hash_combine(acc, std::hash<T>{}(t));
+    }
+
+    return acc;
+}
+
 //hash specialization
 namespace std
 {
@@ -72,10 +84,10 @@ namespace std
         typedef std::size_t result_type;
         result_type operator()(argument_type const& f) const noexcept
         {
-            return hash_combine(std::hash<const optional<std::string>>{}(f.returnType),
-                    hash_combine(std::hash<const optional<std::string>>{}(f.sinceVersion),
-                    hash_combine(std::hash<const std::vector<std::string>>{}(f.parameters),
-                        std::hash<const std::string>{}(f.name));
+            return hash_combine(std::hash<optional<std::string>>{}(f.returnType),
+                    hash_combine(std::hash<optional<std::string>>{}(f.sinceVersion),
+                    hash_combine(hash_vector(f.parameters),
+                        std::hash<std::string>{}(f.name))));
         }
     };
 }
