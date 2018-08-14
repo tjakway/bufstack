@@ -1,5 +1,24 @@
 #include "ApiParser.hpp"
 
+#include "Util/Strcat.hpp"
+
+namespace {
+template<typename T> optional<T> tryConvert(const msgpack::object& h)
+{
+    T t;
+    try
+    {
+        h.convert(t);
+        return t;
+    }
+    catch(msgpack::type_error)
+    {
+        return nullopt;
+    }
+}
+}
+
+
 BUFSTACK_BEGIN_NAMESPACE
 
 
@@ -34,8 +53,36 @@ std::unordered_set<NvimFunction> ApiParser::parseFunctions(const std::vector<msg
     return parsedFunctions;
 }
 
+
 NvimFunction ApiParser::parseFunction(const msgpack::object_handle& h)
 {
+    std::map<std::string, msgpack::object> function;
+
+    try {
+        h.get().convert(function);
+    }
+    catch(msgpack::type_error e)
+    {
+        throw ParseFunctionException(STRCAT("Error converting ", h.get(), 
+                    " to an instance of std::map<std::string, msgpack::object>.",
+                    "  Exception thrown: ", e.what()));
+    }
+
+    optional<std::string> name = tryConvert<std::string>(function.at("name"));
+
+    if(!name.has_value())
+    {
+        throw ParseFunctionException(STRCAT(
+                    "msgpack object ", h.get(), " does not contain"
+                    " the key \"name\""));
+    }
+
+    //const auto parameters = tryConvert(function.at("parameters"))
+    return NvimFunction(tryConvert<std::string>(function.at("returnType")),
+                tryConvert<std::string>(function.at("since")),
+                tryConvert<std::vector<std::string>>(function.at("parameters"))
+                    .value_or(std::vector<std::string>{}),
+                name.value());
 
 }
 
