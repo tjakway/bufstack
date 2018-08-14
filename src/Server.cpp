@@ -23,7 +23,7 @@
 #include <ctime> //for ctime()
 
 //how much to read at once
-#define BUFFER_READ_SIZE 2048
+#define BUFFER_READ_SIZE 65536
 
 //TODO: move to Config
 #define SLEEP_MS 90
