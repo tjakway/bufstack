@@ -51,3 +51,6 @@ T min(T a, T b)
     return (b < a) ? b : a;
 }
 
+
+//from https://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes/27952689#27952689
+size_t hash_combine( size_t lhs, size_t rhs );

@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "Loggable.hpp"
 #include "Util/NewExceptionType.hpp"
+#include "Util/Util.hpp"
 
 #include <msgpack.hpp>
 
@@ -56,12 +57,6 @@ public:
 };
 
 BUFSTACK_END_NAMESPACE
-
-//from https://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes/27952689#27952689
-size_t hash_combine( size_t lhs, size_t rhs ) {
-  lhs^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
-  return lhs;
-}
 
 //hash all items in a vector and return them
 template<typename T> size_t hash_vector(std::vector<T> v)
