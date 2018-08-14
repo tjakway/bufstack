@@ -14,6 +14,7 @@
 #include <fstream>
 #include <vector>
 #include <functional>
+#include <chrono>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -29,10 +30,14 @@ class Server : public Loggable
 private:
     std::atomic_bool done {false};
 protected:
-    Server() {}
-    Server(int serverFd, 
-            sockaddr_in server, 
-            int backlogSize = Config::Defaults::defaultBacklogSize);
+    const int backlogSize;
+    const std::chrono::milliseconds sleepInterval;
+
+    Server(int _backlogSize = Config::Defaults::defaultBacklogSize,
+            std::chrono::milliseconds _sleepInterval = Config::Defaults::serverSleepInterval)
+        : backlogSize(_backlogSize),
+            sleepInterval(_sleepInterval)
+    {}
 
     using Buffer = std::unique_ptr<std::pair<char*, long>>;
 
@@ -45,6 +50,7 @@ protected:
 
     static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
     virtual void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
+
 
 public:
     virtual ~Server() {}

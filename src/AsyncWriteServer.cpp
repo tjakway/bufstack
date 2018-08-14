@@ -35,7 +35,7 @@ AsyncWriteServer::AsyncWriteServer(
             sockaddr_in server, 
             int backlogSize,
             bool _forceAsync)
-    : Server(serverFd, server, backlogSize),
+    : Server(backlogSize),
     forceAsync(_forceAsync)
 {}
 

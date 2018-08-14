@@ -2,6 +2,8 @@
 
 #include "NamespaceDefines.hpp"
 
+#include <chrono>
+
 BUFSTACK_BEGIN_NAMESPACE
 
 class Config
@@ -13,6 +15,10 @@ public:
     {
     public:
         static const int defaultBacklogSize;
+        /*
+         * time to sleep between file descriptor reads
+         */
+        static const std::chrono::milliseconds serverSleepInterval;
     };
 };
 

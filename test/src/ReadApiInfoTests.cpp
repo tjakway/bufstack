@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <cstring>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -94,6 +95,56 @@ TEST_F(ReadApiInfoTests, TestExtractFunctionNames)
             return true;
         });
 }
+
+/*
+TEST_F(ReadApiInfoTests, TestDecodeFile)
+{
+    //read the entire file into memory
+
+    //ate = open at end
+    std::ifstream in(ReadApiInfoTests::apiInfoFilename, 
+            std::ios::binary | std::ios::in | std::ios::ate);
+
+    std::ifstream::pos_type pos = in.tellg();
+
+    std::vector<char> buf;
+    buf.reserve(pos);
+
+    in.seekg(0, std::ios::beg);
+    in.read(buf.data(), pos);
+
+    const auto length = pos;
+
+    //decode msgpack objects
+    msgpack::unpacker unpacker;
+    unpacker.reserve_buffer(length);
+    std::memcpy(unpacker.buffer(), buf.data(), length);
+    unpacker.buffer_consumed(length);
+
+    std::vector<msgpack::object_handle> handles;
+
+
+    bool decodeDone = false;
+    while(!decodeDone)
+    {
+        msgpack::object_handle oh;
+        if(!unpacker.next(oh))
+        {
+            decodeDone = true;
+        }
+        else
+        {
+            handles.emplace_back(std::move(oh));
+        }
+    }
+
+    for(const auto& h : handles)
+    {
+        std::cout << "TestDecodeFile type:\t" << h.get().type << std::endl
+            << "TestDecodeFile object:\t" << h.get() << std::endl;
+    }
+}
+*/
 
 TEST_F(ReadApiInfoTests, TestReadTypeCodes)
 {

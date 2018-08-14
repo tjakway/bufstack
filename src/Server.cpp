@@ -25,9 +25,6 @@
 //how much to read at once
 #define BUFFER_READ_SIZE 65536
 
-//TODO: move to Config
-#define SLEEP_MS 90
-
 //namespace {
 
 //NOTE: can't read directly into the unpacker buffer because we might need to 
@@ -165,7 +162,7 @@ void Server::readFd(int fd,
         amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
         if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MS));
+            std::this_thread::sleep_for(sleepInterval);
         }
         //if we read data copy into the result buffer
         else if(amtRead > 0)
