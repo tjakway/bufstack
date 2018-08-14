@@ -47,7 +47,7 @@ std::unordered_set<NvimFunction> ApiParser::parseFunctions(const std::vector<msg
 
     for(const auto& h : handles)
     {
-        //parsedFunctions.
+        parsedFunctions.emplace(parseFunction(h));
     }
 
     return parsedFunctions;
