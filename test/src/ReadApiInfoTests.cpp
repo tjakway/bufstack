@@ -74,6 +74,17 @@ public:
 };
 const std::string ReadApiInfoTests::apiInfoFilename {"resources/api_info"};
 
+class MockApiParser : public ApiParser
+{
+public:
+    MockApiParser(const msgpack::object_handle& _handle)
+        : ApiParser(_handle)
+    {}
+
+    static ApiParser::ParseFunctions parseFunctions;
+};
+
+ApiParser::ParseFunctions MockApiParser::parseFunctions;
 
 //make sure we can decode it without crashing
 TEST_F(ReadApiInfoTests, TestCallbackInvoked)
@@ -190,7 +201,7 @@ TEST_F(ReadApiInfoTests, TestParseFunctions)
             const auto keyVec = extractKeys(apiInfo);
             const std::set<std::string> keySet(keyVec.cbegin(), keyVec.cend());
 
-            assert(ApiParser::keysAreApiInfo(keySet));
+            assert(MockApiParser::parseFunctions.keysAreApiInfo(keySet));
 
             std::vector<msgpack::object> functionObjects;
             apiInfo.at("functions").convert(functionObjects);
@@ -201,7 +212,7 @@ TEST_F(ReadApiInfoTests, TestParseFunctions)
                 refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
             }
 
-            std::unordered_set<NvimFunction> functions = ApiParser::parseFunctions(refs);
+            std::unordered_set<NvimFunction> functions = MockApiParser::parseFunctions.parseNvimFunctions(refs);
             assert(functions.size() > 0);
             return true;
     });
