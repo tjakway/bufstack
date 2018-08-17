@@ -21,6 +21,7 @@ template<typename T> optional<T> tryConvert(const msgpack::object& h)
         return nullopt;
     }
 }
+
 }
 
 
@@ -64,15 +65,47 @@ std::ostream& operator <<(std::ostream& stream, const NvimFunction& f)
 }
 
 
+const std::string ApiParser::Keys::ApiInfo::functions = "functions";
+const std::string ApiParser::Keys::ApiInfo::types = "types";
+const std::string ApiParser::Keys::ApiInfo::version = "version";
+const std::string ApiParser::Keys::ApiInfo::errorTypes = "error_types";
+
+const std::set<std::string> ApiParser::Keys::ApiInfo::keys {
+    functions, types, version, errorTypes
+};
+
+const std::string ApiParser::Keys::Function::returnType = "return_type";
+const std::string ApiParser::Keys::Function::since = "since";
+const std::string ApiParser::Keys::Function::method = "method";
+const std::string ApiParser::Keys::Function::parameters = "parameters";
+const std::string ApiParser::Keys::Function::name = "name";
+
+const std::set<std::string> ApiParser::Keys::Function::keys {
+    returnType, since, method, parameters, name
+};
+
+
+void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
+{
+    if(!vecH.size())
+    {
+        throw ParseApiInfoException(STRCATS("Expected api info message to" <<
+                " have 1 msgpack object but size == " << vecH.size()));
+    }
+    else
+    {
+
+    }
+}
+
+bool ApiParser::keysAreApiInfo(const std::set<std::string>& keys)
+{
+    return Util::leftIncludesRight(keys, Keys::ApiInfo::keys);
+}
+
 bool ApiParser::keysAreFunctionObject(const std::set<std::string>& keys)
 {
-    const std::set<std::string> expectedKeys = {
-        "return_type", "since", "method",
-        "parameters", "name"
-    };
-
-    return std::includes(keys.begin(), keys.end(),
-            expectedKeys.begin(), expectedKeys.end());
+    return Util::leftIncludesRight(keys, Keys::Function::keys);
 }
 
 

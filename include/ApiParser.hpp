@@ -109,6 +109,35 @@ class ApiParser : public Loggable
 {
     const msgpack::object_handle& handle;
 
+    class Keys
+    {
+    public:
+        //TODO: a macro would probably make declaring this easier
+        class ApiInfo
+        {
+        public:
+            static const std::string functions,
+                                     types,
+                                     version,
+                                     errorTypes;
+
+            static const std::set<std::string> keys;
+        };
+
+        class Function
+        {
+        public:
+            static const std::string returnType,
+                                     since,
+                                     method,
+                                     parameters,
+                                     name;
+
+            static const std::set<std::string> keys;
+
+        };
+    };
+
 protected:
     NEW_EXCEPTION_TYPE(ApiParserException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseApiInfoException, ApiParserException);
