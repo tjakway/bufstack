@@ -54,7 +54,8 @@ std::string NvimFunction::printMultiline() const
 
 std::ostream& operator <<(std::ostream& stream, const NvimFunction& f)
 {
-
+    stream << f.printCompact();
+    return stream;
 }
 
 
