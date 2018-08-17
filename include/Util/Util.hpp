@@ -5,6 +5,9 @@
 #include <array>
 #include <functional>
 #include <memory>
+#include <vector>
+#include <sstream>
+#include <algorithm>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -35,6 +38,36 @@ public:
     static int fd_is_valid(int fd)
     {
         return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+    }
+
+
+    template <typename T>
+    static std::string printVector(std::vector<T> vec, 
+            std::string separator = ", ",
+            std::string header = "vec { ",
+            std::string footer = " }")
+    {
+        std::ostringstream stream;
+        stream << header;
+
+        if(vec.size() > 1)
+        {
+            for(auto it = vec.begin(); it < (vec.end() - 1); ++it)
+            {
+                stream << *it << separator;
+            }
+
+            //insert the last item without a trailing separator
+            stream << vec.back();
+        }
+        else if(vec.size() == 1)
+        {
+            //insert the only item without a separator
+            stream << vec.front();
+        }
+
+        stream << footer;
+        return stream.str();
     }
 };
 
