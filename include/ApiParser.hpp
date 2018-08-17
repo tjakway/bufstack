@@ -30,22 +30,26 @@ class NvimFunction
             std::string fieldSep,
             std::string footer) const;
 public:
+    const optional<bool> method;
     const optional<std::string> returnType;
     const optional<std::string> sinceVersion;
     const std::vector<std::string> parameters;
     const std::string name;
 
-    NvimFunction(const optional<std::string> _returnType,
+    NvimFunction(const optional<bool> _method,
+            const optional<std::string> _returnType,
             const optional<std::string> _sinceVersion,
             const std::vector<std::string> _parameters,
             const std::string _name)
-        : returnType(_returnType), sinceVersion(_sinceVersion),
+        : method(_method), 
+        returnType(_returnType), sinceVersion(_sinceVersion),
         parameters(_parameters), name(_name)
     {}
 
     //copy constructor
     NvimFunction(const NvimFunction& other)
-        : returnType(other.returnType),
+        : method(other.method),
+        returnType(other.returnType),
         sinceVersion(other.sinceVersion),
         parameters(other.parameters),
         name(other.name)

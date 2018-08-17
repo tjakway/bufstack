@@ -4,6 +4,7 @@
 #include "Util/Util.hpp"
 #include "Util/PrintOptional.hpp"
 
+#include <sstream>
 #include <string>
 
 namespace {
@@ -33,12 +34,16 @@ std::string NvimFunction::print(std::string header,
         std::string fieldSep,
         std::string footer) const
 {
-    return STRCAT(header, 
-            "name", fieldValueSep, name, fieldSep,
-            "return_type", fieldValueSep, printOptional(returnType), fieldSep,
-            "since", fieldValueSep, printOptional(sinceVersion), fieldSep,
-            "parameters", fieldValueSep, Util::printVector(parameters),
-            footer);
+    std::ostringstream ss;
+    ss << header << 
+            "name" << fieldValueSep << name << fieldSep <<
+            "method" << fieldValueSep << printOptional(method) << fieldSep <<
+            "return_type" << fieldValueSep << printOptional(returnType) << fieldSep <<
+            "since" << fieldValueSep << printOptional(sinceVersion) << fieldSep <<
+            "parameters" << fieldValueSep << Util::printVector(parameters) <<
+            footer;
+
+    return ss.str();
 }
 
 std::string NvimFunction::printCompact() const
@@ -116,7 +121,8 @@ NvimFunction ApiParser::parseFunction(const msgpack::object& h)
     }
 
     //const auto parameters = tryConvert(function.at("parameters"))
-    return NvimFunction(tryConvert<std::string>(function.at("return_type")),
+    return NvimFunction(tryConvert<std::string>(function.at("method")),
+                tryConvert<std::string>(function.at("return_type")),
                 tryConvert<std::string>(function.at("since")),
                 tryConvert<std::vector<std::string>>(function.at("parameters"))
                     .value_or(std::vector<std::string>{}),
