@@ -114,13 +114,6 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseFunctionException, ApiParserException);
 
 public:
-    static bool isFunctionObject(const msgpack::object_handle& h)
-    {
-        std::map<std::string, msgpack::object_handle> functions;
-
-
-    }
-
     static bool keysAreFunctionObject(const std::set<std::string>& keys)
     {
         const std::set<std::string> expectedKeys = {
