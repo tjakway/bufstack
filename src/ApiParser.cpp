@@ -1,6 +1,10 @@
 #include "ApiParser.hpp"
 
 #include "Util/Strcat.hpp"
+#include "Util/Util.hpp"
+#include "Util/PrintOptional.hpp"
+
+#include <string>
 
 namespace {
 template<typename T> optional<T> tryConvert(const msgpack::object& h)
@@ -20,6 +24,38 @@ template<typename T> optional<T> tryConvert(const msgpack::object& h)
 
 
 BUFSTACK_BEGIN_NAMESPACE
+
+
+std::string NvimFunction::print(std::string header, 
+        //between a field's name and its value
+        std::string fieldValueSep,
+        //between the field lines themselves
+        std::string fieldSep,
+        std::string footer) const
+{
+    return STRCAT(header, 
+            "name", fieldValueSep, name, fieldSep,
+            "return_type", fieldValueSep, printOptional(returnType), fieldSep,
+            "since", fieldValueSep, printOptional(sinceVersion), fieldSep,
+            "parameters", fieldValueSep, Util::printVector(parameters),
+            footer);
+}
+
+std::string NvimFunction::printCompact() const
+{
+    return print("NvimFunction {", ": ", ", ", "}");
+}
+
+std::string NvimFunction::printMultiline() const
+{
+    return print("NvimFunction\n\t", ": ", "\n\t", "");
+}
+
+
+std::ostream& operator <<(std::ostream& stream, const NvimFunction& f)
+{
+
+}
 
 
 std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object& h)

@@ -23,6 +23,12 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class NvimFunction
 {
+    std::string print(std::string header, 
+            //between a field's name and its value
+            std::string fieldValueSep,
+            //between the field lines themselves
+            std::string fieldSep,
+            std::string footer) const;
 public:
     const optional<std::string> returnType;
     const optional<std::string> sinceVersion;
@@ -54,7 +60,13 @@ public:
             parameters == other.parameters &&
             name == other.name;
     }
+
+    std::string printCompact() const;
+    std::string printMultiline() const;
 };
+
+std::ostream& operator <<(std::ostream&, const NvimFunction&);
+
 
 BUFSTACK_END_NAMESPACE
 
