@@ -121,7 +121,7 @@ NvimFunction ApiParser::parseFunction(const msgpack::object& h)
     }
 
     //const auto parameters = tryConvert(function.at("parameters"))
-    return NvimFunction(tryConvert<std::string>(function.at("method")),
+    return NvimFunction(tryConvert<bool>(function.at("method")),
                 tryConvert<std::string>(function.at("return_type")),
                 tryConvert<std::string>(function.at("since")),
                 tryConvert<std::vector<std::string>>(function.at("parameters"))
