@@ -120,7 +120,6 @@ NvimFunction ApiParser::parseFunction(const msgpack::object& h)
                     " the key \"name\""));
     }
 
-    //const auto parameters = tryConvert(function.at("parameters"))
     return NvimFunction(tryConvert<bool>(function.at("method")),
                 tryConvert<std::string>(function.at("return_type")),
                 tryConvert<std::string>(function.at("since")),
