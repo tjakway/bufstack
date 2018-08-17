@@ -69,6 +69,16 @@ public:
         stream << footer;
         return stream.str();
     }
+
+    /**
+    * return true if rhs is a subset of lhs
+    */
+    template<typename T> 
+    bool leftIncludesRight(const T& lhs, T& rhs)
+    {
+        return std::includes(rhs.begin(), rhs.end(),
+                lhs.begin(), lhs.end());
+    }
 };
 
 //these functions are included in C++14 but not C++11
