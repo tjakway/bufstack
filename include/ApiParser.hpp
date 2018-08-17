@@ -111,12 +111,14 @@ class ApiParser : public Loggable
 
 protected:
     NEW_EXCEPTION_TYPE(ApiParserException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ParseApiInfoException, ApiParserException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseFunctionException, ApiParserException);
 
-    void parseApiInfo(const msgpack::object&);
+    void parseApiInfo(const std::vector<msgpack::object_handle>&);
 
 public:
-    static bool keysAreFunctionObject(const std::set<std::string>& keys);
+    static bool keysAreApiInfo(const std::set<std::string>&);
+    static bool keysAreFunctionObject(const std::set<std::string>&);
 
     static std::vector<std::string> extractFunctionNames(const msgpack::object&);
 

@@ -190,7 +190,9 @@ TEST_F(ReadApiInfoTests, TestParseFunctions)
             const auto keyVec = extractKeys(apiInfo);
             const std::set<std::string> keySet(keyVec.cbegin(), keyVec.cend());
 
-            assert(ApiParser::keysAreFunctionObject(keySet));
+            const std::set<std::string> expectedKeys { "functions", "types", "version", "error_types" };
+
+            assert(keySet == expectedKeys);
 
             std::vector<msgpack::object> functionObjects;
             apiInfo.at("functions").convert(functionObjects);
