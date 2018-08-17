@@ -192,7 +192,6 @@ TEST_F(ReadApiInfoTests, TestParseFunctions)
 
             const std::set<std::string> expectedKeys { "functions", "types", "version", "error_types" };
 
-            //std::cout << "keyset: " << keySet << std::endl << "expectedKeys: " << expectedKeys << std::endl;
             assert(keySet == expectedKeys);
 
             std::vector<msgpack::object> functionObjects;
