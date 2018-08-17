@@ -107,7 +107,7 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
                 refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
             }
 
-            functions = parseFunctions(refs);
+            functions = parseFunctions.parseNvimFunctions(refs);
         } catch(msgpack::type_error e)
         {
             throw ParseApiInfoException(STRCAT("Caught msgpack::type_error in ", 
@@ -116,18 +116,18 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
     }
 }
 
-bool ApiParser::keysAreApiInfo(const std::set<std::string>& keys)
+bool ApiParser::ParseFunctions::keysAreApiInfo(const std::set<std::string>& keys)
 {
     return Util::leftIncludesRight(keys, Keys::ApiInfo::keys);
 }
 
-bool ApiParser::keysAreFunctionObject(const std::set<std::string>& keys)
+bool ApiParser::ParseFunctions::keysAreFunctionObject(const std::set<std::string>& keys)
 {
     return Util::leftIncludesRight(keys, Keys::Function::keys);
 }
 
 
-std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object& h)
+std::vector<std::string> ApiParser::ParseFunctions::extractFunctionNames(const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> apiInfo;
 
@@ -145,7 +145,7 @@ std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object& 
     return keys;
 }
 
-std::unordered_set<NvimFunction> ApiParser::parseFunctions(
+std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
         const std::vector<std::reference_wrapper<msgpack::object>>& handles)
 {
     std::unordered_set<NvimFunction> parsedFunctions;
@@ -153,14 +153,16 @@ std::unordered_set<NvimFunction> ApiParser::parseFunctions(
 
     for(const auto& h : handles)
     {
-        parsedFunctions.emplace(parseFunction(h));
+        const auto f = parseNvimFunction(h);
+        info() << "parsed function " << f.printMultiline();
+        parsedFunctions.emplace(f);
     }
 
     return parsedFunctions;
 }
 
 
-NvimFunction ApiParser::parseFunction(const msgpack::object& h)
+NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> function;
 

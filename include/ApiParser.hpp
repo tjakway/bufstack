@@ -147,15 +147,20 @@ protected:
 
     void parseApiInfo(const std::vector<msgpack::object_handle>&);
 
-public:
-    static bool keysAreApiInfo(const std::set<std::string>&);
-    static bool keysAreFunctionObject(const std::set<std::string>&);
+    class ParseFunctions : public Loggable
+    {
+    public:
+        bool keysAreApiInfo(const std::set<std::string>&);
+        bool keysAreFunctionObject(const std::set<std::string>&);
 
-    static std::vector<std::string> extractFunctionNames(const msgpack::object&);
+        std::vector<std::string> extractFunctionNames(const msgpack::object&);
 
-    static std::unordered_set<NvimFunction> parseFunctions(
-            const std::vector<std::reference_wrapper<msgpack::object>>&);
-    static NvimFunction parseFunction(const msgpack::object&);
+        std::unordered_set<NvimFunction> parseNvimFunctions(
+         const std::vector<std::reference_wrapper<msgpack::object>>&);
+
+        NvimFunction parseNvimFunction(const msgpack::object&);
+
+    } parseFunctions;
 
 public:
     ApiParser(const msgpack::object_handle& _handle)
