@@ -94,7 +94,25 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
     }
     else
     {
+        try {
+            std::map<std::string, msgpack::object> apiInfo;
+            vecH.at(0).get().convert(apiInfo);
 
+            std::vector<msgpack::object> functionObjects;
+            apiInfo.at(Keys::ApiInfo::functions).convert(functionObjects);
+
+            std::vector<std::reference_wrapper<msgpack::object>> refs;
+            for(auto& it : functionObjects)
+            {
+                refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
+            }
+
+            functions = parseFunctions(refs);
+        } catch(msgpack::type_error e)
+        {
+            throw ParseApiInfoException(STRCAT("Caught msgpack::type_error in ", 
+                        __func__, ": ", e.what()));
+        }
     }
 }
 

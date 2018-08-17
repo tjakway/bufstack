@@ -109,6 +109,8 @@ class ApiParser : public Loggable
 {
     const msgpack::object_handle& handle;
 
+    std::unordered_set<NvimFunction> functions;
+
     class Keys
     {
     public:
