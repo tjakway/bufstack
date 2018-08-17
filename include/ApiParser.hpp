@@ -116,11 +116,11 @@ public:
                 expectedKeys.begin(), expectedKeys.end());
     }
 
-    static std::vector<std::string> extractFunctionNames(const msgpack::object_handle&);
+    static std::vector<std::string> extractFunctionNames(const msgpack::object&);
 
     static std::unordered_set<NvimFunction> parseFunctions(
-            const std::vector<msgpack::object_handle>&);
-    static NvimFunction parseFunction(const msgpack::object_handle&);
+            const std::vector<std::reference_wrapper<msgpack::object>>&);
+    static NvimFunction parseFunction(const msgpack::object&);
 
 public:
     ApiParser(const msgpack::object_handle& _handle)

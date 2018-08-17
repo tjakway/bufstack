@@ -5,6 +5,7 @@
 #include <fstream>
 #include <ostream>
 #include <map>
+#include <set>
 
 #include "NamespaceDefines.hpp"
 #include "Server.hpp"
@@ -80,6 +81,7 @@ TEST_F(ReadApiInfoTests, TestCallbackInvoked)
     readExpect([](const std::vector<msgpack::object_handle>&){ return true; });
 }
 
+/*
 TEST_F(ReadApiInfoTests, TestExtractFunctionNames)
 {
     readExpect([](const std::vector<msgpack::object_handle>& handles){ 
@@ -89,6 +91,7 @@ TEST_F(ReadApiInfoTests, TestExtractFunctionNames)
             return keys.size() > 0;
         });
 }
+*/
 
 /*
 TEST_F(ReadApiInfoTests, TestDecodeFile)
@@ -166,23 +169,43 @@ TEST_F(ReadApiInfoTests, TestReadTypeCodes)
             });*/
 }
 
+template <typename T> std::vector<typename T::key_type> extractKeys(T map)
+{
+    std::vector<typename T::key_type> keys;
+
+    for(const auto& thisItem : map)
+    {
+        keys.emplace_back(thisItem.first);
+    }
+
+    return keys;
+}
+
 TEST_F(ReadApiInfoTests, TestParseFunctions)
 {
     readExpect([](const std::vector<msgpack::object_handle>& vecH) -> bool {
-            std::map<std::string, msgpack::object> top;
+            std::map<std::string, msgpack::object> apiInfo;
 
-            vecH.at(0).get().convert(top);
+            vecH.at(0).get().convert(apiInfo);
+            const auto keyVec = extractKeys(apiInfo);
+            const std::set<std::string> keySet(keyVec.cbegin(), keyVec.cend());
 
-            std::vector<msgpack::object_handle> handles;
-            handles.reserve(top.size());
+            const std::set<std::string> expectedKeys { "functions", "types", "version", "error_types" };
 
-            for(auto it : top)
+            //std::cout << "keyset: " << keySet << std::endl << "expectedKeys: " << expectedKeys << std::endl;
+            assert(keySet == expectedKeys);
+
+            std::vector<msgpack::object> functionObjects;
+            apiInfo.at("functions").convert(functionObjects);
+
+            std::vector<std::reference_wrapper<msgpack::object>> refs;
+            for(auto& it : functionObjects)
             {
-                handles.emplace_back(msgpack::object_handle(it.second));
+                refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
             }
 
-            std::unordered_set<NvimFunction> functions = ApiParser::parseFunctions(handles);
-            ASSERT_GT(functions.size(), 0);
+            std::unordered_set<NvimFunction> functions = ApiParser::parseFunctions(refs);
+            assert(functions.size() > 0);
             return true;
     });
 }
