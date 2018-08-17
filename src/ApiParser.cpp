@@ -156,7 +156,7 @@ NvimFunction ApiParser::parseFunction(const msgpack::object& h)
                     "  Exception thrown: ", e.what()));
     }
 
-    optional<std::string> name = tryConvert<std::string>(function.at("name"));
+    optional<std::string> name = tryConvert<std::string>(function.at(Keys::Function::name));
 
     if(!name.has_value())
     {
@@ -165,10 +165,10 @@ NvimFunction ApiParser::parseFunction(const msgpack::object& h)
                     " the key \"name\""));
     }
 
-    return NvimFunction(tryConvert<bool>(function.at("method")),
-                tryConvert<std::string>(function.at("return_type")),
-                tryConvert<std::string>(function.at("since")),
-                tryConvert<std::vector<std::string>>(function.at("parameters"))
+    return NvimFunction(tryConvert<bool>(function.at(Keys::Function::method)),
+                tryConvert<std::string>(function.at(Keys::Function::returnType)),
+                tryConvert<std::string>(function.at(Keys::Function::since)),
+                tryConvert<std::vector<std::string>>(function.at(Keys::Function::parameters))
                     .value_or(std::vector<std::string>{}),
                 name.value());
 
