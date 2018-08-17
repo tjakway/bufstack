@@ -64,6 +64,18 @@ std::ostream& operator <<(std::ostream& stream, const NvimFunction& f)
 }
 
 
+bool ApiParser::keysAreFunctionObject(const std::set<std::string>& keys)
+{
+    const std::set<std::string> expectedKeys = {
+        "return_type", "since", "method",
+        "parameters", "name"
+    };
+
+    return std::includes(keys.begin(), keys.end(),
+            expectedKeys.begin(), expectedKeys.end());
+}
+
+
 std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> apiInfo;

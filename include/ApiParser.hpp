@@ -113,17 +113,10 @@ protected:
     NEW_EXCEPTION_TYPE(ApiParserException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseFunctionException, ApiParserException);
 
-public:
-    static bool keysAreFunctionObject(const std::set<std::string>& keys)
-    {
-        const std::set<std::string> expectedKeys = {
-            "return_type", "since", "method",
-            "parameters", "name"
-        };
+    void parseApiInfo(const msgpack::object&);
 
-        return std::includes(keys.begin(), keys.end(),
-                expectedKeys.begin(), expectedKeys.end());
-    }
+public:
+    static bool keysAreFunctionObject(const std::set<std::string>& keys);
 
     static std::vector<std::string> extractFunctionNames(const msgpack::object&);
 
