@@ -22,11 +22,11 @@ template<typename T> optional<T> tryConvert(const msgpack::object& h)
 BUFSTACK_BEGIN_NAMESPACE
 
 
-std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object_handle& h)
+std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> apiInfo;
 
-    h.get().convert(apiInfo);
+    h.convert(apiInfo);
 
     std::vector<std::string> keys;
 
@@ -40,7 +40,8 @@ std::vector<std::string> ApiParser::extractFunctionNames(const msgpack::object_h
     return keys;
 }
 
-std::unordered_set<NvimFunction> ApiParser::parseFunctions(const std::vector<msgpack::object_handle>& handles)
+std::unordered_set<NvimFunction> ApiParser::parseFunctions(
+        const std::vector<std::reference_wrapper<msgpack::object>>& handles)
 {
     std::unordered_set<NvimFunction> parsedFunctions;
     parsedFunctions.reserve(handles.size());
@@ -54,16 +55,16 @@ std::unordered_set<NvimFunction> ApiParser::parseFunctions(const std::vector<msg
 }
 
 
-NvimFunction ApiParser::parseFunction(const msgpack::object_handle& h)
+NvimFunction ApiParser::parseFunction(const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> function;
 
     try {
-        h.get().convert(function);
+        h.convert(function);
     }
     catch(msgpack::type_error e)
     {
-        throw ParseFunctionException(STRCAT("Error converting ", h.get(), 
+        throw ParseFunctionException(STRCAT("Error converting ", h, 
                     " to an instance of std::map<std::string, msgpack::object>.",
                     "  Exception thrown: ", e.what()));
     }
@@ -73,12 +74,12 @@ NvimFunction ApiParser::parseFunction(const msgpack::object_handle& h)
     if(!name.has_value())
     {
         throw ParseFunctionException(STRCAT(
-                    "msgpack object ", h.get(), " does not contain"
+                    "msgpack object ", h, " does not contain"
                     " the key \"name\""));
     }
 
     //const auto parameters = tryConvert(function.at("parameters"))
-    return NvimFunction(tryConvert<std::string>(function.at("returnType")),
+    return NvimFunction(tryConvert<std::string>(function.at("return_type")),
                 tryConvert<std::string>(function.at("since")),
                 tryConvert<std::vector<std::string>>(function.at("parameters"))
                     .value_or(std::vector<std::string>{}),
