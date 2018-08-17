@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <sstream>
 
 #include "nonstd/optional.hpp"
 
@@ -9,7 +9,9 @@ std::string printOptional(const nonstd::optional<T>& o)
 {
     if(o)
     {
-        std::to_string(o.value());
+        std::ostringstream ss;
+        ss << o.value();
+        return ss.str();
     }
     else
     {
