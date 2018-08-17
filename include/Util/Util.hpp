@@ -74,7 +74,7 @@ public:
     * return true if rhs is a subset of lhs
     */
     template<typename T> 
-    static bool leftIncludesRight(const T& lhs, T& rhs)
+    static bool leftIncludesRight(const T& lhs, const T& rhs)
     {
         return std::includes(rhs.begin(), rhs.end(),
                 lhs.begin(), lhs.end());
