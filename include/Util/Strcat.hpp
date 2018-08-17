@@ -45,3 +45,6 @@
 
 #define STRCAT(...) UTIL_STRCAT__(__VA_ARGS__)
 
+//same as above but instead of passing arguments just write the stream operator yourself, e.g:
+//  STRCATS("foo" << bar << " baz" << std::endl);
+#define STRCATS(x) ((std::ostringstream&)(std::ostringstream("") << x )).str()
