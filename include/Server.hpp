@@ -5,6 +5,8 @@
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
 
+#include "MsgpackRpc.hpp"
+
 #include <memory>
 #include <mutex>
 #include <deque>
@@ -102,6 +104,12 @@ private:
 class MsgpackServer : public SingleConnectionServer, public AsyncWriteServer
 {
 protected:
+    //I think only the rpc server can receive request messages
+    //virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
+    
+    virtual void onReceiveResponseMsg(const MsgpackRpc::Message&) = 0;
+    virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) = 0;
+
     virtual void onRecvMsg(msgpack::object_handle) = 0;
 
 private:
