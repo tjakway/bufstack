@@ -78,7 +78,7 @@ void MsgpackRpc::Message::checkCtorArgs()
             {
                 if(result.has_value())
                 {
-                    if(!result.get().is_nil())
+                    if(!result.value().is_nil())
                     {
                         throw MessageFormatException(STRCATS(
                             "For message of type " <<
