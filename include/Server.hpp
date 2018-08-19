@@ -27,7 +27,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class Server : public Loggable
+class Server : public virtual Loggable
 {
 private:
     std::atomic_bool done {false};
@@ -101,16 +101,21 @@ private:
     void doSend(int, Buffer);
 };
 
-class MsgpackServer : public SingleConnectionServer, public AsyncWriteServer
+class MsgpackServer : 
+    public SingleConnectionServer, 
+    public AsyncWriteServer
 {
 protected:
+    NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackServerError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageError, MsgpackServerError);
+
     //I think only the rpc server can receive request messages
     //virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
     
     virtual void onReceiveResponseMsg(const MsgpackRpc::Message&) = 0;
     virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) = 0;
 
-    virtual void onRecvMsg(msgpack::object_handle) = 0;
+    virtual void onRecvMsg(const msgpack::object&);
 
 private:
     msgpack::object_handle decode(Buffer);
