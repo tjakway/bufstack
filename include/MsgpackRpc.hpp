@@ -41,6 +41,8 @@ public:
         };
         const Type type;
 
+        Type getType() { return type; }
+
         const optional<uint32_t> msgId;
         const optional<std::string> error;
 
@@ -51,6 +53,9 @@ public:
 
         const std::vector<std::reference_wrapper<msgpack::object>> params;
 
+        std::string printMessage();
+
+    protected:
         Message(Type _type, 
                 optional<uint32_t> _msgId, 
                 optional<std::string> _error,
@@ -62,6 +67,7 @@ public:
             result(_result), params(_params)
         {}
 
+    public:
         Message(const Message& other)
             : Message(other.type,
             other.msgId,
@@ -70,10 +76,32 @@ public:
             other.result,
             other.params)
         {}
+    };
 
-        std::string printMessage();
 
+    class Notification : public Message
+    {
+    public:
+        Notification(Type type,
+                std::string method,
+                std::vector<std::reference_wrapper<msgpack::object>> params)
+            : Message(type, 
+                    nullopt,
+                    nullopt,
+                    make_optional(method),
+                    nullopt,
+                    params)
+        {}
 
+        std::string getMethod() 
+        { 
+            return method.value();
+        }
+
+        std::vector<std::reference_wrapper<msgpack::object>> getParams()
+        {
+            return params;
+        }
     };
 };
 
