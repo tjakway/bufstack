@@ -72,6 +72,22 @@ void MsgpackRpc::Message::checkCtorArgs()
             {
                 paramsError();
             }
+
+            //if an error occurred the result should be nil
+            if(error.has_value())
+            {
+                if(result.has_value())
+                {
+                    if(!result.get().is_nil())
+                    {
+                        throw MessageFormatException(STRCATS(
+                            "For message of type " <<
+                            printType(type) << ", result should be nil " <<
+                            "if an error occurred but result == " <<
+                            printOptional(result)));
+                    }
+                }
+            }
             break;
 
         case Notification:
