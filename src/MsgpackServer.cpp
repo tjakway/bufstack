@@ -98,6 +98,18 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
                 std::string method;
                 msgObj.at(1).convert(method);
 
+                
+                std::vector<msgpack::object> paramObjects;
+                msgObj.at(2).convert(paramObjects);
+
+                std::vector<std::reference_wrapper<msgpack::object>> params;
+                params.reserve(paramObjects.size());
+                for(const auto i : paramObjects)
+                {
+                    params.emplace_back(std::ref(i));
+                }
+
+                onReceiveNotificationMsg(MsgpackRpc::Notification(type, method, params));
                 break;
             }
         }
