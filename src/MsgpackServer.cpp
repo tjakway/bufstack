@@ -104,9 +104,9 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
 
                 std::vector<std::reference_wrapper<msgpack::object>> params;
                 params.reserve(paramObjects.size());
-                for(const auto i : paramObjects)
+                for(auto& i : paramObjects)
                 {
-                    params.emplace_back(std::ref(i));
+                    params.emplace_back(std::reference_wrapper<msgpack::object>(i));
                 }
 
                 onReceiveNotificationMsg(MsgpackRpc::Notification(type, method, params));
