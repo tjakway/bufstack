@@ -6,23 +6,20 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-namespace {
-
-    std::string printType(MsgpackRpc::Message::Type t)
+std::string MsgpackRpc::Message::printType(MsgpackRpc::Message::Type t)
+{
+    switch(t)
     {
-        switch(t)
-        {
-            case MsgpackRpc::Message::Type::Request:
-                return std::string("Request");
+        case MsgpackRpc::Message::Type::Request:
+            return std::string("Request");
 
-            case MsgpackRpc::Message::Type::Response:
-                return std::string("Response");
+        case MsgpackRpc::Message::Type::Response:
+            return std::string("Response");
 
-            case MsgpackRpc::Message::Type::Notification:
-                return std::string("Notification");
-        }
-
+        case MsgpackRpc::Message::Type::Notification:
+            return std::string("Notification");
     }
+
 }
 
 void MsgpackRpc::Message::resultError()
@@ -99,5 +96,9 @@ void MsgpackRpc::Message::checkCtorArgs()
     }
 
 }
+
+const int MsgpackRpc::Message::minimumMessageLength = 3;
+const int MsgpackRpc::Response::messageSize = 4;
+const int MsgpackRpc::Notification::messageSize = 3;
 
 BUFSTACK_END_NAMESPACE

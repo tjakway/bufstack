@@ -43,6 +43,9 @@ public:
 
         Type getType() { return type; }
 
+        //minimum number of msgpack objects in a message
+        static const int minimumMessageLength;
+
     protected:
         const optional<uint32_t> msgId;
         const optional<std::string> error;
@@ -78,6 +81,7 @@ public:
         {}
 
         std::string printMessage();
+        static std::string printType(Type);
     };
 
     class Response : public Message
@@ -108,6 +112,8 @@ public:
         {
             return params;
         }
+
+        static const int messageSize;
     };
 
     class Notification : public Message
@@ -138,6 +144,8 @@ public:
         {
             return params;
         }
+
+        static const int messageSize;
     };
 };
 
