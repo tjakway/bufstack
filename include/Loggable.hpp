@@ -1,34 +1,30 @@
 #pragma once
 
 #include "NamespaceDefines.hpp"
+#include "Config.hpp"
 
-#include <iostream>
-#include <ostream>
-#include <streambuf>
+#include <spdlog/spdlog.h>
+
+#include <functional>
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class Loggable
 {
-    std::ostream outstream, errstream;
+    std::shared_ptr<spdlog::logger> logger;
+    std::string loggerName;
 
-public:
-        Loggable() 
-        : outstream(std::cout.rdbuf()), 
-        errstream(std::cerr.rdbuf())
+protected:
+        Loggable(const std::string& name, 
+                std::function<
+                    std::shared_ptr<spdlog::logger>(const std::string&)> 
+                        initLogger = Config::Defaults::mkLogger)
+            : loggerName(name), logger(initLogger(name))
         {}
 
-        std::ostream& log() { return outstream; }
-        std::ostream& info() { return outstream; }
-        std::ostream& warn() 
-        {  
-            errstream << "WARNING:\t";
-            return errstream; 
-        }
-        std::ostream& error() 
-        { 
-            errstream << "ERROR:\t";
-            return errstream; 
+        virtual std::shared_ptr<spdlog::logger> getLogger()
+        {
+            return logger;
         }
 };
 

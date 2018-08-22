@@ -2,7 +2,11 @@
 
 #include "NamespaceDefines.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <chrono>
+#include <functional>
+#include <memory>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -19,6 +23,12 @@ public:
          * time to sleep between file descriptor reads
          */
         static const std::chrono::milliseconds serverSleepInterval;
+
+        /**
+         * default logger configuration
+         */
+        static const 
+            std::function<std::shared_ptr<spdlog::logger>(const std::string&)> mkLogger;
     };
 };
 
