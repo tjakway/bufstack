@@ -11,7 +11,7 @@ set(SPDLOG_TARGET_NAME spdlog)
 
 
 function(depends_spdlog TARGET_NAME_PARAM)
-    target_link_libraries(${MAIN_LIB_TARGET} PRIVATE ${SPDLOG_TARGET_NAME})
+    target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${SPDLOG_TARGET_NAME})
     target_include_directories(${MAIN_LIB_TARGET} 
         SYSTEM PUBLIC ${SPDLOG_INCLUDE_DIRECTORIES})
 endfunction()
