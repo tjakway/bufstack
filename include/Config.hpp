@@ -27,8 +27,7 @@ public:
         /**
          * default logger configuration
          */
-        static const 
-            std::function<std::shared_ptr<spdlog::logger>(const std::string&)> mkLogger;
+        static std::function<std::shared_ptr<spdlog::logger>(const std::string&)> getLoggerConstructor();
     };
 };
 

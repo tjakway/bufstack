@@ -19,7 +19,7 @@ protected:
         Loggable(const std::string& name, 
                 std::function<
                     std::shared_ptr<spdlog::logger>(const std::string&)> 
-                        initLogger = Config::Defaults::mkLogger)
+                        initLogger = Config::Defaults::getLoggerConstructor())
             : loggerName(name), logger(initLogger(name))
         {}
 
