@@ -5,7 +5,9 @@ FILE(GLOB MAIN_TEST_SRCS *.cpp *.c *.cxx)
 
 #build google test
 enable_testing()
-add_subdirectory("${CMAKE_SOURCE_DIR}/lib/googletest" ${CMAKE_BINARY_DIR}/gtest-bin)
+add_subdirectory("${CMAKE_SOURCE_DIR}/lib/googletest" 
+    ${CMAKE_BINARY_DIR}/gtest-bin
+    EXCLUDE_FROM_ALL)
 
 add_executable(${TEST_TARGET} ${MAIN_TEST_SRCS})
 

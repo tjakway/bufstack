@@ -8,7 +8,9 @@ function(depends_rpclib TARGET_NAME_PARAM)
     else()
         set(RPCLIB_CXX_STANDARD 11 CACHE BOOL "Require C++11" FORCE)
 
-        add_subdirectory(${CMAKE_SOURCE_DIR}/lib/rpclib ${CMAKE_BINARY_DIR}/rpclib)
+        add_subdirectory(${CMAKE_SOURCE_DIR}/lib/rpclib 
+            ${CMAKE_BINARY_DIR}/rpclib
+            EXCLUDE_FROM_ALL)
 
        #target_include_directories(${TARGET_NAME_PARAM} SYSTEM PUBLIC
        #    ${CMAKE_SOURCE_DIR}/lib/rpclib/include)

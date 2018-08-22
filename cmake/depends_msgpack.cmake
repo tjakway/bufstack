@@ -8,7 +8,9 @@ function(depends_msgpack TARGET_NAME_PARAM)
         #make sure we get msgpack with C++11
         set(MSGPACK_CXX11 ON CACHE BOOL "Require C++11" FORCE)
 
-        add_subdirectory(${CMAKE_SOURCE_DIR}/lib/msgpack-c ${CMAKE_BINARY_DIR}/msgpack-c)
+        add_subdirectory(${CMAKE_SOURCE_DIR}/lib/msgpack-c 
+            ${CMAKE_BINARY_DIR}/msgpack-c
+            EXCLUDE_FROM_ALL)
 
         target_include_directories(${TARGET_NAME_PARAM} SYSTEM PUBLIC
             ${CMAKE_SOURCE_DIR}/lib/msgpack-c/include)
