@@ -160,11 +160,15 @@ protected:
 
         NvimFunction parseNvimFunction(const msgpack::object&);
 
+        ParseFunctions()
+            : Loggable("ParseFunctions")
+        {}
+
     } parseFunctions;
 
 public:
     ApiParser(const msgpack::object_handle& _handle)
-        : handle(_handle)
+        : Loggable("ApiParser"), handle(_handle)
     {}
 
 

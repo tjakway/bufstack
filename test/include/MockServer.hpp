@@ -11,7 +11,7 @@ class MockServer : public Server
 {
 public:
     MockServer() 
-        : Server()
+        : Loggable("MockServer"), Server()
     {}
 
     static void sendAll(int fd, const char* buf, ssize_t bufLen, Loggable& log)

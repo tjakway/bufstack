@@ -13,7 +13,7 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
 {
     std::vector<msgpack::object> msgObj;
 
-    info() << "Received msgpack object: " << o;
+    getLogger()->info("Received msgpack object: {}", toString(o));
 
     if(o.type != msgpack::type::object_type::ARRAY)
     {

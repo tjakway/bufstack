@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 #include <functional>
+#include <sstream>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -22,10 +23,20 @@ protected:
             : loggerName(name), logger(initLogger(name))
         {}
 
+        template <typename T> 
+        std::string toString(const T& x)
+        {
+            std::ostringstream ss;
+            ss << x;
+            return ss.str();
+        }
+
+public:
         virtual std::shared_ptr<spdlog::logger> getLogger()
         {
             return logger;
         }
+
 };
 
 BUFSTACK_END_NAMESPACE

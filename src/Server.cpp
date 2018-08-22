@@ -6,6 +6,7 @@
 
 
 #include <msgpack.hpp>
+#include <rpc/client.h>
 
 #include <iterator>
 #include <string>
@@ -18,6 +19,7 @@
 #include <deque>
 #include <utility>
 
+#include <cstdint>
 #include <cstdlib>
 #include <cassert>
 #include <ctime> //for ctime()
@@ -68,9 +70,9 @@ std::vector<msgpack::object_handle> decode(
         {
             const time_t now = std::chrono::system_clock::to_time_t(
                             std::chrono::system_clock::now());
-            log.warn() << "failed to decode msgpack object at " << 
-                ctime(&now) << ";\tException info: " << 
-                e.what() << std::endl;
+            log.getLogger()->warn(
+                "failed to decode msgpack object at {};\tException info: {}",
+                    ctime(&now), e.what());
 
             throw e;
         }
@@ -95,7 +97,7 @@ void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& lo
     }
     else if(bufLen == std::numeric_limits<ssize_t>::max())
     {
-        log.warn() << "bufLen == std::numeric_limits<ssize_t>::max()" << std::endl;
+        log.getLogger()->warn("bufLen == std::numeric_limits<ssize_t>::max()");
     }
 
     //don't write more than this at once
@@ -123,9 +125,9 @@ void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& lo
             switch(errno)
             {
                 case EINTR:
-                    log.warn() << "encountered EINTR, indicating the write call was "
-                        << "interrupted by a signal before any data was rewritten"
-                        << ".  Retrying..." << std::endl;
+                    log.getLogger()->warn("encountered EINTR, indicating the write call was "
+                        "interrupted by a signal before any data was rewritten"
+                        ".  Retrying...");
                     continue;
                 default:
                     throw SocketError(STRCAT("Error in sendAll: ", 
@@ -209,5 +211,11 @@ bool Server::interrupted()
     return done.load();
 }
 
+
+//TODO: add to Server
+void connect(const std::string& addr, uint16_t port)
+{
+    rpc::client nvimClient(addr, port);
+}
 
 BUFSTACK_END_NAMESPACE

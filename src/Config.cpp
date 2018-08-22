@@ -1,5 +1,7 @@
 #include "Config.hpp"
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 BUFSTACK_BEGIN_NAMESPACE
 
 //just should be something large
@@ -9,7 +11,7 @@ const std::chrono::milliseconds Config::Defaults::serverSleepInterval =
     std::chrono::milliseconds(50);
 
 
-const std::function<std::shared_ptr<spdlog::logger>(const std::string&)>> mkLogger = 
+const std::function<std::shared_ptr<spdlog::logger>(const std::string&)> mkLogger = 
     [](const std::string& name) { return spdlog::stdout_color_mt(name); };
 
 BUFSTACK_END_NAMESPACE

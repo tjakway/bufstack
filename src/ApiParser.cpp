@@ -154,7 +154,7 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
     for(const auto& h : handles)
     {
         const auto f = parseNvimFunction(h);
-        info() << "parsed function " << f.printMultiline();
+        getLogger()->info("parsed function {}", f.printCompact());
         parsedFunctions.emplace(f);
     }
 

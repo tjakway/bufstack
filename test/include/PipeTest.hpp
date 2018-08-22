@@ -16,6 +16,7 @@ public:
     int readFd, writeFd;
     
     PipeTest()
+        : Loggable("PipeTest")
     {
         //test reading and writing across a pipe
         int pipeFds[2];
