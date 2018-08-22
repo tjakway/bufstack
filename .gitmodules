@@ -7,3 +7,6 @@
 [submodule "lib/rpclib"]
 	path = lib/rpclib
 	url = https://github.com/rpclib/rpclib.git
+[submodule "lib/spdlog"]
+	path = lib/spdlog
+	url = https://github.com/gabime/spdlog.git
