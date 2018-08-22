@@ -1,3 +1,15 @@
+if(USE_SYSTEM_RPCLIB)
+    #note: system rpclib is untested
+    find_package(rpc 2.2.1 REQUIRED)
+else()
+    set(RPCLIB_CXX_STANDARD 11 CACHE BOOL "Require C++11" FORCE)
+
+
+    add_subdirectory(${CMAKE_SOURCE_DIR}/lib/rpclib 
+        ${CMAKE_BINARY_DIR}/rpclib
+        EXCLUDE_FROM_ALL)
+endif()
+
 function(depends_rpclib TARGET_NAME_PARAM)
     if(USE_SYSTEM_RPCLIB)
         #note: system rpclib is untested
