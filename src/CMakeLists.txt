@@ -8,6 +8,8 @@ target_include_directories(${MAIN_LIB_TARGET} SYSTEM PUBLIC ${CMAKE_SOURCE_DIR}/
 
 depends_msgpack(${MAIN_LIB_TARGET})
 depends_rpclib(${MAIN_LIB_TARGET})
+depends_spdlog(${MAIN_LIB_TARGET})
+
 process_warnings(${MAIN_LIB_TARGET})
 
 add_subdirectory(exe)

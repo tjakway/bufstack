@@ -10,6 +10,7 @@ set(TEST_TARGET bufstack_test)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/depends_msgpack.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/depends_rpclib.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/depends_spdlog.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/default_build_type.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/process_warnings.cmake")
 
