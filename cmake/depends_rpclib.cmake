@@ -1,5 +1,5 @@
 function(depends_rpclib TARGET_NAME_PARAM)
-    if(USE_SYSTEM_MSGPACK)
+    if(USE_SYSTEM_RPCLIB)
         #note: system rpclib is untested
         find_package(rpc 2.2.1 REQUIRED)
 
@@ -7,6 +7,7 @@ function(depends_rpclib TARGET_NAME_PARAM)
         target_link_libraries(${TARGET_NAME_PARAM} INTERFACE ${MSGPACK_LIBRARIES})
     else()
         set(RPCLIB_CXX_STANDARD 11 CACHE BOOL "Require C++11" FORCE)
+
 
         add_subdirectory(${CMAKE_SOURCE_DIR}/lib/rpclib 
             ${CMAKE_BINARY_DIR}/rpclib
@@ -21,6 +22,7 @@ function(depends_rpclib TARGET_NAME_PARAM)
         #so when using FIND_PROJECT(..) you would call target_link_libraries(... rpclib::rpc)
         #but when adding a subdirectory all the targets go into the global namespace so its
         #just rpc
-        target_link_libraries(${TARGET_NAME_PARAM} INTERFACE rpc)
+        target_link_libraries(${TARGET_NAME_PARAM} PRIVATE rpc)
+        target_compile_definitions(${TARGET_NAME_PARAM} PUBLIC RPCLIB_MSGPACK=msgpack)
     endif()
 endfunction()
