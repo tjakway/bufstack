@@ -4,3 +4,6 @@
 [submodule "lib/googletest"]
 	path = lib/googletest
 	url = git@github.com:google/googletest.git
+[submodule "lib/rpclib"]
+	path = lib/rpclib
+	url = https://github.com/rpclib/rpclib.git
