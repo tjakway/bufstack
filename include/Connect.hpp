@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Util/Util.hpp"
+#include "NamespaceDefines.hpp"
     
 #include <cstdint>
 
@@ -10,17 +11,21 @@
 //NOTE: must include msgpack before rpc
 #include <rpc/client.h>
 
-class Connect
+BUFSTACK_BEGIN_NAMESPACE
+
+class Client
 {
     std::unique_ptr<rpc::client> client;
 
     std::string address;
     uint16_t port;
 
-    msgpack::object_handle getApiInfo();
+protected:
+    void onConnect();
+    void checkFunctions(const std::unordered_set<NvimFunction>&);
 
 public:
-    Connect(const std::string& _address,
+    Client(const std::string& _address,
             uint16_t _port)
         : address(_address), port(_port),
             client(make_unique<rpc::client>(address, port))
@@ -28,3 +33,5 @@ public:
 
 
 };
+
+BUFSTACK_END_NAMESPACE

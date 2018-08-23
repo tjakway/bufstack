@@ -171,6 +171,8 @@ public:
         : Loggable("ApiParser"), handle(_handle)
     {}
 
+    std::unordered_set<NvimFunction> getFunctions();
+
 
 };
 
