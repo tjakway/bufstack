@@ -2,6 +2,7 @@
 
 #include "Util/Util.hpp"
 #include "NamespaceDefines.hpp"
+#include "ApiParser.hpp"
     
 #include <cstdint>
 
