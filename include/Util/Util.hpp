@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <future>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -92,6 +93,19 @@ template<class T>
 T min(T a, T b)
 {
     return (b < a) ? b : a;
+}
+
+/**
+ * a bind operation for the std::future monad
+ */
+template <typename T, typename U>
+std::future<U> then(std::future<T> input, 
+        std::function<U(T)> f, 
+        std::launch policy = std::launch::async)
+{
+    return std::async(policy, [f, input](){
+            return f(input.get());
+    });
 }
 
 
