@@ -212,6 +212,12 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
         deprecated = make_optional(deprecatedSinceVersion);
     }
 
+    getLogger()->set_level(spdlog::level::debug);
+    std::ostringstream ss;
+    ss << function.at(Keys::Function::parameters);
+    getLogger()->debug("parameters object for {}: {}", printOptional(name),
+            ss.str());
+
     return NvimFunction(tryConvert<bool>(function.at(Keys::Function::method)),
                 tryConvert<std::string>(function.at(Keys::Function::returnType)),
                 tryConvert<std::string>(function.at(Keys::Function::since)),
