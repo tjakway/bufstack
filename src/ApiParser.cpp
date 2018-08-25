@@ -72,6 +72,10 @@ const std::string ApiParser::Keys::ApiInfo::types = "types";
 const std::string ApiParser::Keys::ApiInfo::version = "version";
 const std::string ApiParser::Keys::ApiInfo::errorTypes = "error_types";
 
+const std::set<std::string> ApiParser::Keys::ApiInfo::keys = {
+    functions, types, version, errorTypes
+};
+
 const std::string ApiParser::Keys::Function::returnType = "return_type";
 const std::string ApiParser::Keys::Function::since = "since";
 const std::string ApiParser::Keys::Function::deprecatedSince = "deprecated";
