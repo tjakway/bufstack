@@ -92,6 +92,8 @@ std::set<std::string> ApiParser::Keys::Function::getAllKeys() {
 
     //insert optional keys
     mandatoryKeys.insert(deprecatedSince);
+
+    return mandatoryKeys;
 }
 
 void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
