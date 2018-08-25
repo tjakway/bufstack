@@ -4,6 +4,8 @@
 #include "Util/Util.hpp"
 #include "Util/PrintOptional.hpp"
 
+#include "nonstd/optional.hpp"
+
 #include <sstream>
 #include <string>
 
@@ -70,20 +72,23 @@ const std::string ApiParser::Keys::ApiInfo::types = "types";
 const std::string ApiParser::Keys::ApiInfo::version = "version";
 const std::string ApiParser::Keys::ApiInfo::errorTypes = "error_types";
 
-const std::set<std::string> ApiParser::Keys::ApiInfo::keys {
-    functions, types, version, errorTypes
-};
-
 const std::string ApiParser::Keys::Function::returnType = "return_type";
 const std::string ApiParser::Keys::Function::since = "since";
+const std::string ApiParser::Keys::Function::deprecatedSince = "deprecated";
 const std::string ApiParser::Keys::Function::method = "method";
 const std::string ApiParser::Keys::Function::parameters = "parameters";
 const std::string ApiParser::Keys::Function::name = "name";
 
-const std::set<std::string> ApiParser::Keys::Function::keys {
-    returnType, since, method, parameters, name
+std::set<std::string> ApiParser::Keys::Function::getMandatoryKeys() {
+    return std::set<std::string>{ returnType, since, method, parameters, name };
 };
 
+std::set<std::string> ApiParser::Keys::Function::getAllKeys() {
+    std::set<std::string> mandatoryKeys = getMandatoryKeys();
+
+    //insert optional keys
+    mandatoryKeys.insert(deprecatedSince);
+}
 
 void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
 {
@@ -123,7 +128,7 @@ bool ApiParser::ParseFunctions::keysAreApiInfo(const std::set<std::string>& keys
 
 bool ApiParser::ParseFunctions::keysAreFunctionObject(const std::set<std::string>& keys)
 {
-    return Util::leftIncludesRight(keys, Keys::Function::keys);
+    return Util::leftIncludesRight(keys, Keys::Function::getMandatoryKeys());
 }
 
 
@@ -185,9 +190,26 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
                     " the key \"name\""));
     }
 
+    optional<std::string> deprecated;
+
+    std::map<std::string, msgpack::object>::iterator it = 
+        function.find(Keys::Function::deprecatedSince);
+    if(it == function.end())
+    {
+        //function isn't deprecated
+        deprecated = nullopt;
+    }
+    else
+    {
+        std::string deprecatedSinceVersion = "NOT DEPRECATED";
+        it->second.convert(deprecatedSinceVersion);
+        deprecated = make_optional(deprecatedSinceVersion);
+    }
+
     return NvimFunction(tryConvert<bool>(function.at(Keys::Function::method)),
                 tryConvert<std::string>(function.at(Keys::Function::returnType)),
                 tryConvert<std::string>(function.at(Keys::Function::since)),
+                deprecated,
                 tryConvert<std::vector<std::string>>(function.at(Keys::Function::parameters))
                     .value_or(std::vector<std::string>{}),
                 name.value());

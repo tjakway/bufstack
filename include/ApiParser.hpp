@@ -33,16 +33,19 @@ public:
     const optional<bool> method;
     const optional<std::string> returnType;
     const optional<std::string> sinceVersion;
+    const optional<std::string> deprecatedSince;
     const std::vector<std::string> parameters;
     const std::string name;
 
     NvimFunction(const optional<bool> _method,
             const optional<std::string> _returnType,
             const optional<std::string> _sinceVersion,
+            const optional<std::string> _deprecatedSince,
             const std::vector<std::string> _parameters,
             const std::string _name)
         : method(_method), 
         returnType(_returnType), sinceVersion(_sinceVersion),
+        deprecatedSince(_deprecatedSince),
         parameters(_parameters), name(_name)
     {}
 
@@ -51,6 +54,7 @@ public:
         : method(other.method),
         returnType(other.returnType),
         sinceVersion(other.sinceVersion),
+        deprecatedSince(other.deprecatedSince),
         parameters(other.parameters),
         name(other.name)
     {}
@@ -64,6 +68,18 @@ public:
             parameters == other.parameters &&
             name == other.name;
     }
+
+    /**
+     * equality ignoring irrelevant fields
+     */
+    bool matches(const NvimFunction& other) const
+    {
+        return returnType == other.returnType && 
+            parameters == other.parameters &&
+            name == other.name;
+    }
+
+    bool deprecated() const { return deprecatedSince.has_value(); }
 
     std::string printCompact() const;
     std::string printMultiline() const;
@@ -131,11 +147,14 @@ class ApiParser : public Loggable
         public:
             static const std::string returnType,
                                      since,
+                                     deprecatedSince,
                                      method,
                                      parameters,
                                      name;
 
-            static const std::set<std::string> keys;
+            //not every object needs to have every key
+            static std::set<std::string> getMandatoryKeys();
+            static std::set<std::string> getAllKeys();
 
         };
     };
