@@ -19,6 +19,8 @@ std::function<std::shared_ptr<spdlog::logger>(const std::string&)> Config::Defau
     const std::function<std::shared_ptr<spdlog::logger>(const std::string&)> 
         loggerConstructor = 
             [](const std::string& name) { 
+                //TODO: should make sure to generate a new number for that type 
+                //so there aren't any repeats
                 std::string genName = 
                     name + std::string("_instance_") + std::to_string(rand());
                 return spdlog::stdout_color_mt(genName); 

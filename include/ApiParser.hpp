@@ -21,6 +21,8 @@ using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
 
+using ApiInfo = msgpack::object;
+
 class NvimFunction
 {
     std::string print(std::string header, 

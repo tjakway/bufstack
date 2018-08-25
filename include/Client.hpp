@@ -45,7 +45,7 @@ protected:
 
 public:
     RemoteApiFunction(const NvimFunction& spec, 
-            std::shared_ptr<Client> client
+            std::shared_ptr<Client> client,
             const ApiInfo& info)
         : RemoteApiFunction(make_optional(spec), client)
     {
@@ -61,6 +61,33 @@ public:
     //TODO: implement
     T call(const Args&... args);
     T async_call(const Args&... args);
+};
+
+class RemoteFunctionInstances
+{
+protected:
+    //TODO: implement specification checking
+    //TODO: add a subclass of NvimFunction `NvimFunctionSpec` to be used for this
+    //so we don't have to keep writing in irrelevant fields
+    //TODO: should be able to automatically deduce parts of the spec from 
+    //RemoteApiFunction template args
+    const NvimFunction bufIsValidSpec = 
+        NvimFunction(make_optional(true),
+                make_optional(std::string("Boolean")),
+                nullopt,
+                nullopt,
+                std::vector<std::string>{"Buffer"},
+                "nvim_buf_is_valid");
+
+public:
+    //TODO: wrap nvim types
+    const RemoteApiFunction<bool, std::string> bufIsValid;
+
+    RemoteFunctionInstances(
+        std::shared_ptr<Client> client,
+        const ApiInfo& info)
+        : bufIsValid(bufIsValidSpec, client, info)
+    {}
 };
 
 class Client
