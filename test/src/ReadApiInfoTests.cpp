@@ -12,7 +12,7 @@
 #include "FindNeovim.hpp"
 #include "MockServer.hpp"
 #include "Util/Util.hpp"
-#include "ApiParser.hpp"
+#include "NvimApi/ApiParser.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>

@@ -13,3 +13,6 @@ depends_spdlog(${MAIN_LIB_TARGET})
 process_warnings(${MAIN_LIB_TARGET})
 
 add_subdirectory(exe)
+add_subdirectory(NvimApi)
+
+target_link_libraries(${MAIN_LIB_TARGET} INTERFACE ${NVIM_API_LIB_TARGET})

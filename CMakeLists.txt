@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 project(bufstack)
 
 set(MAIN_LIB_TARGET bufstack)
+set(NVIM_API_LIB_TARGET nvim_api)
 set(MAIN_EXE_TARGET bufstack_server)
 set(TEST_TARGET bufstack_test)
 
