@@ -9,6 +9,9 @@
 #include <sstream>
 #include <algorithm>
 #include <future>
+#include <set>
+#include <iterator>
+#include <utility>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -80,6 +83,22 @@ public:
         return std::includes(rhs.begin(), rhs.end(),
                 lhs.begin(), lhs.end());
     }
+
+
+    template <typename C>
+    static std::set<typename C::key_type> getKeys(const C& map)
+    {
+        std::set<typename C::key_type> keySet;
+
+        //see https://stackoverflow.com/questions/681943/how-can-i-get-a-stdset-of-keys-to-a-stdmap
+        std::transform(map.begin(), map.end(),
+                std::inserter(keySet, keySet.begin()),
+                [](std::pair<typename C::key_type, typename C::value_type> p) {
+                    return p.first;
+                });
+
+        return keySet;
+    }
 };
 
 //these functions are included in C++14 but not C++11
@@ -111,3 +130,4 @@ std::future<U> then(std::future<T> input,
 
 //from https://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes/27952689#27952689
 size_t hash_combine( size_t lhs, size_t rhs );
+
