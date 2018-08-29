@@ -3,7 +3,7 @@
 #include "Util/Util.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "NamespaceDefines.hpp"
-#include "ApiParser.hpp"
+#include "NvimApi/ApiParser.hpp"
 
 #include "nonstd/optional.hpp"
     

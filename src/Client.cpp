@@ -2,7 +2,7 @@
 
 #include "Util/Util.hpp"
 
-#include "ApiParser.hpp"
+#include "NvimApi/ApiParser.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
