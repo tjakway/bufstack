@@ -13,6 +13,7 @@
 #include "MockServer.hpp"
 #include "Util/Util.hpp"
 #include "NvimApi/ApiParser.hpp"
+#include "Loggable.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -22,7 +23,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class ReadApiInfoTests : public ::testing::Test
+class ReadApiInfoTests : public ::testing::Test, public Loggable
 {
 public:
     int readFd;
@@ -30,7 +31,7 @@ public:
 
     //can't use assertions in CTOR
     ReadApiInfoTests()
-        : readFd(-1)
+        : Loggable("ReadApiInfoTests"), readFd(-1)
     { }
 
     virtual void SetUp()
@@ -72,21 +73,36 @@ public:
         EXPECT_TRUE(expected);
     }
 
-    static const std::unordered_set<std::unique_ptr<CustomType>> expectedErrorTypes;
-    static const std::unordered_set<std::unique_ptr<CustomType>> expectedRegTypes;
+    static const std::unordered_set<std::shared_ptr<CustomType>> expectedErrorTypes;
+    static const std::unordered_set<std::shared_ptr<CustomType>> expectedRegTypes;
+
+
+    static std::unordered_set<std::shared_ptr<CustomType>> getAllExpectedTypes();
 };
 const std::string ReadApiInfoTests::apiInfoFilename {"resources/api_info"};
 
-const std::unordered_set<std::shared_ptr<CustomType>> expectedErrorTypes {
+const std::unordered_set<std::shared_ptr<CustomType>> 
+    ReadApiInfoTests::expectedErrorTypes {
+
     std::make_shared<CustomType>(0, "Exception"),
     std::make_shared<CustomType>(1, "Validation")
 };
 
-const std::unordered_set<std::shared_ptr<CustomType>> expectedRegTypes {
+const std::unordered_set<std::shared_ptr<CustomType>> 
+    ReadApiInfoTests::expectedRegTypes {
+
     std::make_shared<PrefixType>(0, "Buffer", "nvim_buf_"),
     std::make_shared<PrefixType>(2, "Tabpage", "nvim_tabpage_"),
     std::make_shared<PrefixType>(1, "Window", "nvim_win_")
 };
+
+std::unordered_set<std::shared_ptr<CustomType>> ReadApiInfoTests::getAllExpectedTypes()
+{
+    std::unordered_set<std::shared_ptr<CustomType>> combine;
+    combine.insert(expectedErrorTypes.begin(), expectedErrorTypes.end());
+    combine.insert(expectedRegTypes.begin(), expectedRegTypes.end());
+    return combine;
+}
 
 class MockApiParser : public ApiParser
 {
@@ -246,14 +262,37 @@ TEST_F(ReadApiInfoTests, TestHasBufferMethods)
             });
 }
 
+
 TEST_F(ReadApiInfoTests, TestParseErrorTypes)
 {
     //make sure the constructor doesn't throw any exceptions
-    readExpect([](const std::vector<msgpack::object_handle>& vecH) -> bool {
+    readExpect([this](const std::vector<msgpack::object_handle>& vecH) -> bool {
             MockApiParser parser(vecH);
+            const auto customTypes = parser.getCustomTypes();
+            const auto expectedTypes = this->getAllExpectedTypes();
 
+            //print all members of both sets
+            std::ostringstream customTypesSS, expectedTypesSS;
+            for(const auto& x : customTypes)
+            {
+                customTypesSS << "\t" << x->printCompact() << "\n";
+            }
+            for(const auto& x : expectedTypes)
+            {
+                expectedTypesSS << "\t" << x->printCompact() << "\n";
+            }
 
-
+            if(customTypes != expectedTypes)
+            {
+                this->getLogger()->set_level(spdlog::level::debug);
+                this->getLogger()->debug("custom types: \n{}\nexpected types: \n{}",
+                    customTypesSS.str(), expectedTypesSS.str());
+                return false;
+            }
+            else
+            {
+                return true;
+            }
             });
 }
 
