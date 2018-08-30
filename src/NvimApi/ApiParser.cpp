@@ -78,6 +78,7 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             std::map<std::string, msgpack::object> apiInfo;
             vecH.at(0).get().convert(apiInfo);
 
+            //parse functions
             std::vector<msgpack::object> functionObjects;
             apiInfo.at(Keys::ApiInfo::functions).convert(functionObjects);
 
@@ -88,6 +89,28 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             }
 
             functions = parseFunctions.parseNvimFunctions(refs);
+            
+            //begin parsing custom types
+            std::unordered_set<std::unique_ptr<CustomType>> customTypes;
+
+            const auto insertAll = [&customTypes](
+                    std::unordered_set<std::unique_ptr<CustomType>> thisSet) {
+
+                for(std::unique_ptr<CustomType>& ptr : thisSet)
+                {
+                    customTypes.emplace(std::move(ptr));
+                }
+            };
+
+            //parse error types
+            std::map<std::string, msgpack::object> errorTypeObjects;
+            apiInfo.at(Keys::ApiInfo::errorTypes).convert(errorTypeObjects);
+            insertAll(parseFunctions.parseCustomTypes(errorTypeObjects));
+
+            std::map<std::string, msgpack::object> regTypeObjects;
+            apiInfo.at(Keys::ApiInfo::types).convert(regTypeObjects);
+            insertAll(parseFunctions.parseCustomTypes(regTypeObjects));
+
         } catch(msgpack::type_error e)
         {
             throw ParseApiInfoException(STRCAT("Caught msgpack::type_error in ", 
