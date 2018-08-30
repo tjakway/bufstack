@@ -263,7 +263,7 @@ TEST_F(ReadApiInfoTests, TestHasBufferMethods)
 }
 
 
-TEST_F(ReadApiInfoTests, TestParseErrorTypes)
+TEST_F(ReadApiInfoTests, TestParseCustomTypes)
 {
     //make sure the constructor doesn't throw any exceptions
     readExpect([this](const std::vector<msgpack::object_handle>& vecH) -> bool {
