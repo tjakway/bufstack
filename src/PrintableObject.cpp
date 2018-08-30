@@ -44,7 +44,8 @@ std::string PrintableObject::print(
     ss << header.value_or(getDefaultHeader());
 
     const auto fields = getFields();
-    auto lastElemIt = fields.rbegin();
+    auto lastElemIt = fields.end();
+    lastElemIt--;
 
     for(auto it = fields.begin(); it != fields.end(); ++it)
     {
@@ -53,9 +54,7 @@ std::string PrintableObject::print(
             it->second;
 
         //append the separator unless we're at the last field
-        //see https://stackoverflow.com/questions/15202978/compare-vectortiterator-with-vectortreverse-iterator
-        //re: comparing an iterator to a reverse iterator
-        if(it != lastElemIt.base())
+        if(it != lastElemIt)
         {
             ss << fieldSep.value_or(getDefaultFieldSep());
         }
