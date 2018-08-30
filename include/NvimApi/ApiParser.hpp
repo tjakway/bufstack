@@ -109,7 +109,7 @@ public:
     {}
 
     std::unordered_set<NvimFunction> getFunctions();
-
+    const std::unordered_set<std::unique_ptr<CustomType>>& getCustomTypes();
 
 };
 

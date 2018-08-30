@@ -296,4 +296,14 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
 
 }
 
+std::unordered_set<NvimFunction> ApiParser::getFunctions()
+{
+    return functions;
+}
+
+const std::unordered_set<std::unique_ptr<CustomType>>& ApiParser::getCustomTypes()
+{
+    return customTypes;
+}
+
 BUFSTACK_END_NAMESPACE
