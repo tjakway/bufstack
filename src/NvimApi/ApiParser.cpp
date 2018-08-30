@@ -92,14 +92,12 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             functions = parseFunctions.parseNvimFunctions(refs);
             
             //begin parsing custom types
-            std::unordered_set<std::shared_ptr<CustomType>> customTypes;
-
-            const auto insertAll = [&customTypes](
+            const auto insertAll = [this](
                     std::unordered_set<std::shared_ptr<CustomType>>& thisSet) {
 
                 for(const auto& thisElem : thisSet)
                 {
-                    customTypes.emplace(thisElem);
+                    this->customTypes.emplace(thisElem);
                 }
             };
 
