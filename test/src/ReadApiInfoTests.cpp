@@ -98,7 +98,7 @@ const ApiParser::CustomTypeSet
 
 ApiParser::CustomTypeSet ReadApiInfoTests::getAllExpectedTypes()
 {
-    std::unordered_set<std::shared_ptr<CustomType>> combine;
+    ApiParser::CustomTypeSet combine;
     combine.insert(expectedErrorTypes.begin(), expectedErrorTypes.end());
     combine.insert(expectedRegTypes.begin(), expectedRegTypes.end());
     return combine;
