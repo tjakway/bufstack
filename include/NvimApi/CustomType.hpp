@@ -63,6 +63,9 @@ public:
     }
 };
 
+std::ostream& operator <<(std::ostream&, const CustomType&);
+std::ostream& operator <<(std::ostream&, const PrefixType&);
+
 BUFSTACK_END_NAMESPACE
 
 
