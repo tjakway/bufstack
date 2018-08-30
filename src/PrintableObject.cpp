@@ -4,9 +4,9 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-const std::string PrintableObject::defaultFieldValueSep = ": ";
-const std::string PrintableObject::defaultFieldSep = ", ";
-const std::string PrintableObject::defaultFooter = "}";
+const std::string PrintableObject::defaultCompactFieldValueSep = ": ";
+const std::string PrintableObject::defaultCompactFieldSep = ", ";
+const std::string PrintableObject::defaultCompactFooter = "}";
 
 std::string PrintableObject::getDefaultHeader() const noexcept
 {
@@ -50,6 +50,24 @@ std::string PrintableObject::print(
     ss << footer.value_or(getDefaultFooter());
 
     return ss.str();
+}
+
+
+std::string PrintableObject::printCompact() const
+{
+    //use default parameters
+    return print(nonstd::make_optional(getHeader()), 
+            nonstd::make_optional(defaultCompactFieldValueSep),
+            nonstd::make_optional(defaultCompactFieldSep),
+            nonstd::make_optional(defaultCompactFooter));
+}
+
+std::string PrintableObject::printMultiline() const
+{
+    return print(nonstd::make_optional(getHeader()), 
+            nonstd::make_optional(defaultMultilineFieldValueSep),
+            nonstd::make_optional(defaultMultilineFieldSep),
+            nonstd::make_optional(defaultMultilineFooter));
 }
 
 BUFSTACK_END_NAMESPACE

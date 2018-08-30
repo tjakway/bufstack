@@ -14,10 +14,13 @@ protected:
     virtual std::map<std::string, std::string> getFields() const noexcept = 0;
     virtual std::string getName() const noexcept = 0;
 
-    static const std::string defaultHeader, 
-                 defaultFieldValueSep,
-                 defaultFieldSep,
-                 defaultFooter;
+    static const std::string defaultCompactFieldValueSep,
+                 defaultCompactFieldSep,
+                 defaultCompactFooter;
+
+    static const std::string defaultMultilineFieldValueSep,
+                 defaultMultilineFieldSep,
+                 defaultMultilineFooter;
 
 public:
     virtual std::string getDefaultHeader() const noexcept;
