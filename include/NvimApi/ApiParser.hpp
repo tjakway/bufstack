@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include <string>
 #include <algorithm>
+#include <memory>
 
 #include "nonstd/optional.hpp"
 
@@ -28,7 +29,7 @@ class ApiParser : public Loggable
     const msgpack::object_handle& handle;
 
     std::unordered_set<NvimFunction> functions;
-    std::unordered_set<CustomType> customTypes;
+    std::unordered_set<std::unique_ptr<CustomType>> customTypes;
 
     class Keys
     {
@@ -91,10 +92,10 @@ protected:
 
         NvimFunction parseNvimFunction(const msgpack::object&);
 
-        std::unordered_set<CustomType> parseCustomTypes(
-                const std::vector<std::reference_wrapper<msgpack::object>>&);
+        std::unordered_set<std::unique_ptr<CustomType>> parseCustomTypes(
+                const std::map<std::string, msgpack::object>&);
 
-        CustomType parseCustomType(const msgpack::object&);
+        std::unique_ptr<CustomType> parseCustomType(const std::string&, const msgpack::object&);
 
         ParseFunctions()
             : Loggable("ParseFunctions")

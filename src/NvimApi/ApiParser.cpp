@@ -142,24 +142,32 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
 }
 
 std::unordered_set<CustomType> ApiParser::ParseFunctions::parseCustomTypes(
-        const std::vector<std::reference_wrapper<msgpack::object>>& handles)
+        const std::map<std::string, msgpack::object>& handles)
 {
     std::unordered_set<CustomType> parsedTypes;
     parsedTypes.reserve(handles.size());
 
     for(const auto& h : handles)
     {
-        const auto f = parseCustomType(h);
-        getLogger()->info("parsed custom type {}", f.printCompact());
-        parsedTypes.emplace(f);
+        auto f = parseCustomType(h.first, h.second);
+        if(!f)
+        {
+            throw ParseCustomTypeException(STRCATS("Got null pointer while parsing " <<
+                        h << " as a msgpack custom type"));
+        }
+        else
+        {
+            getLogger()->info("parsed custom type {}", f.printCompact());
+            parsedTypes.emplace(std::move(f));
+        }
     }
 
     return parsedTypes;
-
 }
 
 
-CustomType ApiParser::ParseFunctions::parseCustomType(const msgpack::object& h)
+CustomType ApiParser::ParseFunctions::parseCustomType(const std::string& name,
+        const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> msgpackType;
 
@@ -175,8 +183,29 @@ CustomType ApiParser::ParseFunctions::parseCustomType(const msgpack::object& h)
                     "  Exception thrown: ", e.what()));
     }
 
-    //optional<int> id = tryConvert(function.at())
-    //TODO
+    optional<int> id = tryConvert(msgpackType.at(ApiParser::Keys::Type::id));
+    
+    if(!id.has_value())
+    {
+        throw ParseCustomTypeException(STRCATS(
+                    "Error parsing " << h << " as a msgpack custom type," <<
+                    " expected nonexistant field " <<
+                    ApiParser::Keys::Type::id));
+    }
+
+    optional<std::string> prefix = tryConvert(
+            msgpackType.at(ApiParser::Keys::Type::prefix));
+
+    //return a PrefixType if the object has a prefix field
+    if(prefix.has_value())
+    {
+        return make_unique<CustomType>(id.value(), name);
+    }
+    else
+    {
+        return make_unique<PrefixType>(id.value(), name, prefix.value());
+    }
+
 }
 
 NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object& h)
