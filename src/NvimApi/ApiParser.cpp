@@ -6,6 +6,7 @@
 
 #include "nonstd/optional.hpp"
 
+#include <iterator>
 #include <sstream>
 #include <string>
 
@@ -97,11 +98,11 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
                     std::unordered_set<std::unique_ptr<CustomType>>& thisSet) {
 
                 std::unordered_set<std::unique_ptr<CustomType>>::iterator setIt;
-                for(setIt = thisSet.begin(); setIt != thisSet.end(); ++setIt)
+                for(setIt = thisSet.begin(); 
+                        setIt != thisSet.end(); ++setIt)
                 {
-                    std::unique_ptr<CustomType> ptr;
-                    ptr = std::move(*setIt);
-                    //customTypes.insert();
+                    //TODO: move instead of copying the custom types into the set
+                    customTypes.emplace((*setIt)->clone());
                 }
             };
 

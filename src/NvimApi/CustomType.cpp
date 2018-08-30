@@ -33,6 +33,19 @@ std::string PrefixType::getName() const noexcept
     return "PrefixType";
 }
 
+std::unique_ptr<CustomType> CustomType::clone() const
+{
+    //use copy constructor
+    return std::unique_ptr<CustomType>(new CustomType(*this));
+}
+
+std::unique_ptr<CustomType> PrefixType::clone() const
+{
+    //use copy constructor but cast up
+    return std::unique_ptr<CustomType>(new PrefixType(*this));
+}
+
+
 std::ostream& operator <<(std::ostream& stream, const CustomType& t)
 {
     stream << t.printCompact();

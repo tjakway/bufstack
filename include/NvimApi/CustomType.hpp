@@ -4,6 +4,7 @@
 #include "Util/Util.hpp"
 #include "Util/PrintableObject.hpp"
 
+#include <memory>
 #include <string>
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -33,6 +34,8 @@ public:
         return id == other.id &&
             name == other.name;
     }
+
+    virtual std::unique_ptr<CustomType> clone() const;
 };
 
 class PrefixType : public CustomType
@@ -61,6 +64,8 @@ public:
             name == other.name &&
             prefix == other.prefix;
     }
+
+    virtual std::unique_ptr<CustomType> clone() const override;
 };
 
 std::ostream& operator <<(std::ostream&, const CustomType&);
