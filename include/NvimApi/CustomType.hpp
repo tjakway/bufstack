@@ -2,15 +2,17 @@
 
 #include "NamespaceDefines.hpp"
 #include "Util/Util.hpp"
+#include "Util/PrintableObject.hpp"
 
 #include <string>
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class CustomType
+class CustomType : public PrintableObject
 {
 protected:
-    virtual std::string printFields(const std::string& divider) const;
+    virtual Fields getFields() const noexcept override;
+    virtual std::string getName() const noexcept override;
 
 public:
     const int id;
@@ -26,7 +28,7 @@ public:
         : CustomType(other.id, other.name)
     {}
 
-    bool operator==(const CustomType& other)
+    bool operator==(const CustomType& other) const
     {
         return id == other.id &&
             name == other.name;
@@ -39,7 +41,8 @@ public:
 class PrefixType : public CustomType
 {
 protected:
-    virtual std::string printFields(const std::string& divider) const override;
+    virtual Fields getFields() const noexcept override;
+    virtual std::string getName() const noexcept override;
 
 public:
     const std::string prefix;
@@ -55,7 +58,7 @@ public:
                 other.prefix)
     {}
 
-    bool operator==(const PrefixType& other)
+    bool operator==(const PrefixType& other) const
     {
         return id == other.id &&
             name == other.name &&
