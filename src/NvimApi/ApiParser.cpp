@@ -225,17 +225,22 @@ std::unique_ptr<CustomType> ApiParser::ParseFunctions::parseCustomType(
                     ApiParser::Keys::Type::id));
     }
 
-    optional<std::string> prefix = tryConvert<std::string>(
-            msgpackType.at(ApiParser::Keys::Type::prefix));
+    optional<std::string> prefix;
+    //extract the prefix if this type has one
+    if(msgpackType.find(ApiParser::Keys::Type::prefix) != msgpackType.end())
+    {
+        prefix = tryConvert<std::string>(
+                msgpackType.at(ApiParser::Keys::Type::prefix));
+    }
 
     //return a PrefixType if the object has a prefix field
     if(prefix.has_value())
     {
-        return make_unique<CustomType>(id.value(), name);
+        return make_unique<PrefixType>(id.value(), name, prefix.value());
     }
     else
     {
-        return make_unique<PrefixType>(id.value(), name, prefix.value());
+        return make_unique<CustomType>(id.value(), name);
     }
 
 }
