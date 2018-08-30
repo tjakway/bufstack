@@ -45,11 +45,13 @@ class ApiParser : public Loggable
         }
     };
 
+public:
     using CustomTypeSet = std::unordered_set<
         CustomTypePtr, 
         CustomTypeHash,
         CustomTypeCmp>;
 
+private:
     std::unordered_set<NvimFunction> functions;
     CustomTypeSet customTypes;
 

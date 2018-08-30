@@ -131,3 +131,38 @@ std::future<U> then(std::future<T> input,
 //from https://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes/27952689#27952689
 size_t hash_combine( size_t lhs, size_t rhs );
 
+template <typename T>
+bool ptrs_equal(T p1, T p2)
+{
+    if(p1 == nullptr && p2 == nullptr)
+    {
+        return true;
+    }
+    else if(p1 != nullptr && p2 == nullptr)
+    {
+        return false;
+    }
+    else if(p1 == nullptr && p2 != nullptr)
+    {
+        return false;
+    }
+    //dereference both and compare
+    else
+    {
+        return *p1 == *p2;
+    }
+}
+
+template <typename T>
+std::size_t hash_ptr(T ptr)
+{
+    if(ptr == nullptr)
+    {
+        return std::hash<T>{}(ptr);
+    }
+    else
+    {
+        //hash the underlying object
+        return std::hash<typename T::element_type>{}(*ptr);
+    }
+}
