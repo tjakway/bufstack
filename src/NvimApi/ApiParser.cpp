@@ -93,7 +93,7 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             
             //begin parsing custom types
             const auto insertAll = [this](
-                    std::unordered_set<std::shared_ptr<CustomType>>& thisSet) {
+                    CustomTypeSet& thisSet) {
 
                 for(const auto& thisElem : thisSet)
                 {
@@ -165,11 +165,11 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
     return parsedFunctions;
 }
 
-std::unordered_set<std::shared_ptr<CustomType>> 
+CustomTypeSet 
     ApiParser::ParseFunctions::parseCustomTypes(
         const std::map<std::string, msgpack::object>& handles)
 {
-    std::unordered_set<std::shared_ptr<CustomType>> parsedTypes;
+    CustomTypeSet parsedTypes;
     parsedTypes.reserve(handles.size());
 
     for(const auto& h : handles)
@@ -301,7 +301,7 @@ std::unordered_set<NvimFunction> ApiParser::getFunctions()
     return functions;
 }
 
-std::unordered_set<std::shared_ptr<CustomType>> ApiParser::getCustomTypes()
+CustomTypeSet ApiParser::getCustomTypes()
 {
     return customTypes;
 }

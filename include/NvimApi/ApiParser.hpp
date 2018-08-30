@@ -30,10 +30,7 @@ class ApiParser : public Loggable
 
     class CustomTypeCmp
     {
-        bool operator()(CustomTypePtr p1, CustomTypePtr p2) const
-        {
-            return ptrs_equal(p1, p2);
-        }
+    public:
         bool operator()(const CustomTypePtr& p1, const CustomTypePtr& p2) const
         {
             return ptrs_equal(p1, p2);
@@ -41,11 +38,7 @@ class ApiParser : public Loggable
     };
     class CustomTypeHash
     {
-        std::size_t operator()(CustomTypePtr p) const
-        {
-            return hash_ptr(p);
-        }
-
+    public:
         std::size_t operator()(const CustomTypePtr& p) const
         {
             return hash_ptr(p);
