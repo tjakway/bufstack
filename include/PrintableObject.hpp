@@ -11,7 +11,8 @@ BUFSTACK_BEGIN_NAMESPACE
 class PrintableObject
 {
 protected:
-    virtual std::map<std::string, std::string> getFields() const noexcept = 0;
+    using Fields = std::map<std::string, std::string>;
+    virtual Fields getFields() const noexcept = 0;
     virtual std::string getName() const noexcept = 0;
 
     static const std::string defaultCompactFieldValueSep,
