@@ -43,12 +43,22 @@ std::string PrintableObject::print(
     std::ostringstream ss;
     ss << header.value_or(getDefaultHeader());
 
-    for(const auto& it : getFields())
+    const auto fields = getFields();
+    auto lastElemIt = fields.rbegin();
+
+    for(auto it = fields.begin(); it != fields.end(); ++it)
     {
-        ss << it.first << 
+        ss << it->first << 
             fieldValueSep.value_or(getDefaultFieldValueSep()) << 
-            it.second << 
-            fieldSep.value_or(getDefaultFieldSep());
+            it->second;
+
+        //append the separator unless we're at the last field
+        //see https://stackoverflow.com/questions/15202978/compare-vectortiterator-with-vectortreverse-iterator
+        //re: comparing an iterator to a reverse iterator
+        if(it != lastElemIt.base())
+        {
+            ss << fieldSep.value_or(getDefaultFieldSep());
+        }
     }
 
     ss << footer.value_or(getDefaultFooter());
