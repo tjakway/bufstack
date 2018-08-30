@@ -15,17 +15,17 @@ std::string PrintableObject::getDefaultHeader() const noexcept
 
 std::string PrintableObject::getDefaultFieldValueSep() const noexcept
 {
-    return defaultFieldValueSep;
+    return defaultCompactFieldValueSep;
 }
 
 std::string PrintableObject::getDefaultFieldSep() const noexcept
 {
-    return defaultFieldSep;
+    return defaultCompactFieldSep;
 }
 
 std::string PrintableObject::getDefaultFooter() const noexcept
 {
-    return defaultFooter;
+    return defaultCompactFooter;
 }
 
 std::string PrintableObject::print(
@@ -56,7 +56,7 @@ std::string PrintableObject::print(
 std::string PrintableObject::printCompact() const
 {
     //use default parameters
-    return print(nonstd::make_optional(getHeader()), 
+    return print(nonstd::make_optional(getDefaultHeader()), 
             nonstd::make_optional(defaultCompactFieldValueSep),
             nonstd::make_optional(defaultCompactFieldSep),
             nonstd::make_optional(defaultCompactFooter));
@@ -64,7 +64,8 @@ std::string PrintableObject::printCompact() const
 
 std::string PrintableObject::printMultiline() const
 {
-    return print(nonstd::make_optional(getHeader()), 
+    std::string multilineHeader = getName() + std::string("\n\t");
+    return print(nonstd::make_optional(multilineHeader), 
             nonstd::make_optional(defaultMultilineFieldValueSep),
             nonstd::make_optional(defaultMultilineFieldSep),
             nonstd::make_optional(defaultMultilineFooter));
