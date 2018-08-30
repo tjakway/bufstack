@@ -4,6 +4,7 @@
 #include "Loggable.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "Util/Util.hpp"
+#include "Util/PrintableObject.hpp"
 
 #include <msgpack.hpp>
 
@@ -23,14 +24,12 @@ BUFSTACK_BEGIN_NAMESPACE
 
 using ApiInfo = msgpack::object;
 
-class NvimFunction
+class NvimFunction : public PrintableObject
 {
-    std::string print(std::string header, 
-            //between a field's name and its value
-            std::string fieldValueSep,
-            //between the field lines themselves
-            std::string fieldSep,
-            std::string footer) const;
+protected:
+    virtual Fields getFields() const noexcept override;
+    virtual std::string getName() const noexcept override;
+
 public:
     const optional<bool> method;
     const optional<std::string> returnType;
