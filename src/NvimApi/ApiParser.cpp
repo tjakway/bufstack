@@ -94,22 +94,27 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             std::unordered_set<std::unique_ptr<CustomType>> customTypes;
 
             const auto insertAll = [&customTypes](
-                    std::unordered_set<std::unique_ptr<CustomType>> thisSet) {
+                    std::unordered_set<std::unique_ptr<CustomType>>& thisSet) {
 
-                for(std::unique_ptr<CustomType>& ptr : thisSet)
+                std::unordered_set<std::unique_ptr<CustomType>>::iterator setIt;
+                for(setIt = thisSet.begin(); setIt != thisSet.end(); ++setIt)
                 {
-                    customTypes.emplace(std::move(ptr));
+                    std::unique_ptr<CustomType> ptr;
+                    ptr = std::move(*setIt);
+                    //customTypes.insert();
                 }
             };
 
             //parse error types
             std::map<std::string, msgpack::object> errorTypeObjects;
             apiInfo.at(Keys::ApiInfo::errorTypes).convert(errorTypeObjects);
-            insertAll(parseFunctions.parseCustomTypes(errorTypeObjects));
+            auto errTypesSet = parseFunctions.parseCustomTypes(errorTypeObjects);
+            insertAll(errTypesSet);
 
             std::map<std::string, msgpack::object> regTypeObjects;
             apiInfo.at(Keys::ApiInfo::types).convert(regTypeObjects);
-            insertAll(parseFunctions.parseCustomTypes(regTypeObjects));
+            auto regTypesSet = parseFunctions.parseCustomTypes(regTypeObjects);
+            insertAll(regTypesSet);
 
         } catch(msgpack::type_error e)
         {
