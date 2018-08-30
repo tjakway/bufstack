@@ -59,6 +59,12 @@ std::set<std::string> ApiParser::Keys::Function::getAllKeys() {
     return keys;
 }
 
+const std::string ApiParser::Keys::Type::id = "id";
+const std::string ApiParser::Keys::Type::prefix = "prefix";
+const std::set<std::string> ApiParser::Keys::Type::keys = {
+    id, prefix
+};
+
 void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
 {
     if(!vecH.size())
@@ -135,6 +141,42 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
     return parsedFunctions;
 }
 
+std::unordered_set<CustomType> ApiParser::ParseFunctions::parseCustomTypes(
+        const std::vector<std::reference_wrapper<msgpack::object>>& handles)
+{
+    std::unordered_set<CustomType> parsedTypes;
+    parsedTypes.reserve(handles.size());
+
+    for(const auto& h : handles)
+    {
+        const auto f = parseCustomType(h);
+        getLogger()->info("parsed custom type {}", f.printCompact());
+        parsedTypes.emplace(f);
+    }
+
+    return parsedTypes;
+
+}
+
+
+CustomType ApiParser::ParseFunctions::parseCustomType(const msgpack::object& h)
+{
+    std::map<std::string, msgpack::object> msgpackType;
+
+
+    try {
+        h.convert(msgpackType);
+    }
+    catch(msgpack::type_error e)
+    {
+        //TODO: DRY, see parseNvimFunction
+        throw ParseCustomTypeException(STRCAT("Error converting ", h, 
+                    " to an instance of std::map<std::string, msgpack::object>.",
+                    "  Exception thrown: ", e.what()));
+    }
+
+    optional<int> id = tryConvert(function.at())
+}
 
 NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object& h)
 {
@@ -145,6 +187,7 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
     }
     catch(msgpack::type_error e)
     {
+        //TODO: DRY, see parseCustomType 
         throw ParseFunctionException(STRCAT("Error converting ", h, 
                     " to an instance of std::map<std::string, msgpack::object>.",
                     "  Exception thrown: ", e.what()));

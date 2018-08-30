@@ -5,6 +5,7 @@
 #include "Util/NewExceptionType.hpp"
 #include "Util/Util.hpp"
 #include "NvimApi/NvimFunction.hpp"
+#include "NvimApi/CustomType.hpp"
 
 #include <msgpack.hpp>
 
@@ -27,6 +28,7 @@ class ApiParser : public Loggable
     const msgpack::object_handle& handle;
 
     std::unordered_set<NvimFunction> functions;
+    std::unordered_set<CustomType> customTypes;
 
     class Keys
     {
@@ -58,12 +60,21 @@ class ApiParser : public Loggable
             static std::set<std::string> getAllKeys();
 
         };
+
+        class Type
+        {
+        public:
+            static const std::string id, prefix;
+
+            static const std::set<std::string> keys;
+        };
     };
 
 protected:
     NEW_EXCEPTION_TYPE(ApiParserException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseApiInfoException, ApiParserException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseFunctionException, ApiParserException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ParseCustomTypeException, ApiParserException);
 
     void parseApiInfo(const std::vector<msgpack::object_handle>&);
 
@@ -79,6 +90,11 @@ protected:
          const std::vector<std::reference_wrapper<msgpack::object>>&);
 
         NvimFunction parseNvimFunction(const msgpack::object&);
+
+        std::unordered_set<CustomType> parseCustomTypes(
+                const std::vector<std::reference_wrapper<msgpack::object>>&);
+
+        CustomType parseCustomType(const msgpack::object&);
 
         ParseFunctions()
             : Loggable("ParseFunctions")
