@@ -175,7 +175,8 @@ CustomType ApiParser::ParseFunctions::parseCustomType(const msgpack::object& h)
                     "  Exception thrown: ", e.what()));
     }
 
-    optional<int> id = tryConvert(function.at())
+    //optional<int> id = tryConvert(function.at())
+    //TODO
 }
 
 NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object& h)

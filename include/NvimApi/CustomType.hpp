@@ -33,9 +33,6 @@ public:
         return id == other.id &&
             name == other.name;
     }
-
-    virtual std::string printCompact() const;
-    virtual std::string printMultiline() const;
 };
 
 class PrefixType : public CustomType

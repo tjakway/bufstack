@@ -81,9 +81,6 @@ public:
     }
 
     bool deprecated() const { return deprecatedSince.has_value(); }
-
-    std::string printCompact() const;
-    std::string printMultiline() const;
 };
 
 std::ostream& operator <<(std::ostream&, const NvimFunction&);
