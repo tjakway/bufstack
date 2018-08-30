@@ -27,7 +27,7 @@ BUFSTACK_BEGIN_NAMESPACE
 class ApiParser : public Loggable
 {
     std::unordered_set<NvimFunction> functions;
-    std::unordered_set<std::unique_ptr<CustomType>> customTypes;
+    std::unordered_set<std::shared_ptr<CustomType>> customTypes;
 
     class Keys
     {
@@ -90,10 +90,10 @@ protected:
 
         NvimFunction parseNvimFunction(const msgpack::object&);
 
-        std::unordered_set<std::unique_ptr<CustomType>> parseCustomTypes(
+        std::unordered_set<std::shared_ptr<CustomType>> parseCustomTypes(
                 const std::map<std::string, msgpack::object>&);
 
-        std::unique_ptr<CustomType> parseCustomType(const std::string&, const msgpack::object&);
+        std::shared_ptr<CustomType> parseCustomType(const std::string&, const msgpack::object&);
 
         ParseFunctions()
             : Loggable("ParseFunctions")
@@ -105,7 +105,7 @@ public:
     ApiParser(const std::vector<msgpack::object_handle>&);
 
     std::unordered_set<NvimFunction> getFunctions();
-    const std::unordered_set<std::unique_ptr<CustomType>>& getCustomTypes();
+    const std::unordered_set<std::shared_ptr<CustomType>>& getCustomTypes();
 
 };
 

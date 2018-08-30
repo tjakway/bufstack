@@ -92,12 +92,12 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             functions = parseFunctions.parseNvimFunctions(refs);
             
             //begin parsing custom types
-            std::unordered_set<std::unique_ptr<CustomType>> customTypes;
+            std::unordered_set<std::shared_ptr<CustomType>> customTypes;
 
             const auto insertAll = [&customTypes](
-                    std::unordered_set<std::unique_ptr<CustomType>>& thisSet) {
+                    std::unordered_set<std::shared_ptr<CustomType>>& thisSet) {
 
-                std::unordered_set<std::unique_ptr<CustomType>>::iterator setIt;
+                std::unordered_set<std::shared_ptr<CustomType>>::iterator setIt;
                 for(setIt = thisSet.begin(); 
                         setIt != thisSet.end(); ++setIt)
                 {
@@ -170,11 +170,11 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
     return parsedFunctions;
 }
 
-std::unordered_set<std::unique_ptr<CustomType>> 
+std::unordered_set<std::shared_ptr<CustomType>> 
     ApiParser::ParseFunctions::parseCustomTypes(
         const std::map<std::string, msgpack::object>& handles)
 {
-    std::unordered_set<std::unique_ptr<CustomType>> parsedTypes;
+    std::unordered_set<std::shared_ptr<CustomType>> parsedTypes;
     parsedTypes.reserve(handles.size());
 
     for(const auto& h : handles)
@@ -197,7 +197,7 @@ std::unordered_set<std::unique_ptr<CustomType>>
 }
 
 
-std::unique_ptr<CustomType> ApiParser::ParseFunctions::parseCustomType(
+std::shared_ptr<CustomType> ApiParser::ParseFunctions::parseCustomType(
         const std::string& name,
         const msgpack::object& h)
 {
@@ -236,11 +236,11 @@ std::unique_ptr<CustomType> ApiParser::ParseFunctions::parseCustomType(
     //return a PrefixType if the object has a prefix field
     if(prefix.has_value())
     {
-        return make_unique<PrefixType>(id.value(), name, prefix.value());
+        return std::make_shared<PrefixType>(id.value(), name, prefix.value());
     }
     else
     {
-        return make_unique<CustomType>(id.value(), name);
+        return std::make_shared<CustomType>(id.value(), name);
     }
 
 }
@@ -306,7 +306,7 @@ std::unordered_set<NvimFunction> ApiParser::getFunctions()
     return functions;
 }
 
-const std::unordered_set<std::unique_ptr<CustomType>>& ApiParser::getCustomTypes()
+const std::unordered_set<std::shared_ptr<CustomType>>& ApiParser::getCustomTypes()
 {
     return customTypes;
 }
