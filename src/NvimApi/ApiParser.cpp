@@ -97,12 +97,9 @@ void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
             const auto insertAll = [&customTypes](
                     std::unordered_set<std::shared_ptr<CustomType>>& thisSet) {
 
-                std::unordered_set<std::shared_ptr<CustomType>>::iterator setIt;
-                for(setIt = thisSet.begin(); 
-                        setIt != thisSet.end(); ++setIt)
+                for(const auto& thisElem : thisSet)
                 {
-                    //TODO: move instead of copying the custom types into the set
-                    customTypes.emplace((*setIt)->clone());
+                    customTypes.emplace(thisElem);
                 }
             };
 
