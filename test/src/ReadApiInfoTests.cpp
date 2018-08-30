@@ -71,8 +71,22 @@ public:
         EXPECT_TRUE(receivedMessage);
         EXPECT_TRUE(expected);
     }
+
+    static const std::unordered_set<std::unique_ptr<CustomType>> expectedErrorTypes;
+    static const std::unordered_set<std::unique_ptr<CustomType>> expectedRegTypes;
 };
 const std::string ReadApiInfoTests::apiInfoFilename {"resources/api_info"};
+
+const std::unordered_set<std::shared_ptr<CustomType>> expectedErrorTypes {
+    std::make_shared<CustomType>(0, "Exception"),
+    std::make_shared<CustomType>(1, "Validation")
+};
+
+const std::unordered_set<std::shared_ptr<CustomType>> expectedRegTypes {
+    std::make_shared<PrefixType>(0, "Buffer", "nvim_buf_"),
+    std::make_shared<PrefixType>(2, "Tabpage", "nvim_tabpage_"),
+    std::make_shared<PrefixType>(1, "Window", "nvim_win_")
+};
 
 class MockApiParser : public ApiParser
 {
@@ -232,14 +246,14 @@ TEST_F(ReadApiInfoTests, TestHasBufferMethods)
             });
 }
 
-TEST_F(ReadApiInfoTests, TestReadApiInfo)
+TEST_F(ReadApiInfoTests, TestParseErrorTypes)
 {
     //make sure the constructor doesn't throw any exceptions
     readExpect([](const std::vector<msgpack::object_handle>& vecH) -> bool {
-            ApiParser parser(vecH);
+            MockApiParser parser(vecH);
 
 
-            return true;
+
             });
 }
 
