@@ -141,10 +141,11 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
     return parsedFunctions;
 }
 
-std::unordered_set<CustomType> ApiParser::ParseFunctions::parseCustomTypes(
+std::unordered_set<std::unique_ptr<CustomType>> 
+    ApiParser::ParseFunctions::parseCustomTypes(
         const std::map<std::string, msgpack::object>& handles)
 {
-    std::unordered_set<CustomType> parsedTypes;
+    std::unordered_set<std::unique_ptr<CustomType>> parsedTypes;
     parsedTypes.reserve(handles.size());
 
     for(const auto& h : handles)
@@ -153,11 +154,12 @@ std::unordered_set<CustomType> ApiParser::ParseFunctions::parseCustomTypes(
         if(!f)
         {
             throw ParseCustomTypeException(STRCATS("Got null pointer while parsing " <<
-                        h << " as a msgpack custom type"));
+                        "{ key = " << h.first << ", value = " << 
+                        h.second << " } as a msgpack custom type"));
         }
         else
         {
-            getLogger()->info("parsed custom type {}", f.printCompact());
+            getLogger()->info("parsed custom type {}", f->printCompact());
             parsedTypes.emplace(std::move(f));
         }
     }
@@ -166,7 +168,8 @@ std::unordered_set<CustomType> ApiParser::ParseFunctions::parseCustomTypes(
 }
 
 
-CustomType ApiParser::ParseFunctions::parseCustomType(const std::string& name,
+std::unique_ptr<CustomType> ApiParser::ParseFunctions::parseCustomType(
+        const std::string& name,
         const msgpack::object& h)
 {
     std::map<std::string, msgpack::object> msgpackType;
@@ -183,7 +186,7 @@ CustomType ApiParser::ParseFunctions::parseCustomType(const std::string& name,
                     "  Exception thrown: ", e.what()));
     }
 
-    optional<int> id = tryConvert(msgpackType.at(ApiParser::Keys::Type::id));
+    optional<int> id = tryConvert<int>(msgpackType.at(ApiParser::Keys::Type::id));
     
     if(!id.has_value())
     {
@@ -193,7 +196,7 @@ CustomType ApiParser::ParseFunctions::parseCustomType(const std::string& name,
                     ApiParser::Keys::Type::id));
     }
 
-    optional<std::string> prefix = tryConvert(
+    optional<std::string> prefix = tryConvert<std::string>(
             msgpackType.at(ApiParser::Keys::Type::prefix));
 
     //return a PrefixType if the object has a prefix field
