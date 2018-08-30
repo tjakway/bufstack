@@ -96,7 +96,7 @@ const ApiParser::CustomTypeSet
     std::make_shared<PrefixType>(1, "Window", "nvim_win_")
 };
 
-std::unordered_set<std::shared_ptr<CustomType>> ReadApiInfoTests::getAllExpectedTypes()
+ApiParser::CustomTypeSet ReadApiInfoTests::getAllExpectedTypes()
 {
     std::unordered_set<std::shared_ptr<CustomType>> combine;
     combine.insert(expectedErrorTypes.begin(), expectedErrorTypes.end());
