@@ -73,22 +73,22 @@ public:
         EXPECT_TRUE(expected);
     }
 
-    static const std::unordered_set<std::shared_ptr<CustomType>> expectedErrorTypes;
-    static const std::unordered_set<std::shared_ptr<CustomType>> expectedRegTypes;
+    static const ApiParser::CustomTypeSet expectedErrorTypes;
+    static const ApiParser::CustomTypeSet expectedRegTypes;
 
 
-    static std::unordered_set<std::shared_ptr<CustomType>> getAllExpectedTypes();
+    static ApiParser::CustomTypeSet getAllExpectedTypes();
 };
 const std::string ReadApiInfoTests::apiInfoFilename {"resources/api_info"};
 
-const std::unordered_set<std::shared_ptr<CustomType>> 
+const ApiParser::CustomTypeSet 
     ReadApiInfoTests::expectedErrorTypes {
 
     std::make_shared<CustomType>(0, "Exception"),
     std::make_shared<CustomType>(1, "Validation")
 };
 
-const std::unordered_set<std::shared_ptr<CustomType>> 
+const ApiParser::CustomTypeSet 
     ReadApiInfoTests::expectedRegTypes {
 
     std::make_shared<PrefixType>(0, "Buffer", "nvim_buf_"),
