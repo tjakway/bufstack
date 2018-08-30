@@ -26,8 +26,6 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class ApiParser : public Loggable
 {
-    const msgpack::object_handle& handle;
-
     std::unordered_set<NvimFunction> functions;
     std::unordered_set<std::unique_ptr<CustomType>> customTypes;
 
@@ -104,9 +102,7 @@ protected:
     } parseFunctions;
 
 public:
-    ApiParser(const msgpack::object_handle& _handle)
-        : Loggable("ApiParser"), handle(_handle)
-    {}
+    ApiParser(const std::vector<msgpack::object_handle>&);
 
     std::unordered_set<NvimFunction> getFunctions();
     const std::unordered_set<std::unique_ptr<CustomType>>& getCustomTypes();

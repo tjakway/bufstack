@@ -77,8 +77,8 @@ const std::string ReadApiInfoTests::apiInfoFilename {"resources/api_info"};
 class MockApiParser : public ApiParser
 {
 public:
-    MockApiParser(const msgpack::object_handle& _handle)
-        : ApiParser(_handle)
+    MockApiParser(const std::vector<msgpack::object_handle>& handles)
+        : ApiParser(handles)
     {}
 
     static ApiParser::ParseFunctions parseFunctions;
@@ -228,6 +228,17 @@ TEST_F(ReadApiInfoTests, TestHasBufferMethods)
 
     readExpect([](const std::vector<msgpack::object_handle>& vecH){
             //std::find_if(vecH.begin(), vecH.end(), );
+            return true;
+            });
+}
+
+TEST_F(ReadApiInfoTests, TestReadApiInfo)
+{
+    //make sure the constructor doesn't throw any exceptions
+    readExpect([](const std::vector<msgpack::object_handle>& vecH) -> bool {
+            ApiParser parser(vecH);
+
+
             return true;
             });
 }

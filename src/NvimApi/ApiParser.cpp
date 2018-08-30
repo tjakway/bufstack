@@ -306,4 +306,10 @@ const std::unordered_set<std::unique_ptr<CustomType>>& ApiParser::getCustomTypes
     return customTypes;
 }
 
+ApiParser::ApiParser(const std::vector<msgpack::object_handle>& handles)
+    : Loggable("ApiParser")
+{
+    parseApiInfo(handles);
+}
+
 BUFSTACK_END_NAMESPACE
