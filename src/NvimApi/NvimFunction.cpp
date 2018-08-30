@@ -6,36 +6,26 @@
 
 #include "nonstd/optional.hpp"
 
+#include <utility>
+#include <map>
+
 BUFSTACK_BEGIN_NAMESPACE
 
-
-std::string NvimFunction::print(std::string header, 
-        //between a field's name and its value
-        std::string fieldValueSep,
-        //between the field lines themselves
-        std::string fieldSep,
-        std::string footer) const
+NvimFunction::Fields NvimFunction::getFields() const noexcept
 {
-    std::ostringstream ss;
-    ss << header << 
-            "name" << fieldValueSep << name << fieldSep <<
-            "method" << fieldValueSep << printOptional(method) << fieldSep <<
-            "return_type" << fieldValueSep << printOptional(returnType) << fieldSep <<
-            "since" << fieldValueSep << printOptional(sinceVersion) << fieldSep <<
-            "parameters" << fieldValueSep << Util::printVector(parameters) <<
-            footer;
-
-    return ss.str();
+    return Fields {
+        std::make_pair("method", printOptional(method)),
+        std::make_pair("returnType", printOptional(returnType)),
+        std::make_pair("sinceVersion", printOptional(sinceVersion)),
+        std::make_pair("name", name),
+        std::make_pair("deprecatedSince", printOptional(deprecatedSince)),
+        std::make_pair("parameters", Util::printVector(parameters)),
+    };
 }
 
-std::string NvimFunction::printCompact() const
+std::string NvimFunction::getName() const noexcept
 {
-    return print("NvimFunction {", ": ", ", ", "}");
-}
-
-std::string NvimFunction::printMultiline() const
-{
-    return print("NvimFunction\n\t", ": ", "\n\t", "");
+    return "NvimFunction";
 }
 
 
