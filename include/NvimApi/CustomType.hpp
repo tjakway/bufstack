@@ -10,7 +10,7 @@ BUFSTACK_BEGIN_NAMESPACE
 class CustomType
 {
 protected:
-    virtual std::string printFields(const std::string& divider);
+    virtual std::string printFields(const std::string& divider) const;
 
 public:
     const int id;
@@ -32,14 +32,14 @@ public:
             name == other.name;
     }
 
-    virtual std::string printCompact();
-    virtual std::string printMultiline();
+    virtual std::string printCompact() const;
+    virtual std::string printMultiline() const;
 };
 
 class PrefixType : public CustomType
 {
 protected:
-    virtual std::string printFields(const std::string& divider) override;
+    virtual std::string printFields(const std::string& divider) const override;
 
 public:
     const std::string prefix;
