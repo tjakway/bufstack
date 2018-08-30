@@ -26,8 +26,39 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class ApiParser : public Loggable
 {
+    using CustomTypePtr = std::shared_ptr<CustomType>;
+
+    class CustomTypeCmp
+    {
+        bool operator()(CustomTypePtr p1, CustomTypePtr p2) const
+        {
+            return ptrs_equal(p1, p2);
+        }
+        bool operator()(const CustomTypePtr& p1, const CustomTypePtr& p2) const
+        {
+            return ptrs_equal(p1, p2);
+        }
+    };
+    class CustomTypeHash
+    {
+        std::size_t operator()(CustomTypePtr p) const
+        {
+            return hash_ptr(p);
+        }
+
+        std::size_t operator()(const CustomTypePtr& p) const
+        {
+            return hash_ptr(p);
+        }
+    };
+
+    using CustomTypeSet = std::unordered_set<
+        CustomTypePtr, 
+        CustomTypeHash,
+        CustomTypeCmp>;
+
     std::unordered_set<NvimFunction> functions;
-    std::unordered_set<std::shared_ptr<CustomType>> customTypes;
+    CustomTypeSet customTypes;
 
     class Keys
     {
@@ -90,7 +121,7 @@ protected:
 
         NvimFunction parseNvimFunction(const msgpack::object&);
 
-        std::unordered_set<std::shared_ptr<CustomType>> parseCustomTypes(
+        CustomTypeSet parseCustomTypes(
                 const std::map<std::string, msgpack::object>&);
 
         std::shared_ptr<CustomType> parseCustomType(const std::string&, const msgpack::object&);
@@ -105,7 +136,7 @@ public:
     ApiParser(const std::vector<msgpack::object_handle>&);
 
     std::unordered_set<NvimFunction> getFunctions();
-    std::unordered_set<std::shared_ptr<CustomType>> getCustomTypes();
+    CustomTypeSet getCustomTypes();
 
 };
 
