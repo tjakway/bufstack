@@ -306,7 +306,7 @@ std::unordered_set<NvimFunction> ApiParser::getFunctions()
     return functions;
 }
 
-const std::unordered_set<std::shared_ptr<CustomType>>& ApiParser::getCustomTypes()
+std::unordered_set<std::shared_ptr<CustomType>> ApiParser::getCustomTypes()
 {
     return customTypes;
 }

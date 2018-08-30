@@ -105,7 +105,7 @@ public:
     ApiParser(const std::vector<msgpack::object_handle>&);
 
     std::unordered_set<NvimFunction> getFunctions();
-    const std::unordered_set<std::shared_ptr<CustomType>>& getCustomTypes();
+    std::unordered_set<std::shared_ptr<CustomType>> getCustomTypes();
 
 };
 
