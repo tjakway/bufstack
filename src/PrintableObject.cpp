@@ -1,4 +1,4 @@
-#include "PrintableObject.hpp"
+#include "Util/PrintableObject.hpp"
 
 #include <sstream>
 
@@ -7,6 +7,10 @@ BUFSTACK_BEGIN_NAMESPACE
 const std::string PrintableObject::defaultCompactFieldValueSep = ": ";
 const std::string PrintableObject::defaultCompactFieldSep = ", ";
 const std::string PrintableObject::defaultCompactFooter = "}";
+
+const std::string PrintableObject::defaultMultilineFieldValueSep = ": ";
+const std::string PrintableObject::defaultMultilineFieldSep = "\n\t";
+const std::string PrintableObject::defaultMultilineFooter = "";
 
 std::string PrintableObject::getDefaultHeader() const noexcept
 {
