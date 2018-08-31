@@ -13,18 +13,49 @@ BUFSTACK_BEGIN_NAMESPACE
 template <typename T, typename... Args>
 class RemoteApiFunction
 {
-    const std::string name;
+    NEW_EXCEPTION_TYPE(RemoteApiFunctionError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedError, RemoteApiFunctionError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(BadNameError, RemoteApiFunctionError);
+
+    bool initialized;
+
+    std::string name;
     optional<NvimFunction> functionSpecification;
     std::shared_ptr<rpc::client> rpcClient;
 
+    void checkName()
+    {
+        //make sure we have a function name
+        if(initialized && Util::StringTrim::trim_copy(name).empty())
+        {
+            throw BadNameError("RemoteApiFunction constructor "
+                    "called with empty name");
+        }
+    }
+
+    void check()
+    {
+        if(!initialized)
+        {
+            throw RemoteApiFunctionUninitiliazedError(
+                    "Uninitialized RemoteApiFunction called");
+        }
+
+        checkName();
+    }
+
 protected:
-    RemoteApiFunction(const std::string& _name,
+    RemoteApiFunction(bool _initialized,
+            const std::string& _name,
             optional<NvimFunction> spec,
             std::shared_ptr<rpc::client> _client)
-        : name(_name), 
+        : initialized(_initialized),
+        name(_name), 
         functionSpecification(spec),
         rpcClient(_client)
-    {}
+    {
+        checkName();
+    }
 
     NEW_EXCEPTION_TYPE(RemoteApiFunctionError);
     NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoError, RemoteApiFunctionError);
@@ -36,10 +67,15 @@ protected:
     void checkApiInfo(const ApiInfo&);
 
 public:
+    //uninitialized ctor
+    RemoteApiFunction()
+        : RemoteApiFunction(initialized, "", nullopt, nullptr)
+    {}
+
     RemoteApiFunction(const NvimFunction& spec, 
             std::shared_ptr<rpc::client> rpcClient,
             const ApiInfo& info)
-        : RemoteApiFunction(spec.name, make_optional(spec), rpcClient)
+        : RemoteApiFunction(true, spec.name, make_optional(spec), rpcClient)
     {
         checkApiInfo(info);
     }
@@ -48,13 +84,15 @@ public:
     //ctor that skips the api info check
     RemoteApiFunction(const std::string& _name,
             std::shared_ptr<Client> client)
-        : RemoteApiFunction(_name, nullopt, client)
+        : RemoteApiFunction(true, _name, nullopt, client)
     {}
 
 
     //TODO: implement
     T call(const Args&... args)
     {
+        check();
+
         T t;
         msgpack::object_handle h = rpcClient->call(name, &args...);
         h.get().convert(t);
@@ -63,6 +101,8 @@ public:
 
     std::future<T> async_call(const Args&... args)
     {
+        check();
+
         const auto conv = [](msgpack::object_handle h){
             T t;
             h.get().convert(t);
