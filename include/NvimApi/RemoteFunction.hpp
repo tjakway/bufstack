@@ -56,7 +56,7 @@ public:
     T call(const Args&... args)
     {
         T t;
-        msgpack::object_handle h = rpcClient->call(name, args);
+        msgpack::object_handle h = rpcClient->call(name, &args...);
         h.get().convert(t);
         return t;
     }
@@ -69,12 +69,12 @@ public:
             return t;
         };
 
-        return runAfter(rpcClient->async_call(name, args), conv);
+        return runAfter(rpcClient->async_call(name, &args...), conv);
     }
 
     T operator()(const Args&... args)
     {
-        return call(args);
+        return call(&args...);
     }
 };
 
