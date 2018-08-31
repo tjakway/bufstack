@@ -72,7 +72,7 @@ protected:
 public:
     //uninitialized ctor
     RemoteApiFunction()
-        : RemoteApiFunction(initialized, "", nullopt, nullptr)
+        : RemoteApiFunction(false, "", nullopt, nullptr)
     {}
 
     RemoteApiFunction(const NvimFunction& spec, 
@@ -122,34 +122,28 @@ public:
 };
 
 template <typename... Args>
-class RemoteApiFunction<void, Args...>
+void RemoteApiFunction<void, Args...>::call(const Args&... args)
 {
-    void call(const Args&... args)
-    {
-        RemoteApiFunction::check();
+    check();
 
-        RemoteApiFunction::rpcClient->call(
-                RemoteApiFunction::name, &args...);
-    }
+    rpcClient->call(
+            name, &args...);
+}
 
-    std::future<void> async_call(const Args&... args)
-    {
-        RemoteApiFunction::check();
+template <typename... Args>
+std::future<void> RemoteApiFunction<void, Args...>::async_call(const Args&... args)
+{
+    check();
 
-        const auto conv = [](msgpack::object_handle h) -> void {
-        };
+    const auto conv = [](msgpack::object_handle h) -> void {
+    };
 
-        return runAfter(
-                RemoteApiFunction::rpcClient->async_call(
-                    RemoteApiFunction::name, &args...), 
-                conv);
-    }
+    return runAfter(
+            rpcClient->async_call(
+                name, &args...), 
+            conv);
+}
 
-    void operator()(const Args&... args)
-    {
-        return call(&args...);
-    }
-};
 
 class RemoteFunctionInstances
 {
