@@ -116,6 +116,33 @@ public:
     }
 };
 
+template <typename... Args>
+class RemoteApiFunction<void, Args...>
+{
+    void call(const Args&... args)
+    {
+        check();
+
+        rpcClient->call(name, &args...);
+    }
+
+    std::future<void> async_call(const Args&... args)
+    {
+        check();
+
+        const auto conv = [](msgpack::object_handle h){
+            return void;
+        };
+
+        return runAfter(rpcClient->async_call(name, &args...), conv);
+    }
+
+    void operator()(const Args&... args)
+    {
+        return call(&args...);
+    }
+}
+
 class RemoteFunctionInstances
 {
 protected:
@@ -146,7 +173,7 @@ public:
     const RemoteApiFunction<void, std::string> subscribe;
 
     RemoteFunctionInstances(
-        std::shared_ptr<Client> client,
+        std::shared_ptr<rpc::client> client,
         const ApiInfo& info)
         : bufIsValid(bufIsValidSpec, client, info),
         subscribe(subscribeSpec, client, info)
