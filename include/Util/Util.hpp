@@ -128,6 +128,19 @@ std::future<U> then(std::future<T> input,
     });
 }
 
+template <typename T, typename U>
+std::future<U> runAfter(std::future<T> input,
+        std::function<U(T)> after)
+{
+    return std::async(std::launch::async,
+            [input, after](){
+            //wait for the future's value
+            T val = input.get();
+            //then run the provided function
+            return after(val);
+    });
+}
+
 
 //from https://stackoverflow.com/questions/5889238/why-is-xor-the-default-way-to-combine-hashes/27952689#27952689
 size_t hash_combine( size_t lhs, size_t rhs );

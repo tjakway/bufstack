@@ -3,6 +3,9 @@
 #include "Util/Util.hpp"
 
 #include "NvimApi/ApiParser.hpp"
+#include "NvimApi/RemoteFunction.hpp"
+
+#include <future>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -11,9 +14,10 @@ const std::string Client::subscribedEvents =
 
 void Client::onConnect()
 {
-    std::future<msgpack::object_handle> apiInfoCall = client->async_call("nvim_get_api_info");
-    std::function<void(msgpack::object_handle)> init = 
-        [this](msgpack::object_handle apiInfoObject) -> void {
+    std::function<void(void)> init = 
+        [this]() -> void {
+            msgpack::object_handle apiInfoObject = client->call("nvim_get_api_info");
+
             ApiParser parser(apiInfoObject.get());
             ApiInfo apiInfo = parser.getApiInfo();
 
@@ -23,11 +27,11 @@ void Client::onConnect()
 
             this->initializeRemoteFunctions(apiInfo);
             this->subscribeEvents();
-
         };
 
-    std::future<void> x = then<msgpack::object_handle, std::function<void(msgpack::object_handle)>>
-        (apiInfoCall, init);
+    std::async(std::launch::async, init);
+//    std::future<void> x = then<msgpack::object_handle, std::function<void(msgpack::object_handle)>>
+//        (apiInfoCall, init);
 }
 
 void Client::initializeRemoteFunctions(
@@ -44,6 +48,7 @@ void Client::checkFunctions(const std::unordered_set<NvimFunction>&)
 
 void Client::subscribeEvents()
 {
+    remoteFunctions->subscribe(subscribedEvents);
 }
 
 BUFSTACK_END_NAMESPACE
