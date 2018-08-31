@@ -4,9 +4,14 @@
 #include "Util/Util.hpp"
 #include "NamespaceDefines.hpp"
 
+#include "NvimApi/ApiParser.hpp"
+#include "NvimApi/NvimFunction.hpp"
+
 #include <msgpack.hpp>
 //NOTE: must include msgpack before rpc
 #include <rpc/client.h>
+
+using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -81,7 +86,7 @@ public:
 
     //ctor that skips the api info check
     RemoteApiFunction(const std::string& _name,
-            std::shared_ptr<Client> client)
+            std::shared_ptr<rpc::client> client)
         : RemoteApiFunction(true, _name, nullopt, client)
     {}
 
@@ -121,27 +126,30 @@ class RemoteApiFunction<void, Args...>
 {
     void call(const Args&... args)
     {
-        check();
+        RemoteApiFunction::check();
 
-        rpcClient->call(name, &args...);
+        RemoteApiFunction::rpcClient->call(
+                RemoteApiFunction::name, &args...);
     }
 
     std::future<void> async_call(const Args&... args)
     {
-        check();
+        RemoteApiFunction::check();
 
-        const auto conv = [](msgpack::object_handle h){
-            return void;
+        const auto conv = [](msgpack::object_handle h) -> void {
         };
 
-        return runAfter(rpcClient->async_call(name, &args...), conv);
+        return runAfter(
+                RemoteApiFunction::rpcClient->async_call(
+                    RemoteApiFunction::name, &args...), 
+                conv);
     }
 
     void operator()(const Args&... args)
     {
         return call(&args...);
     }
-}
+};
 
 class RemoteFunctionInstances
 {
