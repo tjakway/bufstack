@@ -123,7 +123,8 @@ std::future<U> then(std::future<T> input,
         std::launch policy = std::launch::async)
 {
     return std::async(policy, [f, input](){
-            return f(input.get());
+            U res = f(input.get());
+            return res;
     });
 }
 

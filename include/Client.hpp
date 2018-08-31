@@ -79,33 +79,50 @@ protected:
                 std::vector<std::string>{"Buffer"},
                 "nvim_buf_is_valid");
 
+    const NvimFunction subscribeSpec =
+        NvimFunction(make_optional(true),
+                nullopt, //TODO
+                nullopt, //TODO
+                nullopt,
+                std::vector<std::string>{"Events"},
+                "nvim_subscribe");
+
 public:
     //TODO: wrap nvim types
     const RemoteApiFunction<bool, std::string> bufIsValid;
+    const RemoteApiFunction<bool, std::string> subscribe;
 
     RemoteFunctionInstances(
         std::shared_ptr<Client> client,
         const ApiInfo& info)
-        : bufIsValid(bufIsValidSpec, client, info)
+        : bufIsValid(bufIsValidSpec, client, info),
+        subscribe(subscribeSpec, client, info)
     {}
 };
 
-class Client
+class Client : public std::enable_shared_from_this<Client>
 {
-    std::unique_ptr<rpc::client> client;
+    std::shared_ptr<rpc::client> client;
+    std::unique_ptr<RemoteFunctionInstances> remoteFunctions;
 
     std::string address;
     uint16_t port;
 
+    static const std::string subscribedEvents;
+
 protected:
+    //TODO: set an atomic flag to make sure we haven't run anything twice
     void onConnect();
+
+    void initializeRemoteFunctions(const ApiInfo&);
+    void subscribeEvents();
     void checkFunctions(const std::unordered_set<NvimFunction>&);
 
 public:
     Client(const std::string& _address,
             uint16_t _port)
         : address(_address), port(_port),
-            client(make_unique<rpc::client>(address, port))
+            client(std::make_shared<rpc::client>(address, port))
     {}
 
 

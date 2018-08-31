@@ -22,7 +22,7 @@ using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
 
-using ApiInfo = msgpack::object;
+using ApiInfoPacket = msgpack::object;
 
 class NvimFunction : public PrintableObject
 {
