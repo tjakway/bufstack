@@ -16,6 +16,7 @@ class RemoteApiFunction
     NEW_EXCEPTION_TYPE(RemoteApiFunctionError);
     NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedError, RemoteApiFunctionError);
     NEW_EXCEPTION_TYPE_WITH_BASE(BadNameError, RemoteApiFunctionError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoError, RemoteApiFunctionError);
 
     bool initialized;
 
@@ -37,7 +38,7 @@ class RemoteApiFunction
     {
         if(!initialized)
         {
-            throw RemoteApiFunctionUninitiliazedError(
+            throw RemoteFunctionUninitiliazedError(
                     "Uninitialized RemoteApiFunction called");
         }
 
@@ -56,9 +57,6 @@ protected:
     {
         checkName();
     }
-
-    NEW_EXCEPTION_TYPE(RemoteApiFunctionError);
-    NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoError, RemoteApiFunctionError);
 
     /**
      * throw a NotInApiInfoError if the api info doesn't contain the 
