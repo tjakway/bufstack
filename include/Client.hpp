@@ -24,7 +24,7 @@ using namespace nonstd;
 BUFSTACK_BEGIN_NAMESPACE
 
 
-class Client : public std::enable_shared_from_this<Client>
+class Client 
 {
     std::shared_ptr<rpc::client> client;
     std::unique_ptr<RemoteFunctionInstances> remoteFunctions;

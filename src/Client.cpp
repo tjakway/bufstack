@@ -38,7 +38,7 @@ void Client::initializeRemoteFunctions(
         const ApiInfo& apiInfo)
 {
     remoteFunctions = make_unique<RemoteFunctionInstances>(
-            shared_from_this(), apiInfo);
+            client, apiInfo);
 }
 
 void Client::checkFunctions(const std::unordered_set<NvimFunction>&)
