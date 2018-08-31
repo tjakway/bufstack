@@ -306,6 +306,11 @@ ApiParser::CustomTypeSet ApiParser::getCustomTypes()
     return customTypes;
 }
 
+ApiInfo ApiParser::getApiInfo()
+{
+    return ApiInfo(functions, customTypes);
+}
+
 ApiParser::ApiParser(const std::vector<msgpack::object_handle>& handles)
     : Loggable("ApiParser")
 {

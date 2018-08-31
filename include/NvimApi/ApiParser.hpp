@@ -24,6 +24,20 @@ using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
 
+class ApiInfo
+{
+public:
+    const std::unordered_set<NvimFunction> functions;
+    const CustomTypeSet customTypes;
+
+    ApiInfo(
+        const std::unordered_set<NvimFunction>& _functions,
+        const CustomTypeSet& _customTypes)
+        : functions(_functions), 
+        customTypes(_customTypes)
+    {}
+};
+
 class ApiParser : public Loggable
 {
     using CustomTypePtr = std::shared_ptr<CustomType>;
@@ -133,6 +147,7 @@ public:
     std::unordered_set<NvimFunction> getFunctions();
     CustomTypeSet getCustomTypes();
 
+    ApiInfo getApiInfo();
 };
 
 BUFSTACK_END_NAMESPACE
