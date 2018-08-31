@@ -29,7 +29,7 @@ class RemoteApiFunction
     optional<NvimFunction> functionSpecification;
     std::shared_ptr<rpc::client> rpcClient;
 
-    void checkName()
+    void checkName() const
     {
         //make sure we have a function name
         if(initialized && Util::StringTrim::trim_copy(name).empty())
@@ -39,7 +39,7 @@ class RemoteApiFunction
         }
     }
 
-    void check()
+    void check() const
     {
         if(!initialized)
         {
@@ -48,6 +48,13 @@ class RemoteApiFunction
         }
 
         checkName();
+    }
+
+    optional<T> convert(const msgpack::object& obj)
+    {
+        T t;
+        obj.convert(t);
+        return make_optional(t);
     }
 
 protected:
@@ -92,58 +99,40 @@ public:
 
 
     //TODO: implement
-    T call(const Args&... args)
+    optional<T> call(const Args&... args) const
     {
         check();
 
-        T t;
         msgpack::object_handle h = rpcClient->call(name, &args...);
-        h.get().convert(t);
-        return t;
+        return convert(h.get());
     }
 
-    std::future<T> async_call(const Args&... args)
+    std::future<optional<T>> async_call(const Args&... args) const
     {
         check();
 
-        const auto conv = [](msgpack::object_handle h){
-            T t;
-            h.get().convert(t);
-            return t;
+        const auto conv = [this](msgpack::object_handle h){
+            return this->convert(h.get());
         };
 
         return runAfter(rpcClient->async_call(name, &args...), conv);
     }
 
-    T operator()(const Args&... args)
+    T operator()(const Args&... args) const
     {
-        return call(&args...);
+        return call(args...);
     }
 };
 
-template <typename... Args>
-void RemoteApiFunction<void, Args...>::call(const Args&... args)
-{
-    check();
-
-    rpcClient->call(
-            name, &args...);
-}
 
 template <typename... Args>
-std::future<void> RemoteApiFunction<void, Args...>::async_call(const Args&... args)
+class RemoteApiFunction<void, Args...>
 {
-    check();
-
-    const auto conv = [](msgpack::object_handle h) -> void {
-    };
-
-    return runAfter(
-            rpcClient->async_call(
-                name, &args...), 
-            conv);
-}
-
+    optional<void> convert(const msgpack::object& obj)
+    {
+        return nullopt;
+    }
+};
 
 class RemoteFunctionInstances
 {
