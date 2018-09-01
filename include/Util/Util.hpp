@@ -99,6 +99,29 @@ public:
 
         return keySet;
     }
+
+    template <typename C> 
+    static bool setsEqual(C a, C b)
+    {
+        //check if each set is a subset of the other
+        for(const auto& x : a)
+        {
+            if(b.find(x) == b.end())
+            {
+                return false;
+            }
+        }
+
+        for(const auto& x : b)
+        {
+            if(a.find(x) == a.end())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 };
 
 //these functions are included in C++14 but not C++11

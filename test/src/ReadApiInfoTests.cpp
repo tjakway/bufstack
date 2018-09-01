@@ -282,7 +282,7 @@ TEST_F(ReadApiInfoTests, TestParseCustomTypes)
                 expectedTypesSS << "\t" << x->printCompact() << "\n";
             }
 
-            if(customTypes != expectedTypes)
+            if(!Util::setsEqual(customTypes, expectedTypes))
             {
                 this->getLogger()->set_level(spdlog::level::debug);
                 this->getLogger()->debug("custom types: \n{}\nexpected types: \n{}",
