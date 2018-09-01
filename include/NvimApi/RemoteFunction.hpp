@@ -107,8 +107,8 @@ public:
     { 
         check(); 
         
-        msgpack::object_handle h = rpcClient->call(name, &args...); 
-        return convert(h.get()); 
+        msgpack::object_handle h = rpcClient->call(name, args...); 
+        return convert<T>(h.get()); 
     }
     
     std::future<T> async_call(const Args&... args) const 
@@ -116,10 +116,10 @@ public:
         check(); 
     
         const auto conv = [this](msgpack::object_handle h){ 
-            return HasReturnValueRemoteApiFunction::convert(h.get()); 
+            return HasReturnValueRemoteApiFunction::convert<T>(h.get()); 
         }; 
         
-        return runAfter(rpcClient->async_call(name, &args...), conv); 
+        return runAfter(rpcClient->async_call(name, args...), conv); 
     } 
 
     T operator()(const Args&... args) const 
@@ -139,7 +139,7 @@ public:
     { 
         check(); 
         
-        rpcClient->call(name, &args...); 
+        rpcClient->call(name, args...); 
     }
     
     void async_call(const Args&... args) const 
@@ -148,7 +148,7 @@ public:
     
         //don't need a conversion step here because we're discarding
         //the return value
-        rpcClient->async_call(name, &args...); 
+        rpcClient->async_call(name, args...); 
     } 
 
     void operator()(const Args&... args) const 
