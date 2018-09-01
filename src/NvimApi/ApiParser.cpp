@@ -66,57 +66,49 @@ const std::set<std::string> ApiParser::Keys::Type::keys = {
     id, prefix
 };
 
-void ApiParser::parseApiInfo(const std::vector<msgpack::object_handle>& vecH)
+void ApiParser::parseApiInfo(const msgpack::object& o)
 {
-    if(!vecH.size())
-    {
-        throw ParseApiInfoException(STRCATS("Expected api info message to" <<
-                " have 1 msgpack object but size == " << vecH.size()));
-    }
-    else
-    {
-        try {
-            std::map<std::string, msgpack::object> apiInfo;
-            vecH.at(0).get().convert(apiInfo);
+    try {
+        std::map<std::string, msgpack::object> apiInfo;
+        o.convert(apiInfo);
 
-            //parse functions
-            std::vector<msgpack::object> functionObjects;
-            apiInfo.at(Keys::ApiInfo::functions).convert(functionObjects);
+        //parse functions
+        std::vector<msgpack::object> functionObjects;
+        apiInfo.at(Keys::ApiInfo::functions).convert(functionObjects);
 
-            std::vector<std::reference_wrapper<msgpack::object>> refs;
-            for(auto& it : functionObjects)
-            {
-                refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
-            }
-
-            functions = parseFunctions.parseNvimFunctions(refs);
-            
-            //begin parsing custom types
-            const auto insertAll = [this](
-                    ApiParser::CustomTypeSet& thisSet) {
-
-                for(const auto& thisElem : thisSet)
-                {
-                    this->customTypes.emplace(thisElem);
-                }
-            };
-
-            //parse error types
-            std::map<std::string, msgpack::object> errorTypeObjects;
-            apiInfo.at(Keys::ApiInfo::errorTypes).convert(errorTypeObjects);
-            auto errTypesSet = parseFunctions.parseCustomTypes(errorTypeObjects);
-            insertAll(errTypesSet);
-
-            std::map<std::string, msgpack::object> regTypeObjects;
-            apiInfo.at(Keys::ApiInfo::types).convert(regTypeObjects);
-            auto regTypesSet = parseFunctions.parseCustomTypes(regTypeObjects);
-            insertAll(regTypesSet);
-
-        } catch(msgpack::type_error e)
+        std::vector<std::reference_wrapper<msgpack::object>> refs;
+        for(auto& it : functionObjects)
         {
-            throw ParseApiInfoException(STRCAT("Caught msgpack::type_error in ", 
-                        __func__, ": ", e.what()));
+            refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
         }
+
+        functions = parseFunctions.parseNvimFunctions(refs);
+        
+        //begin parsing custom types
+        const auto insertAll = [this](
+                ApiParser::CustomTypeSet& thisSet) {
+
+            for(const auto& thisElem : thisSet)
+            {
+                this->customTypes.emplace(thisElem);
+            }
+        };
+
+        //parse error types
+        std::map<std::string, msgpack::object> errorTypeObjects;
+        apiInfo.at(Keys::ApiInfo::errorTypes).convert(errorTypeObjects);
+        auto errTypesSet = parseFunctions.parseCustomTypes(errorTypeObjects);
+        insertAll(errTypesSet);
+
+        std::map<std::string, msgpack::object> regTypeObjects;
+        apiInfo.at(Keys::ApiInfo::types).convert(regTypeObjects);
+        auto regTypesSet = parseFunctions.parseCustomTypes(regTypeObjects);
+        insertAll(regTypesSet);
+
+    } catch(msgpack::type_error e)
+    {
+        throw ParseApiInfoException(STRCAT("Caught msgpack::type_error in ", 
+                    __func__, ": ", e.what()));
     }
 }
 
@@ -311,10 +303,10 @@ ApiInfo ApiParser::getApiInfo()
     return ApiInfo(functions, customTypes);
 }
 
-ApiParser::ApiParser(const std::vector<msgpack::object_handle>& handles)
+ApiParser::ApiParser(const msgpack::object& o)
     : Loggable("ApiParser")
 {
-    parseApiInfo(handles);
+    parseApiInfo(o);
 }
 
 BUFSTACK_END_NAMESPACE

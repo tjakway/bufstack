@@ -103,7 +103,7 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseFunctionException, ApiParserException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ParseCustomTypeException, ApiParserException);
 
-    void parseApiInfo(const std::vector<msgpack::object_handle>&);
+    void parseApiInfo(const msgpack::object&);
 
     class ParseFunctions : public Loggable
     {
