@@ -11,34 +11,6 @@
 //NOTE: must include msgpack before rpc
 #include <rpc/client.h>
 
-
-#define REMOTE_API_FUNCTION_CALL_IMPL( \
-        SYNC_RETURN_TYPE, ASYNC_RETURN_TYPE, CONVERT_FUNCTION)  \
-    SYNC_RETURN_TYPE call(const Args&... args) const \
-    { \
-        check(); \
-        \
-        msgpack::object_handle h = rpcClient->call(name, &args...); \
-        return CONVERT_FUNCTION(h.get()); \
-    } \
-    \
-    ASYNC_RETURN_TYPE async_call(const Args&... args) const \
-    { \
-        check(); \
-    \
-        const auto conv = [this](msgpack::object_handle h){ \
-            return CONVERT_FUNCTION(h.get()); \
-        }; \
-        \
-        return runAfter(rpcClient->async_call(name, &args...), conv); \
-    } \
-    \
-    SYNC_RETURN_TYPE operator()(const Args&... args) const \
-    { \
-        return call(args...); \
-    }
-
-
 using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
