@@ -5,6 +5,12 @@
 #include "NvimApi/ApiParser.hpp"
 #include "NvimApi/RemoteFunction.hpp"
 
+#include <msgpack/object_decl.hpp>
+#include <msgpack/object_fwd.hpp>
+#include <msgpack/object_fwd_decl.hpp>
+#include <msgpack/pack_decl.hpp>
+#include <msgpack.hpp>
+
 #include <future>
 
 BUFSTACK_BEGIN_NAMESPACE

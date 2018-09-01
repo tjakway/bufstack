@@ -108,7 +108,7 @@ class MockApiParser : public ApiParser
 {
 public:
     MockApiParser(const std::vector<msgpack::object_handle>& handles)
-        : ApiParser(handles)
+        : ApiParser(handles.at(0).get())
     {}
 
     static ApiParser::ParseFunctions parseFunctions;
