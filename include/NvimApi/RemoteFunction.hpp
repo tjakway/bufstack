@@ -11,11 +11,37 @@
 //NOTE: must include msgpack before rpc
 #include <rpc/client.h>
 
+#define REMOTE_API_FUNCTION_CALL_IMPL( \
+        SYNC_RETURN_TYPE, ASYNC_RETURN_TYPE, CONVERT_FUNCTION)  \
+    SYNC_RETURN_TYPE call(const Args&... args) const \
+    { \
+        check(); \
+        \
+        msgpack::object_handle h = rpcClient->call(name, &args...); \
+        return CONVERT_FUNCTION(h.get()); \
+    } \
+    \
+    ASYNC_RETURN_TYPE async_call(const Args&... args) const \
+    { \
+        check(); \
+    \
+        const auto conv = [this](msgpack::object_handle h){ \
+            return CONVERT_FUNCTION(h.get()); \
+        }; \
+        \
+        return runAfter(rpcClient->async_call(name, &args...), conv); \
+    } \
+    \
+    SYNC_RETURN_TYPE operator()(const Args&... args) const \
+    { \
+        return call(args...); \
+    }
+
+
 using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
 
-template <typename T, typename... Args>
 class AbstractRemoteApiFunction
 {
 protected:
@@ -49,13 +75,6 @@ protected:
         }
 
         checkName();
-    }
-
-    optional<T> convert(const msgpack::object& obj)
-    {
-        T t;
-        obj.convert(t);
-        return make_optional(t);
     }
 
     AbstractRemoteApiFunction(bool _initialized,
@@ -99,42 +118,30 @@ public:
 };
 
 template <typename T, typename... Args>
-class ResultRemoteApiFunction : public 
+class HasReturnValueRemoteApiFunction : public AbstractRemoteApiFunction
 {
+    template <typename X>
+    static X convert(const msgpack::object& obj)
+    {
+        X x;
+        obj.convert(x);
+        return x;
+    }
+public:
     using AbstractRemoteApiFunction::AbstractRemoteApiFunction;
-    optional<T> call(const Args&... args) const
-    {
-        check();
 
-        msgpack::object_handle h = rpcClient->call(name, &args...);
-        return convert(h.get());
-    }
-
-    std::future<optional<T>> async_call(const Args&... args) const
-    {
-        check();
-
-        const auto conv = [this](msgpack::object_handle h){
-            return this->convert(h.get());
-        };
-
-        return runAfter(rpcClient->async_call(name, &args...), conv);
-    }
-
-    T operator()(const Args&... args) const
-    {
-        return call(args...);
-    }
+    REMOTE_API_FUNCTION_CALL_IMPL(T, std::future<T>, HasReturnValueRemoteApiFunction::convert);
 };
 
 
 template <typename... Args>
-class RemoteApiFunction<void, Args...>
+class NoReturnRemoteApiFunction : public AbstractRemoteApiFunction
 {
-    optional<void> convert(const msgpack::object& obj)
-    {
-        return nullopt;
-    }
+    void noOp(const msgpack::object&) {}
+public:
+    using AbstractRemoteApiFunction::AbstractRemoteApiFunction;
+
+    REMOTE_API_FUNCTION_CALL_IMPL(void, void, NoReturnRemoteApiFunction::noOp);
 };
 
 class RemoteFunctionInstances
