@@ -16,8 +16,9 @@ using namespace nonstd;
 BUFSTACK_BEGIN_NAMESPACE
 
 template <typename T, typename... Args>
-class RemoteApiFunction
+class AbstractRemoteApiFunction
 {
+protected:
     NEW_EXCEPTION_TYPE(RemoteApiFunctionError);
     NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedError, RemoteApiFunctionError);
     NEW_EXCEPTION_TYPE_WITH_BASE(BadNameError, RemoteApiFunctionError);
@@ -57,8 +58,7 @@ class RemoteApiFunction
         return make_optional(t);
     }
 
-protected:
-    RemoteApiFunction(bool _initialized,
+    AbstractRemoteApiFunction(bool _initialized,
             const std::string& _name,
             optional<NvimFunction> spec,
             std::shared_ptr<rpc::client> _client)
@@ -78,27 +78,30 @@ protected:
 
 public:
     //uninitialized ctor
-    RemoteApiFunction()
-        : RemoteApiFunction(false, "", nullopt, nullptr)
+    AbstractRemoteApiFunction()
+        : AbstractRemoteApiFunction(false, "", nullopt, nullptr)
     {}
 
-    RemoteApiFunction(const NvimFunction& spec, 
+    AbstractRemoteApiFunction(const NvimFunction& spec, 
             std::shared_ptr<rpc::client> rpcClient,
             const ApiInfo& info)
-        : RemoteApiFunction(true, spec.name, make_optional(spec), rpcClient)
+        : AbstractRemoteApiFunction(true, spec.name, make_optional(spec), rpcClient)
     {
         checkApiInfo(info);
     }
 
 
     //ctor that skips the api info check
-    RemoteApiFunction(const std::string& _name,
+    AbstractRemoteApiFunction(const std::string& _name,
             std::shared_ptr<rpc::client> client)
-        : RemoteApiFunction(true, _name, nullopt, client)
+        : AbstractRemoteApiFunction(true, _name, nullopt, client)
     {}
+};
 
-
-    //TODO: implement
+template <typename T, typename... Args>
+class ResultRemoteApiFunction : public 
+{
+    using AbstractRemoteApiFunction::AbstractRemoteApiFunction;
     optional<T> call(const Args&... args) const
     {
         check();
