@@ -20,6 +20,7 @@ class NvimConnectionTest : virtual public Loggable
     //atomically initialize the client
     void connect();
     void launchNeovim(
+        const std::string& path,
         const std::string& _address = localhost,
         uint16_t _port);
 
