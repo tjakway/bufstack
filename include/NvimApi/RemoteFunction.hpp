@@ -11,6 +11,7 @@
 //NOTE: must include msgpack before rpc
 #include <rpc/client.h>
 
+
 #define REMOTE_API_FUNCTION_CALL_IMPL( \
         SYNC_RETURN_TYPE, ASYNC_RETURN_TYPE, CONVERT_FUNCTION)  \
     SYNC_RETURN_TYPE call(const Args&... args) const \
@@ -130,18 +131,58 @@ class HasReturnValueRemoteApiFunction : public AbstractRemoteApiFunction
 public:
     using AbstractRemoteApiFunction::AbstractRemoteApiFunction;
 
-    REMOTE_API_FUNCTION_CALL_IMPL(T, std::future<T>, HasReturnValueRemoteApiFunction::convert);
+    T call(const Args&... args) const 
+    { 
+        check(); 
+        
+        msgpack::object_handle h = rpcClient->call(name, &args...); 
+        return convert(h.get()); 
+    }
+    
+    std::future<T> async_call(const Args&... args) const 
+    { 
+        check(); 
+    
+        const auto conv = [this](msgpack::object_handle h){ 
+            return HasReturnValueRemoteApiFunction::convert(h.get()); 
+        }; 
+        
+        return runAfter(rpcClient->async_call(name, &args...), conv); 
+    } 
+
+    T operator()(const Args&... args) const 
+    { 
+        return call(args...); 
+    }
 };
 
 
 template <typename... Args>
 class NoReturnRemoteApiFunction : public AbstractRemoteApiFunction
 {
-    static void noOp(const msgpack::object&) {}
 public:
     using AbstractRemoteApiFunction::AbstractRemoteApiFunction;
 
-    REMOTE_API_FUNCTION_CALL_IMPL(void, void, NoReturnRemoteApiFunction::noOp);
+    void call(const Args&... args) const 
+    { 
+        check(); 
+        
+        rpcClient->call(name, &args...); 
+    }
+    
+    void async_call(const Args&... args) const 
+    { 
+        check(); 
+    
+        //don't need a conversion step here because we're discarding
+        //the return value
+        rpcClient->async_call(name, &args...); 
+    } 
+
+    void operator()(const Args&... args) const 
+    { 
+        call(args...); 
+    }
 };
 
 class RemoteFunctionInstances
