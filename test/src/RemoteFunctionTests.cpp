@@ -3,6 +3,7 @@
 #include <msgpack.hpp>
 
 #include "NamespaceDefines.hpp"
+#include "Loggable.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
