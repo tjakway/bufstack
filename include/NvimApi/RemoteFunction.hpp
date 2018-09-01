@@ -137,7 +137,7 @@ public:
 template <typename... Args>
 class NoReturnRemoteApiFunction : public AbstractRemoteApiFunction
 {
-    void noOp(const msgpack::object&) {}
+    static void noOp(const msgpack::object&) {}
 public:
     using AbstractRemoteApiFunction::AbstractRemoteApiFunction;
 
@@ -170,8 +170,8 @@ protected:
 
 public:
     //TODO: wrap nvim types
-    const RemoteApiFunction<bool, std::string> bufIsValid;
-    const RemoteApiFunction<void, std::string> subscribe;
+    const HasReturnValueRemoteApiFunction<bool, std::string> bufIsValid;
+    const NoReturnRemoteApiFunction<std::string> subscribe;
 
     RemoteFunctionInstances(
         std::shared_ptr<rpc::client> client,
