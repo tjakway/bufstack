@@ -43,7 +43,14 @@ protected:
             sleepInterval(_sleepInterval)
     {}
 
-    using Buffer = std::unique_ptr<std::pair<char*, long>>;
+    class Server::BufDeleter
+    {
+        void operator()(typename Server::Buffer::pointer buf)
+        {
+            delete[] buf->first;
+        }
+    };
+    using Buffer = std::unique_ptr<std::pair<char*, long>, BufDeleter>;
 
     virtual Buffer onRecv(Buffer) = 0;
     virtual void send(int, Buffer) = 0;
@@ -100,9 +107,11 @@ protected:
             int backlogSize = Config::Defaults::defaultBacklogSize,
             bool _forceAsync = false);
     virtual void send(int, Buffer) override;
+    virtual void send(int, const char*, std::size_t) override;
 
     NEW_EXCEPTION_TYPE_WITH_BASE(AsyncWriteServerError, ServerError);
 
+    void doSend(int, Buffer);
 private:
     /** determines whether or not to pass std::launch::async */
     bool forceAsync;
@@ -111,7 +120,6 @@ private:
 
     //newest futures will be at the front of the queue
     std::deque<std::future<void>> futures;
-    void doSend(int, Buffer);
 };
 
 class MsgpackServer : 
@@ -218,7 +226,7 @@ public:
         auto call_obj =
             std::make_tuple(static_cast<uint8_t>(
                         MsgpackRpc::Message::Type::Request), 
-                    thisMsgId, name, args);
+                    thisMsgId, name, args...);
 
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
@@ -235,7 +243,8 @@ public:
     }
 
     MsgpackServerClient()
-        : idSeq(0)
+        : idSeq(0), responseCallbacks(
+                std::vector<BoundResponseCallback>{})
     {}
 };
 
