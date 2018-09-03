@@ -193,7 +193,7 @@ protected:
                     throw ResponseResultConversionError(
                         STRCATS("Could not convert request " <<
                             "response to the desired " <<
-                            "type for MsgId < " << msgId << 
+                            "type for MsgId < " << responseMsg.msgId << 
                             " >.  Object received: " << objectReceived));
                 }
             }
@@ -216,7 +216,8 @@ public:
         const auto thisMsgId = idSeq.nextAndIncrement();
 
         auto call_obj =
-            std::make_tuple(static_cast<uint8_t>(client::request_type::call), 
+            std::make_tuple(static_cast<uint8_t>(
+                        MsgpackRpc::Message::Type::Request), 
                     thisMsgId, name, args);
 
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
