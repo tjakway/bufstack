@@ -16,20 +16,20 @@ public:
     template <typename U>
     U access(std::function<U(T&)> f)
     {
-        std::lock_guard {mut};
+        std::lock_guard<std::mutex> {mut};
         return f(*val);
     }
 
     template <typename U>
     U access(std::function<U(const T&)> f)
     {
-        std::lock_guard {mut};
+        std::lock_guard<std::mutex> {mut};
         return f(*val);
     }
 
     T get()
     {
-        std::lock_guard {mut};
+        std::lock_guard<std::mutex> {mut};
         return *val;
     }
 
