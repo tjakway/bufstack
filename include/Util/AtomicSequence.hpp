@@ -3,6 +3,10 @@
 #include <mutex>
 #include <memory>
 
+#include "NamespaceDefines.hpp"
+
+BUFSTACK_BEGIN_NAMESPACE
+
 template <typename T>
 class AtomicSequence
 {
@@ -16,6 +20,14 @@ protected:
     }
 
 public:
+    AtomicSequence(T startingValue)
+        : seqPtr(new T(startingValue))
+    {}
+
+    AtomicSequence()
+        : seqPtr(new T())
+    {}
+
     T nextAndIncrement()
     {
         std::lock_guard<std::mutex> lock(mut);
@@ -24,3 +36,5 @@ public:
     }
 };
 
+
+BUFSTACK_END_NAMESPACE
