@@ -102,7 +102,7 @@ public:
             msgId(_msgId), error(_error), result(_result)
         {}
 
-        bool error() const
+        bool isError() const
         {
             return error.has_value();
         }
