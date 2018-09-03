@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "Config.hpp"
 #include "Util/NewExceptionType.hpp"
+#include "Util/AtomicSequence.hpp"
 #include "Loggable.hpp"
 
 #include "MsgpackRpc.hpp"
@@ -117,6 +118,24 @@ protected:
 
 private:
     msgpack::object_handle decode(Buffer);
+};
+
+class Client : virtual public MsgpackServer
+{
+    std::vector<std::pair<std::string, std::size_t>> openCalls;
+    AtomicSequence<unsigned long> idSeq;
+
+protected:
+    virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) override;
+
+    virtual void asyncCallVoidReturn(const std::string& name, 
+            std::vector<msgpack::object>& args);
+    virtual void asyncCall(const std::string& name);
+
+public:
+    Client()
+        : idSeq(0)
+    {}
 };
 
 BUFSTACK_END_NAMESPACE
