@@ -54,6 +54,7 @@ public:
             : type(_type)
         {}
 
+    public:
         //minimum number of msgpack objects in a message
         //TODO: make constexpr
         static int getMinimumMessageLength();
