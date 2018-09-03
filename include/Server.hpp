@@ -45,9 +45,9 @@ protected:
 
     using Buffer = std::unique_ptr<std::pair<char*, long>>;
 
-    virtual void onConnect(int clientFd) = 0;
     virtual Buffer onRecv(Buffer) = 0;
     virtual void send(int, Buffer) = 0;
+    virtual void send(int, const char*, std::size_t) = 0;
 
     NEW_EXCEPTION_TYPE(ServerError);
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
@@ -78,6 +78,17 @@ protected:
 
     std::atomic_bool connected {false};
     virtual void onConnect(int clientFd) override;
+};
+
+class HasClientFd
+{
+    int clientFd;
+public:
+    int getClientFd();
+
+    HasClientFd(int _fd)
+        : clientFd(_fd)
+    {}
 };
 
 class AsyncWriteServer : public Server
@@ -121,7 +132,9 @@ private:
     msgpack::object_handle decode(Buffer);
 };
 
-class MsgpackServerClient : virtual public MsgpackServer
+class MsgpackServerClient : 
+    virtual public MsgpackServer,
+    virtual public HasClientFd
 {
     using MsgId = uint32_t;
 
@@ -202,12 +215,13 @@ public:
         const auto thisMsgId = idSeq.nextAndIncrement();
 
         auto call_obj =
-            std::make_tuple(static_cast<uint8_t>(client::request_type::call), idx,
-                          func_name, args_obj);
+            std::make_tuple(static_cast<uint8_t>(client::request_type::call), 
+                    thisMsgId, name, args);
 
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
 
+        send(getClientFd(), buffer->data(), buffer->size());
 
         std::shared_ptr<std::promise<T>> thisPromise = 
             std::make_shared<std::promise<T>>();
@@ -218,7 +232,7 @@ public:
         return thisPromise->get_future();
     }
 
-    Client()
+    MsgpackServerClient()
         : idSeq(0)
     {}
 };
