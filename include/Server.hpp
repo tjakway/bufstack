@@ -174,11 +174,12 @@ protected:
 
             //try to convert the response to that type
             try {
-                if(responseMsg.error())
+                if(responseMsg.isError())
                 {
                     throw ResponseGotError(STRCATS(
                         "Server returned an error for request with " <<
-                        "MsgId < " << msgId << " >.  Object received: " <<
+                        "MsgId < " << responseMsg.msgId << 
+                        " >.  Object received: " <<
                         objectReceived));
                 }
 
