@@ -43,7 +43,7 @@ protected:
             sleepInterval(_sleepInterval)
     {}
 
-    class Server::BufDeleter
+    class BufDeleter
     {
         void operator()(std::unique_ptr<std::pair<char*, long>, BufDeleter> buf)
         {
