@@ -205,7 +205,7 @@ protected:
 
 public:
 
-    template <typename Args...>
+    template <typename... Args>
     virtual void asyncCallVoidReturn(const std::string& name, 
             Args... args);
 
