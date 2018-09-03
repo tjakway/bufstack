@@ -68,10 +68,12 @@ public:
         const std::vector<std::reference_wrapper<msgpack::object>> params;
 
         RequestMessage(
-            const std::string _method,
+            uint32_t _msgId,
+            const std::string& _method,
             const std::vector<
-                std::reference_wrapper<msgpack::object>> _params)
+                std::reference_wrapper<msgpack::object>>& _params)
             : Message(Type::Request),
+            msgId(_msgId),
             method(_method), params(_params)
         {}
 
@@ -119,17 +121,7 @@ public:
 
             return ss.str();
         }
-
-        std::string getMethod() 
-        { 
-            return method.value();
-        }
-
-        std::vector<std::reference_wrapper<msgpack::object>> getParams()
-        {
-            return params;
-        }
-
+        
         static const int messageSize;
 
 
