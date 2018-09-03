@@ -50,12 +50,13 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
 
         switch(type)
         {
+            //TODO
             case MsgpackRpc::Message::Type::Request:
                 throw MsgpackServerError("Request messages not implemented.");
 
             case MsgpackRpc::Message::Type::Response:
             {
-                checkMessageLength(MsgpackRpc::Response::messageSize);
+                checkMessageLength(MsgpackRpc::ResponseMessage::messageSize);
 
                 uint32_t msgId;
                 msgObj.at(1).convert(msgId);
@@ -86,14 +87,14 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
                 }
 
                 onReceiveResponseMsg(
-                        MsgpackRpc::Response(type, msgId, errorField, resultField));
+                        MsgpackRpc::ResponseMessage(msgId, errorField, resultField));
                 break;
             }
 
 
             case MsgpackRpc::Message::Type::Notification:
             {
-                checkMessageLength(MsgpackRpc::Notification::messageSize);
+                checkMessageLength(MsgpackRpc::NotificationMessage::messageSize);
 
                 std::string method;
                 msgObj.at(1).convert(method);
@@ -109,7 +110,8 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
                     params.emplace_back(std::reference_wrapper<msgpack::object>(i));
                 }
 
-                onReceiveNotificationMsg(MsgpackRpc::Notification(type, method, params));
+                onReceiveNotificationMsg(
+                        MsgpackRpc::NotificationMessage(method, params));
                 break;
             }
         }

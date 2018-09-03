@@ -49,9 +49,9 @@ MsgpackRpc::Message::Type MsgpackRpc::Message::intToType(int i)
 PrintableObject::Fields MsgpackRpc::RequestMessage::getFields() const noexcept
 {
     return PrintableObject::Fields {
-        std::make_pair("msgId", msgId),
+        std::make_pair("msgId", std::to_string(msgId)),
         std::make_pair("method", method),
-        std::make_pair("params", params)
+        std::make_pair("params", Util::printVector(params))
     };
 }
 std::string MsgpackRpc::RequestMessage::getName() const noexcept
@@ -62,9 +62,9 @@ std::string MsgpackRpc::RequestMessage::getName() const noexcept
 PrintableObject::Fields MsgpackRpc::ResponseMessage::getFields() const noexcept
 {
     return PrintableObject::Fields {
-        std::make_pair("msgId", msgId),
+        std::make_pair("msgId", std::to_string(msgId)),
         std::make_pair("error", printOptional(error)),
-        std::make_pair("result", result)
+        std::make_pair("result", STRCAT(result))
     };
 }
 std::string MsgpackRpc::ResponseMessage::getName() const noexcept
@@ -76,7 +76,7 @@ PrintableObject::Fields MsgpackRpc::NotificationMessage::getFields() const noexc
 {
     return PrintableObject::Fields {
         std::make_pair("method", method),
-        std::make_pair("params", params)
+        std::make_pair("params", Util::printVector(params))
     };
 }
 std::string MsgpackRpc::NotificationMessage::getName() const noexcept

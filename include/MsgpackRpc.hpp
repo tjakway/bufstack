@@ -92,12 +92,12 @@ public:
         /**
             * nullopt if no error
             */
-        const optional<std::reference_wrapper<msgpack::object>> error;
+        const optional<std::string> error;
         const std::reference_wrapper<msgpack::object> result;
 
         ResponseMessage(
                 uint32_t _msgId,
-                optional<std::reference_wrapper<msgpack::object>> _error,
+                optional<std::string> _error,
                 std::reference_wrapper<msgpack::object> _result)
             : Message(Type::Response),
             msgId(_msgId), error(_error), result(_result)
