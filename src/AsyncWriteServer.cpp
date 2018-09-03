@@ -13,6 +13,7 @@
 #include <sstream>
 #include <limits>
 #include <string>
+#include <utility>
 
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -62,6 +63,15 @@ void AsyncWriteServer::send(int clientFd, Server::Buffer buf)
     //will block until the thread completes, making our code effectively synchronous
     //see https://stackoverflow.com/questions/36920579/how-to-use-stdasync-to-call-a-function-in-a-mutex-protected-loop
     futures.emplace_back(std::move(result));
+}
+
+
+void AsyncWriteServer::send(int clientFd, const char* buf, std::size_t len)
+{
+    Server::Buffer ptr = Server::Buffer(
+            new Server::Buffer::element_type(
+                std::make_pair(new char[len], len)));
+    AsyncWriteServer::send(clientFd, std::move(ptr));
 }
 
 

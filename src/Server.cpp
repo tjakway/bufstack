@@ -223,4 +223,5 @@ void connect(const std::string& addr, uint16_t port)
     rpc::client nvimClient(addr, port);
 }
 
+
 BUFSTACK_END_NAMESPACE
