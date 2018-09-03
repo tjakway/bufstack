@@ -136,7 +136,10 @@ class MsgpackServerClient : virtual public MsgpackServer
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
     
 protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionError, ResponseError);
+    //indicates a serverside error
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotError, ResponseError);
 
     virtual void addResponseCallback(BoundResponseCallback&& cb);
     virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) override;
@@ -150,34 +153,36 @@ protected:
         //check if this is the response we're waiting for
         if(responseMsg.msgId == thisCallId)
         {
-            if(responseMsg.error())
-            {
+            const msgpack::object& objectReceived = 
+                responseMsg.result.get();
 
-            }
-            else
-            {
-                const msgpack::object& objectReceived = 
-                    responseMsg.result.get();
-
-                //try to convert the response to that type
-                try {
-                    try {
-                        //creates a new object of T
-                        //see https://github.com/msgpack/msgpack-c/issues/480
-                        promise->set_value(objectReceived.as<T>());
-                    }
-                    catch(msgpack::type_error e)
-                    {
-                        ResponseResultConversionError(
-                            STRCATS("Could not convert request " <<
-                                "response to the desired " <<
-                                "type.  Object received: " << objectReceived));
-                    }
-                }
-                catch(...)
+            //try to convert the response to that type
+            try {
+                if(responseMsg.error())
                 {
-
+                    throw ResponseGotError(STRCATS(
+                        "Server returned an error for request with " <<
+                        "MsgId < " << msgId << " >.  Object received: " <<
+                        objectReceived));
                 }
+
+                try {
+                    //creates a new object of T
+                    //see https://github.com/msgpack/msgpack-c/issues/480
+                    promise->set_value(objectReceived.as<T>());
+                }
+                catch(msgpack::type_error e)
+                {
+                    ResponseResultConversionError(
+                        STRCATS("Could not convert request " <<
+                            "response to the desired " <<
+                            "type for MsgId < " << msgId << 
+                            " >.  Object received: " << objectReceived));
+                }
+            }
+            catch(...)
+            {
+                promise.set_exception(std::current_exception());
             }
         }
     }
