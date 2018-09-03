@@ -173,7 +173,7 @@ protected:
                 }
                 catch(msgpack::type_error e)
                 {
-                    ResponseResultConversionError(
+                    throw ResponseResultConversionError(
                         STRCATS("Could not convert request " <<
                             "response to the desired " <<
                             "type for MsgId < " << msgId << 
