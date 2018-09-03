@@ -145,7 +145,7 @@ public:
 
         std::string getMethod() 
         { 
-            return method.value();
+            return method;
         }
 
         std::vector<std::reference_wrapper<msgpack::object>> getParams()
