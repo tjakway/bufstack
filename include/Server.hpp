@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "Config.hpp"
 #include "Util/NewExceptionType.hpp"
+#include "Util/Strcat.hpp"
 #include "Util/AtomicSequence.hpp"
 #include "Util/AtomicAccess.hpp"
 #include "Loggable.hpp"
@@ -46,12 +47,13 @@ protected:
     class BufDeleter
     {
     public:
-        void operator()(std::pair<char*, long>* buf)
+        void operator()(std::pair<char*, std::size_t>* buf)
         {
             delete[] buf->first;
+            delete buf;
         }
     };
-    using Buffer = std::unique_ptr<std::pair<char*, long>, BufDeleter>;
+    using Buffer = std::unique_ptr<std::pair<char*, std::size_t>, BufDeleter>;
 
     virtual Buffer onRecv(Buffer) = 0;
     virtual void send(int, Buffer) = 0;
