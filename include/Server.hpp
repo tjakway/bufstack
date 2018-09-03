@@ -45,7 +45,8 @@ protected:
 
     class BufDeleter
     {
-        void operator()(std::unique_ptr<std::pair<char*, long>, BufDeleter> buf)
+    public:
+        void operator()(std::pair<char*, long>* buf)
         {
             delete[] buf->first;
         }
@@ -62,6 +63,7 @@ protected:
     static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
     virtual void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
 
+    virtual void onConnect(int clientFd) = 0;
 
 public:
     virtual ~Server() {}
@@ -231,7 +233,7 @@ public:
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
 
-        send(getClientFd(), buffer->data(), buffer->size());
+        AsyncWriteServer::send(getClientFd(), buffer->data(), buffer->size());
 
         std::shared_ptr<std::promise<T>> thisPromise = 
             std::make_shared<std::promise<T>>();
