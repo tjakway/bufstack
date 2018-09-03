@@ -78,8 +78,8 @@ public:
         static const int messageSize;
 
 
-        virtual Fields getFields() const override noexcept;
-        virtual std::string getName() const override noexcept;
+        virtual Fields getFields() const noexcept override;
+        virtual std::string getName() const noexcept override;
     };
 
     class ResponseMessage : public Message
@@ -133,8 +133,8 @@ public:
         static const int messageSize;
 
 
-        virtual Fields getFields() const override noexcept;
-        virtual std::string getName() const override noexcept;
+        virtual Fields getFields() const noexcept override;
+        virtual std::string getName() const noexcept override;
     };
 
     class NotificationMessage : public Message
