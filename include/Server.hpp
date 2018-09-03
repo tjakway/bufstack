@@ -109,10 +109,8 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackServerError, ServerError);
     NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageError, MsgpackServerError);
 
-    //I think only the rpc server can receive request messages
-    //virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
-    
     virtual void onReceiveResponseMsg(const MsgpackRpc::Message&) = 0;
+    virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
     virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) = 0;
 
     virtual void onRecvMsg(const msgpack::object&);
