@@ -4,6 +4,7 @@
 #include "Config.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "Util/AtomicSequence.hpp"
+#include "Util/AtomicAccess.hpp"
 #include "Loggable.hpp"
 
 #include "MsgpackRpc.hpp"
@@ -120,19 +121,89 @@ private:
     msgpack::object_handle decode(Buffer);
 };
 
-class Client : virtual public MsgpackServer
+class MsgpackServerClient : virtual public MsgpackServer
 {
-    std::vector<std::pair<std::string, std::size_t>> openCalls;
-    AtomicSequence<unsigned long> idSeq;
+    using MsgId = uint32_t;
 
+    std::vector<std::pair<std::string, MsgId>> openCalls;
+    AtomicSequence<MsgId> idSeq;
+
+
+    using UnboundResponseCallback = std::function<void(MsgId, 
+            std::shared_ptr<std::promise>)>;
+    using BoundResponseCallback = std::function<void(MsgId)>;
+
+    AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
+    
 protected:
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionError, ServerError);
+
+    virtual void addResponseCallback(BoundResponseCallback&& cb);
     virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) override;
 
-    virtual void asyncCallVoidReturn(const std::string& name, 
-            std::vector<msgpack::object>& args);
-    virtual void asyncCall(const std::string& name);
+    template <typename T>
+    static void setResponseValue(
+            MsgId thisCallId,
+            std::shared_ptr<std::promise<T>> promise,
+            const MsgpackRpc::ResponseMessage& responseMsg)
+    {
+        //check if this is the response we're waiting for
+        if(responseMsg.msgId == thisCallId)
+        {
+            if(responseMsg.error())
+            {
+
+            }
+            else
+            {
+                const msgpack::object& objectReceived = 
+                    responseMsg.result.get();
+
+                //try to convert the response to that type
+                try {
+                    try {
+                        //creates a new object of T
+                        //see https://github.com/msgpack/msgpack-c/issues/480
+                        promise->set_value(objectReceived.as<T>());
+                    }
+                    catch(msgpack::type_error e)
+                    {
+                        ResponseResultConversionError(
+                            STRCATS("Could not convert request " <<
+                                "response to the desired " <<
+                                "type.  Object received: " << objectReceived));
+                    }
+                }
+                catch(...)
+                {
+
+                }
+            }
+        }
+    }
 
 public:
+
+    template <typename Args...>
+    virtual void asyncCallVoidReturn(const std::string& name, 
+            Args... args);
+
+    template <typename T, typename Args...>
+    virtual std::future<T> asyncCall(const std::string& name, Args... args)
+    {
+        const auto id = idSeq.nextAndIncrement();
+
+        //auto call_obj =
+        //    std::make_tuple(static_cast<uint8_t>(client::request_type::call), idx,
+        //                  func_name, args_obj);
+
+        auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
+        RPCLIB_MSGPACK::pack(*buffer, call_obj);
+
+
+
+    }
+
     Client()
         : idSeq(0)
     {}
