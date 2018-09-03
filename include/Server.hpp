@@ -206,11 +206,11 @@ protected:
 public:
 
     template <typename... Args>
-    virtual void asyncCallVoidReturn(const std::string& name, 
+    void asyncCallVoidReturn(const std::string& name, 
             Args... args);
 
     template <typename T, typename Args...>
-    virtual std::future<T> asyncCall(const std::string& name, Args... args)
+    std::future<T> asyncCall(const std::string& name, Args... args)
     {
         const auto thisMsgId = idSeq.nextAndIncrement();
 
