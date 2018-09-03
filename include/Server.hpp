@@ -209,7 +209,7 @@ public:
     void asyncCallVoidReturn(const std::string& name, 
             Args... args);
 
-    template <typename T, typename Args...>
+    template <typename T, typename... Args>
     std::future<T> asyncCall(const std::string& name, Args... args)
     {
         const auto thisMsgId = idSeq.nextAndIncrement();
