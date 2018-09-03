@@ -45,7 +45,7 @@ protected:
 
     class Server::BufDeleter
     {
-        void operator()(typename Server::Buffer::pointer buf)
+        void operator()(std::unique_ptr<std::pair<char*, long>, BufDeleter> buf)
         {
             delete[] buf->first;
         }
