@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <sstream>
 
 #include <msgpack.hpp>
 
@@ -23,7 +24,14 @@ public:
 
     class Message
     {
-    private:
+    public:
+        enum Type
+        {
+            Request = 0,
+            Response = 1,
+            Notification = 2
+        };
+
         NEW_EXCEPTION_TYPE_WITH_BASE(MessageFormatException, 
                 MsgpackRpcException);
         void checkCtorArgs();
@@ -31,76 +39,108 @@ public:
         void methodError();
         void paramsError();
 
-    public:
-        //TODO: represent messages using a tagged union
-        enum Type
-        {
-            Request = 0,
-            Response = 1,
-            Notification = 2
-        };
         const Type type;
 
-        Type getType() { return type; }
-
-        //minimum number of msgpack objects in a message
-        static const int minimumMessageLength;
-
-    protected:
-        const optional<uint32_t> msgId;
-        const optional<std::string> error;
-
-         
-        const optional<std::string> method;
-
-        const optional<std::reference_wrapper<msgpack::object>> result;
-
-        const std::vector<std::reference_wrapper<msgpack::object>> params;
-
-
-    protected:
-        Message(Type _type, 
-                optional<uint32_t> _msgId, 
-                optional<std::string> _error,
-                optional<std::string> _method,
-                optional<std::reference_wrapper<msgpack::object>> _result,
-                std::vector<std::reference_wrapper<msgpack::object>> _params)
-            : type(_type), msgId(_msgId), error(_error),
-            method(_method),
-            result(_result), params(_params)
-        {}
-
-    public:
-        Message(const Message& other)
-            : Message(other.type,
-            other.msgId,
-            other.error,
-            other.method,
-            other.result,
-            other.params)
-        {}
+        Type getType() const { return type; }
 
         std::string printMessage();
         static std::string printType(Type);
-    };
 
-    class Response : public Message
-    {
-    public:
-        Response(Type type,
-                uint32_t msgId,
-                optional<std::string> error,
-                optional<std::reference_wrapper<msgpack::object>> result)
-            : Message(type, 
-                    make_optional(msgId),
-                    error,
-                    nullopt,
-                    result,
-                    std::vector<std::reference_wrapper<msgpack::object>>{})
+    protected:
+        static Type intToType(int);
+
+        Message(int _type)
+            : type(_type)
         {}
 
-        Response(const Response& other)
-            : Message(other)
+        Message(Type _type)
+            : type(_type)
+        {}
+
+        //minimum number of msgpack objects in a message
+        static const int minimumMessageLength;
+    };
+
+
+    class RequestMessage : public Message
+    {
+    public:
+        const uint32_t msgId;
+        const std::string method;
+        const std::vector<std::reference_wrapper<msgpack::object>> params;
+
+        RequestMessage(
+            const std::string _method,
+            const std::vector<
+                std::reference_wrapper<msgpack::object>> _params)
+            : Message(Type::Request),
+            method(_method), params(_params)
+        {}
+    };
+
+    class ResponseMessage : public Message
+    {
+    public:
+        const uint32_t msgId;
+        /**
+            * nullopt if no error
+            */
+        const optional<std::reference_wrapper<msgpack::object>> error;
+        const std::reference_wrapper<msgpack::object> result;
+
+        ResponseMessage(
+                uint32_t _msgId,
+                optional<std::reference_wrapper<msgpack::object>> _error,
+                std::reference_wrapper<msgpack::object> result)
+            : Message(Type::Response),
+            msgId(_msgId), error(_error), result(_result)
+        {}
+
+        bool error() const
+        {
+            return error.has_value();
+        }
+
+        std::string errorToString() const
+        {
+            std::ostringstream ss;
+            if(error.has_value())
+            {
+                ss << error.value();
+            }
+            else
+            {
+                ss << "[no error]";
+            }
+
+            return ss.str();
+        }
+
+        std::string getMethod() 
+        { 
+            return method.value();
+        }
+
+        std::vector<std::reference_wrapper<msgpack::object>> getParams()
+        {
+            return params;
+        }
+
+        static const int messageSize;
+    };
+
+    class NotificationMessage : public Message
+    {
+    public:
+        const std::string method;
+        const std::vector<std::reference_wrapper<msgpack::object>> params;
+
+        NotificationMessage(
+            const std::string _method,
+            const std::vector<
+                std::reference_wrapper<msgpack::object>> _params)
+            : Message(Type::Notification),
+            method(_method), params(_params)
         {}
 
         std::string getMethod() 
@@ -116,37 +156,6 @@ public:
         static const int messageSize;
     };
 
-    class Notification : public Message
-    {
-    public:
-        Notification(Type type,
-                std::string method,
-                std::vector<std::reference_wrapper<msgpack::object>> params)
-            : Message(type, 
-                    nullopt,
-                    nullopt,
-                    make_optional(method),
-                    nullopt,
-                    params)
-        {}
-
-
-        Notification(const Notification& other)
-            : Message(other)
-        {}
-
-        std::string getMethod() 
-        { 
-            return method.value();
-        }
-
-        std::vector<std::reference_wrapper<msgpack::object>> getParams()
-        {
-            return params;
-        }
-
-        static const int messageSize;
-    };
 };
 
 
