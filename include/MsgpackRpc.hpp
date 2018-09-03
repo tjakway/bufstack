@@ -34,10 +34,6 @@ public:
 
         NEW_EXCEPTION_TYPE_WITH_BASE(MessageFormatException, 
                 MsgpackRpcException);
-        void checkCtorArgs();
-        void resultError();
-        void methodError();
-        void paramsError();
 
         const Type type;
 
@@ -50,7 +46,7 @@ public:
         static Type intToType(int);
 
         Message(int _type)
-            : type(_type)
+            : type(intToType(_type))
         {}
 
         Message(Type _type)
@@ -58,7 +54,7 @@ public:
         {}
 
         //minimum number of msgpack objects in a message
-        static const int minimumMessageLength;
+        static int getMinimumMessageLength();
     };
 
 
@@ -76,6 +72,8 @@ public:
             : Message(Type::Request),
             method(_method), params(_params)
         {}
+
+        static const int messageSize;
     };
 
     class ResponseMessage : public Message

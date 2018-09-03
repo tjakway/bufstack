@@ -4,6 +4,8 @@
 #include "Util/PrintOptional.hpp"
 #include "Util/Util.hpp"
 
+#include <algorithm>
+
 BUFSTACK_BEGIN_NAMESPACE
 
 std::string MsgpackRpc::Message::printType(MsgpackRpc::Message::Type t)
@@ -22,83 +24,36 @@ std::string MsgpackRpc::Message::printType(MsgpackRpc::Message::Type t)
 
 }
 
-void MsgpackRpc::Message::resultError()
+MsgpackRpc::Message::Type MsgpackRpc::Message::intToType(int i)
 {
-    throw MessageFormatException(
-        STRCATS("Did not expect result for message of type " <<
-            printType(type) << 
-            " but result == " << printOptional(result)));
-}
-
-void MsgpackRpc::Message::paramsError()
-{
-    throw MessageFormatException(
-        STRCATS("Did not expect params for message of type " <<
-            printType(type) << 
-            " but params == " << Util::printVector(params)));
-}
-
-void MsgpackRpc::Message::methodError()
-{
-    throw MessageFormatException(
-        STRCATS("Did not expect a method name for message of type " <<
-            printType(type) << 
-            " but method == " << printOptional(method)));
-}
-
-void MsgpackRpc::Message::checkCtorArgs()
-{
-    //see https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md for reference
-
-    switch(type)
+    switch(i)
     {
-        case Request:
-            if(result.has_value())
-            {
-                resultError();
-            }
+        case MsgpackRpc::Message::Type::Request:
+            return MsgpackRpc::Message::Type::Request;
 
-            break;
+        case MsgpackRpc::Message::Type::Response:
+            return MsgpackRpc::Message::Type::Response;
 
-        case Response:
-            if(method.has_value())
-            {
-                methodError();
-            }
-            if(params.size() > 0)
-            {
-                paramsError();
-            }
+        case MsgpackRpc::Message::Type::Notification:
+            return MsgpackRpc::Message::Type::Notification;
 
-            //if an error occurred the result should be nil
-            if(error.has_value())
-            {
-                if(result.has_value())
-                {
-                    if(!result.value().get().is_nil())
-                    {
-                        throw MessageFormatException(STRCATS(
-                            "For message of type " <<
-                            printType(type) << ", result should be nil " <<
-                            "if an error occurred but result == " <<
-                            printOptional(result)));
-                    }
-                }
-            }
-            break;
-
-        case Notification:
-            if(result.has_value())
-            {
-                resultError();
-            }
-            break;
+        default:
+            throw MessageFormatException(STRCATS(
+                    "Unknown message type < " << i << " >"));
     }
-
 }
 
-const int MsgpackRpc::Message::minimumMessageLength = 3;
-const int MsgpackRpc::Response::messageSize = 4;
-const int MsgpackRpc::Notification::messageSize = 3;
+const int MsgpackRpc::RequestMessage::messageSize = 4;
+const int MsgpackRpc::ResponseMessage::messageSize = 4;
+const int MsgpackRpc::NotificationMessage::messageSize = 3;
+
+int MsgpackRpc::Message::getMinimumMessageLength()
+{
+    return std::min(
+        RequestMessage::messageSize,
+        std::min(ResponseMessage::messageSize,
+                 NotificationMessage::messageSize));
+}
+
 
 BUFSTACK_END_NAMESPACE
