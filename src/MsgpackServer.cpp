@@ -25,10 +25,10 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
     {
         o.convert(msgObj);
 
-        if(msgObj.size() < MsgpackRpc::Message::minimumMessageLength)
+        if(msgObj.size() < MsgpackRpc::Message::getMinimumMessageLength())
         {
             throw MsgpackServerError(STRCATS("Expected a vector of size() >= " <<
-                        MsgpackRpc::Message::minimumMessageLength <<
+                        MsgpackRpc::Message::getMinimumMessageLength() <<
                         " but size() == " << msgObj.size()));
         }
 
