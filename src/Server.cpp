@@ -149,6 +149,11 @@ void Server::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& lo
     }
 }
 
+void Server::send(int clientFd, const char* buf, std::size_t len)
+{
+    Server::sendAll(clientFd, buf, len, *this);
+}
+
 void Server::readFd(int fd, 
         std::function<void(const std::vector<msgpack::object_handle>&)> callback)
 {
