@@ -129,8 +129,11 @@ class MsgpackServerClient : virtual public MsgpackServer
     AtomicSequence<MsgId> idSeq;
 
 
+    template <typename T>
     using UnboundResponseCallback = std::function<void(MsgId, 
-            std::shared_ptr<std::promise>)>;
+            std::shared_ptr<std::promise<T>>,
+            MsgpackRpc::ResponseMessage)>;
+
     using BoundResponseCallback = std::function<void(MsgId)>;
 
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
@@ -146,9 +149,9 @@ protected:
 
     template <typename T>
     static void setResponseValue(
+            const MsgpackRpc::ResponseMessage& responseMsg,
             MsgId thisCallId,
-            std::shared_ptr<std::promise<T>> promise,
-            const MsgpackRpc::ResponseMessage& responseMsg)
+            std::shared_ptr<std::promise<T>> promise)
     {
         //check if this is the response we're waiting for
         if(responseMsg.msgId == thisCallId)
@@ -196,17 +199,23 @@ public:
     template <typename T, typename Args...>
     virtual std::future<T> asyncCall(const std::string& name, Args... args)
     {
-        const auto id = idSeq.nextAndIncrement();
+        const auto thisMsgId = idSeq.nextAndIncrement();
 
-        //auto call_obj =
-        //    std::make_tuple(static_cast<uint8_t>(client::request_type::call), idx,
-        //                  func_name, args_obj);
+        auto call_obj =
+            std::make_tuple(static_cast<uint8_t>(client::request_type::call), idx,
+                          func_name, args_obj);
 
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
 
 
+        std::shared_ptr<std::promise<T>> thisPromise = 
+            std::make_shared<std::promise<T>>();
 
+        addResponseCallback(std::bind(thisMsgId, thisPromise,
+                    std::placeholders::_1));
+
+        return thisPromise->get_future();
     }
 
     Client()
