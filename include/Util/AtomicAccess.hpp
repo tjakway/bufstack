@@ -37,10 +37,6 @@ public:
         : val(new T(_val))
     {}
 
-    AtomicAccess(T&& t)
-        : val(t)
-    {}
-
     AtomicAccess()
         : AtomicAccess(T())
     {}
