@@ -3,7 +3,10 @@
 #include "Util/Strcat.hpp"
 #include "Util/PrintOptional.hpp"
 #include "Util/Util.hpp"
+#include "Util/PrintOptional.hpp"
 
+#include <utility>
+#include <map>
 #include <algorithm>
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -41,6 +44,44 @@ MsgpackRpc::Message::Type MsgpackRpc::Message::intToType(int i)
             throw MessageFormatException(STRCATS(
                     "Unknown message type < " << i << " >"));
     }
+}
+
+PrintableObject::Fields MsgpackRpc::RequestMessage::getFields() const noexcept
+{
+    return PrintableObject::Fields {
+        std::make_pair("msgId", msgId),
+        std::make_pair("method", method),
+        std::make_pair("params", params)
+    };
+}
+std::string MsgpackRpc::RequestMessage::getName() const noexcept
+{
+    return "RequestMessage";
+}
+
+PrintableObject::Fields MsgpackRpc::ResponseMessage::getFields() const noexcept
+{
+    return PrintableObject::Fields {
+        std::make_pair("msgId", msgId),
+        std::make_pair("error", printOptional(error)),
+        std::make_pair("result", result)
+    };
+}
+std::string MsgpackRpc::ResponseMessage::getName() const noexcept
+{
+    return "ResponseMessage";
+}
+
+PrintableObject::Fields MsgpackRpc::NotificationMessage::getFields() const noexcept
+{
+    return PrintableObject::Fields {
+        std::make_pair("method", method),
+        std::make_pair("params", params)
+    };
+}
+std::string MsgpackRpc::NotificationMessage::getName() const noexcept
+{
+    return "NotificationMessage";
 }
 
 const int MsgpackRpc::RequestMessage::messageSize = 4;

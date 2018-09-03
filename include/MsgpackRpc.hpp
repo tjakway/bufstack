@@ -12,6 +12,7 @@
 #include "NamespaceDefines.hpp"
 
 #include "Util/NewExceptionType.hpp"
+#include "Util/PrintableObject.hpp"
 
 using namespace nonstd;
 
@@ -22,7 +23,7 @@ class MsgpackRpc
 public:
     NEW_EXCEPTION_TYPE(MsgpackRpcException);
 
-    class Message
+    class Message : public PrintableObject
     {
     public:
         enum Type
@@ -75,6 +76,10 @@ public:
         {}
 
         static const int messageSize;
+
+
+        virtual Fields getFields() const override noexcept;
+        virtual std::string getName() const override noexcept;
     };
 
     class ResponseMessage : public Message
@@ -126,6 +131,10 @@ public:
         }
 
         static const int messageSize;
+
+
+        virtual Fields getFields() const override noexcept;
+        virtual std::string getName() const override noexcept;
     };
 
     class NotificationMessage : public Message
@@ -153,6 +162,10 @@ public:
         }
 
         static const int messageSize;
+
+
+        virtual Fields getFields() const noexcept override; 
+        virtual std::string getName() const noexcept override;
     };
 
 };
