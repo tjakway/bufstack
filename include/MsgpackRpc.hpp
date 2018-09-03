@@ -97,7 +97,7 @@ public:
         ResponseMessage(
                 uint32_t _msgId,
                 optional<std::reference_wrapper<msgpack::object>> _error,
-                std::reference_wrapper<msgpack::object> result)
+                std::reference_wrapper<msgpack::object> _result)
             : Message(Type::Response),
             msgId(_msgId), error(_error), result(_result)
         {}
