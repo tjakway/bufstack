@@ -182,7 +182,7 @@ protected:
         if(responseMsg.msgId == thisCallId)
         {
             const msgpack::object& objectReceived = 
-                responseMsg.result.get();
+                responseMsg.result->get();
 
             //try to convert the response to that type
             try {

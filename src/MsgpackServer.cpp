@@ -83,7 +83,11 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
                 else
                 {
                     errorField = nullopt;
-                    resultField = make_optional(std::ref(msgObj.at(3)));
+                    auto resultObj = msgObj.at(3);
+                    if(!resultObj.is_nil())
+                    {
+                        resultField = make_optional(std::ref(resultObj));
+                    }
                 }
 
                 onReceiveResponseMsg(

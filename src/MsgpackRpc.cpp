@@ -64,7 +64,7 @@ PrintableObject::Fields MsgpackRpc::ResponseMessage::getFields() const noexcept
     return PrintableObject::Fields {
         std::make_pair("msgId", std::to_string(msgId)),
         std::make_pair("error", printOptional(error)),
-        std::make_pair("result", STRCAT(result))
+        std::make_pair("result", printOptional(result))
     };
 }
 std::string MsgpackRpc::ResponseMessage::getName() const noexcept
