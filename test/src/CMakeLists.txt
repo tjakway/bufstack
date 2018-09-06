@@ -9,6 +9,7 @@ add_executable(${TEST_TARGET} ${MAIN_TEST_SRCS})
 target_link_libraries(${TEST_TARGET} PRIVATE ${MAIN_LIB_TARGET})
 
 depends_gtest(${TEST_TARGET})
+depends_rpclib(${TEST_TARGET})
 
 
 #test target synonyms
