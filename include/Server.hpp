@@ -77,6 +77,8 @@ public:
 
     //basically call join()
     virtual void waitUntilDone() = 0;
+
+    static constexpr auto localhost = "127.0.0.1";
 };
 
 /**
@@ -96,9 +98,14 @@ class HasClientFd
     int clientFd;
 public:
     int getClientFd();
+    void setClientFd(int);
 
     HasClientFd(int _fd)
         : clientFd(_fd)
+    {}
+
+    HasClientFd()
+        : HasClientFd(-1)
     {}
 };
 
@@ -252,13 +259,19 @@ public:
 
 
 class MsgpackClient : 
-    public MsgpackServer,
-    public HasClientFd
+    public MsgpackServerClient,
+    virtual public HasClientFd
 {
+
 
 public:
     MsgpackClient(
-            const std::string& address);
+        const std::string& address,
+        uint16_t port);
+
+
+    NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionError);
 };
 
 BUFSTACK_END_NAMESPACE
