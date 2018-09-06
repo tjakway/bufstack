@@ -259,7 +259,7 @@ public:
 
 
 class MsgpackClient : 
-    public MsgpackServerClient,
+    protected MsgpackServerClient,
     virtual public HasClientFd
 {
 
