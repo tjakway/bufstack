@@ -21,11 +21,19 @@ public:
     }
 
     template <typename U>
+    U access(std::function<U(T*)> f)
+    {
+        return access([&f](T* t) { return f(*t); });
+    }
+
+    /*
+    template <typename U>
     U access(std::function<U(const T&)> f)
     {
         std::lock_guard<std::mutex> {mut};
         return f(*val);
     }
+    */
 
     T get()
     {
@@ -37,7 +45,4 @@ public:
         : val(new T(_val))
     {}
 
-    AtomicAccess()
-        : AtomicAccess(T())
-    {}
 };
