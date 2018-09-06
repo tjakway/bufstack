@@ -32,8 +32,6 @@ void SingleConnectionServer::onConnect(int clientFd)
 }
 
 AsyncWriteServer::AsyncWriteServer(
-            int serverFd, 
-            sockaddr_in server, 
             int backlogSize,
             bool _forceAsync)
     : Server(backlogSize),

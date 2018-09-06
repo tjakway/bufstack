@@ -106,8 +106,6 @@ class AsyncWriteServer : public Server
 {
 protected:
     AsyncWriteServer(
-            int serverFd, 
-            sockaddr_in server, 
             int backlogSize = Config::Defaults::defaultBacklogSize,
             bool _forceAsync = false);
     virtual void send(int, Buffer) override;
@@ -250,6 +248,17 @@ public:
         : idSeq(0), responseCallbacks(
                 std::vector<BoundResponseCallback>{})
     {}
+};
+
+
+class MsgpackClient : 
+    public MsgpackServer,
+    public HasClientFd
+{
+
+public:
+    MsgpackClient(
+            const std::string& address);
 };
 
 BUFSTACK_END_NAMESPACE
