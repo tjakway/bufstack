@@ -28,7 +28,6 @@ void NvimConnectionTest::launchNeovim(
     //child
     if(pid == 0)
     {
-        char *const envp[] = [connectionString.c_str(), NULL];
         const char* envVar = "NVIM_LISTEN_ADDRESS";
         int ret = setenv(envVar, addrString.c_str(), 1);
         if(ret < 0)
@@ -42,7 +41,9 @@ void NvimConnectionTest::launchNeovim(
             perror(errMsg);
             exit(1);
         }
-        execv(path, envp);
+        execl(path.c_str(), 
+                //don't forget to pass the executable path as argv[0]
+                path.c_str(), "--headless", NULL);
     }
     //parent
     else
