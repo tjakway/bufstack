@@ -14,19 +14,25 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class NvimConnectionTest : virtual public Loggable
 {
-    static std::atomic<std::unique_ptr<Client>> client;
     static const std::string localhost;
 
     //atomically initialize the client
-    void connect();
+    void connect(
+        const std::string& _address,
+        uint16_t _port);
     void launchNeovim(
         const std::string& path,
-        const std::string& _address = localhost,
+        const std::string& _address,
         uint16_t _port);
 
 protected:
-    NEW_EXCEPTION_TYPE(CannotFindNeovimException);
-    Client getClientInstance();
+
+    NEW_EXCEPTION_TYPE(NvimConnectionTestException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(CannotFindNeovimException,
+            NvimConnectionTestException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NvimNotInitialized,
+            NvimConnectionTestException);
+    Client& getClientInstance();
 
 public:
     NvimConnectionTest()

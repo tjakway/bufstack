@@ -47,11 +47,7 @@ void NvimConnectionTest::launchNeovim(
     }
     //parent
     else
-    {
-
-    }
-
-    //connect to that address
+    {}
 }
 
 BUFSTACK_END_NAMESPACE
