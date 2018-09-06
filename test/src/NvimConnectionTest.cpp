@@ -1,5 +1,7 @@
 #include "NvimConnectionTest.hpp"
 
+#include <msgpack.hpp>
+
 #include "NamespaceDefines.hpp"
 #include "FindNeovim.hpp"
 
