@@ -27,11 +27,13 @@ public:
 
     virtual void onConnect(int /*clientFd*/) {}
 
-    virtual Buffer onRecv(Buffer)
+    virtual Buffer onRecv(Buffer) override
     { 
         //TODO: actually implement
-        return Buffer(new std::pair<char*, long>(nullptr, 0));
+        return nullptr;
     }
+
+    virtual void send(int, const char*, std::size_t) override {}
 
     virtual void send(int, Buffer) {} 
     virtual void waitUntilDone() {}
