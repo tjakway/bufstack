@@ -91,6 +91,9 @@ protected:
 
     std::atomic_bool connected {false};
     virtual void onConnect(int clientFd) override;
+
+public:
+    virtual ~SingleConnectionServer() {}
 };
 
 
