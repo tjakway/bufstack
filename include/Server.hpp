@@ -67,8 +67,6 @@ protected:
     using BaseException = ServerException;
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketException, BaseException);
 
-    virtual void onConnect(int clientFd) = 0;
-
 public:
     virtual ~Server() {}
 
