@@ -6,8 +6,9 @@
 #include <cstring>
 
 #define SAFE_CLOSE_LOG_ERROR(fd) \
-    if(fd > 0) { \
-        if(close(getFd())res != 0) \
+    if(fd > 0) \
+    { \
+        if(close(getFd()) != 0) \
         { \
             auto _errno = errno; \
             getLogger()->warn(STRCATS("close returned" << \
