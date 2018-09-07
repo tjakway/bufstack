@@ -85,7 +85,10 @@ public:
 
 
 
-class MsgpackServer : 
+/**
+ * class that receives msgpack RPC messages
+ */
+class MsgpackReceiver : 
     public SingleConnectionServer, 
     public AsyncWriteServer
 {
@@ -103,8 +106,8 @@ private:
     msgpack::object_handle decode(Buffer);
 };
 
-class MsgpackServerClient : 
-    virtual public MsgpackServer,
+class AbstractMsgpackClient : 
+    virtual public MsgpackReceiver,
     virtual public HasClientFd
 {
     using MsgId = uint32_t;
