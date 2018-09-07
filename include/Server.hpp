@@ -74,8 +74,6 @@ public:
 
     //basically call join()
     virtual void waitUntilDone() = 0;
-
-    static constexpr auto localhost = "127.0.0.1";
 };
 
 
