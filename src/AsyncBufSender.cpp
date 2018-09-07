@@ -1,6 +1,6 @@
 #include "AsyncBufSender.hpp"
 
-#include "Server.hpp"
+#include "Buffer.hpp"
 
 #include <utility>
 #include <algorithm>
@@ -24,11 +24,12 @@ void AsyncBufSender::reapFutures() noexcept
 AsyncBufSender::AsyncBufSender(
             std::size_t _backlogSize,
             bool _forceAsync)
-    : backlogSize(_backlogSize),
+    : Loggable("AsyncBufSender"),
+    backlogSize(_backlogSize),
     forceAsync(_forceAsync)
 {}
 
-void AsyncBufSender::send(int clientFd, Server::Buffer buf)
+void AsyncBufSender::send(int clientFd, Buffer buf)
 {
     std::lock_guard<std::mutex> {writeMutex};
 
@@ -58,14 +59,14 @@ void AsyncBufSender::send(int clientFd, Server::Buffer buf)
 
 void AsyncBufSender::send(int clientFd, const char* buf, std::size_t len)
 {
-    Server::Buffer ptr = Server::Buffer(
-            new Server::Buffer::element_type(
+    Buffer ptr = Buffer(
+            new Buffer::element_type(
                 std::make_pair(new char[len], len)));
     AsyncBufSender::send(clientFd, std::move(ptr));
 }
 
 
-void AsyncBufSender::doSend(int clientFd, Server::Buffer buf)
+void AsyncBufSender::doSend(int clientFd, Buffer buf)
 {
     std::unique_lock<std::mutex> {writeMutex};
 
