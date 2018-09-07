@@ -66,13 +66,13 @@ public:
     public:
         const uint32_t msgId;
         const std::string method;
-        const std::vector<std::reference_wrapper<msgpack::object>> params;
+        const std::vector<std::reference_wrapper<const msgpack::object>> params;
 
         RequestMessage(
             uint32_t _msgId,
             const std::string& _method,
             const std::vector<
-                std::reference_wrapper<msgpack::object>>& _params)
+                std::reference_wrapper<const msgpack::object>>& _params)
             : Message(Type::Request),
             msgId(_msgId),
             method(_method), params(_params)

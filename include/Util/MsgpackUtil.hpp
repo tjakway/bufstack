@@ -15,7 +15,7 @@ public:
     /**
      * returns a list of the passed objects in reference wrappers
      */
-    static std::vector<std::reference_wrapper<msgpack::object>> 
+    static std::vector<std::reference_wrapper<const msgpack::object>> 
         wrapObjects(const std::vector<msgpack::object>&);
 };
 
