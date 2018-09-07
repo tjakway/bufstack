@@ -34,6 +34,8 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class Server : public virtual Loggable, public virtual Interruptible
 {
+public:
+    using Buffer = std::unique_ptr<std::pair<char*, std::size_t>, BufDeleter>;
 private:
     std::atomic_bool done {false};
 protected:
@@ -55,7 +57,6 @@ protected:
             delete buf;
         }
     };
-    using Buffer = std::unique_ptr<std::pair<char*, std::size_t>, BufDeleter>;
 
     virtual Buffer onRecv(Buffer) = 0;
 
