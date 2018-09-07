@@ -13,13 +13,13 @@ BUFSTACK_BEGIN_NAMESPACE
 class SingleConnection : public Connectible
 {
 protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(SingleConnectionServerException, BaseException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(SingleConnectionException, BaseException);
 
     std::atomic_bool connected {false};
     virtual void onConnect(int clientFd) override;
 
 public:
-    virtual ~SingleConnectionServer() {}
+    virtual ~SingleConnection() {}
 };
 
 BUFSTACK_END_NAMESPACE
