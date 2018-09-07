@@ -1,12 +1,16 @@
 #pragma once
 
+#include "Config.hpp"
+#include "NamespaceDefines.hpp"
 #include "BufSender.hpp"
 
-#include "NamespaceDefines.hpp"
+#include <deque>
+#include <future>
+#include <mutex>
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class AsyncBufSender : public BufSender
+class AsyncBufSender : public BufSender, public Interruptible
 {
 protected:
     AsyncBufSender(
@@ -25,7 +29,10 @@ private:
     std::mutex writeMutex;
 
     //newest futures will be at the front of the queue
-    std::deque<std::future<void>> futures;
+    using FutureType = std::future<void>;
+    std::deque<FutureType> futures;
+
+    void reapFutures() noexcept;
 
 public:
     virtual ~AsyncBufSender() {}
