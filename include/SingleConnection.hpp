@@ -16,7 +16,7 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(SingleConnectionException, BaseException);
 
     std::atomic_bool connected {false};
-    virtual void onConnect(int clientFd) override;
+    virtual void onConnect() override;
 
 public:
     virtual ~SingleConnection() {}
