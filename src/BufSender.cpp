@@ -14,7 +14,7 @@ void BufSender::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable&
 {
     if(bufLen <= 0)
     {
-        throw SocketError(
+        throw SocketException(
                 STRCAT("Could not write to socket file descriptor ", 
                     clientFd, ": buffer length <= 0 (actual: ", bufLen, ")"));
     }
@@ -53,7 +53,7 @@ void BufSender::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable&
                         ".  Retrying...");
                     continue;
                 default:
-                    throw SocketError(STRCAT("Error in sendAll: ", 
+                    throw SocketException(STRCAT("Error in sendAll: ", 
                                 strerror(errno)));
             }
         }
@@ -62,7 +62,7 @@ void BufSender::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable&
             remaining -= amountWritten;
             if(remaining < 0)
             {
-                throw SocketError(
+                throw SocketException(
                         STRCAT("Error while writing to socket file descriptor ", 
                             clientFd, ": remaining < 0 (actual:", remaining, ")"));
             }
