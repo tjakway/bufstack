@@ -23,6 +23,7 @@ protected:
 
     void doSend(int, Buffer);
 private:
+    std::size_t backlogSize;
     /** determines whether or not to pass std::launch::async */
     bool forceAsync;
 
