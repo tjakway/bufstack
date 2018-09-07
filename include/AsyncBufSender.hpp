@@ -3,6 +3,8 @@
 #include "Config.hpp"
 #include "NamespaceDefines.hpp"
 #include "BufSender.hpp"
+#include "Buffer.hpp"
+#include "Interruptible.hpp"
 
 #include <deque>
 #include <future>
