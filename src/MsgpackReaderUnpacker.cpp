@@ -97,7 +97,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
 
     int amtRead = -1;
 
-    while(amtRead != 0 && !done.load())
+    while(amtRead != 0 && !interrupted())
     {
         amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
         if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
@@ -138,6 +138,29 @@ void MsgpackReaderUnpacker::readFd(int fd,
         }
     }
 
+}
+
+MsgpackReaderUnpacker::MsgpackReaderUnpacker(
+        std::size_t _backlogSize,
+        std::chrono::milliseconds _sleepInterval)
+    : backlogSize(_backlogSize),
+    sleepInterval(_sleepInterval)
+{}
+
+MsgpackReaderUnpacker::MsgpackReaderUnpacker()
+    : MsgpackReaderUnpacker(
+            Config::Defaults::defaultBacklogSize, 
+            Config::Defaults::serverSleepInterval)
+{}
+
+MsgpackReaderUnpacker::~MsgpackReaderUnpacker()
+{
+    done();
+}
+
+void MsgpackReaderUnpacker::done()
+{
+    interrupt();
 }
 
 BUFSTACK_END_NAMESPACE
