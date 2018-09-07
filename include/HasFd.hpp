@@ -55,6 +55,7 @@ public:
                     fd << ", error description: " << strerror(_errno)));
             }
         }
+        setFd(-1);
     }
 };
 
