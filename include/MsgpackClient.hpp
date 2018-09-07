@@ -16,6 +16,7 @@ public:
         const std::string& address,
         uint16_t port);
 
+    virtual ~MsgpackClient() {}
 
     NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionException, BaseException);
     NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionException);
