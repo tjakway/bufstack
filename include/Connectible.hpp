@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NamespaceDefines.hpp"
+#include "Util/NewExceptionType.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 

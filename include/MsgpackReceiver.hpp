@@ -2,8 +2,13 @@
 
 #include "NamespaceDefines.hpp"
 
+#include "MsgpackRpc.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "AsyncBufSender.hpp"
+#include "Loggable.hpp"
+
+#include <msgpack.hpp>
+#include <vector>
 
 BUFSTACK_BEGIN_NAMESPACE
 
