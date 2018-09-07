@@ -57,8 +57,6 @@ protected:
     using Buffer = std::unique_ptr<std::pair<char*, std::size_t>, BufDeleter>;
 
     virtual Buffer onRecv(Buffer) = 0;
-    virtual void send(int, Buffer) = 0;
-    virtual void send(int, const char*, std::size_t) = 0;
 
 private:
     NEW_EXCEPTION_TYPE(ServerException);
@@ -67,7 +65,6 @@ protected:
     using BaseException = ServerException;
     NEW_EXCEPTION_TYPE_WITH_BASE(SocketException, BaseException);
 
-    static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
     virtual void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
 
     virtual void onConnect(int clientFd) = 0;
