@@ -90,8 +90,8 @@ class MsgpackServer :
     public AsyncWriteServer
 {
 protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackServerError, ServerError);
-    NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageError, MsgpackServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackBaseException, BaseException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageError, MsgpackBaseException);
 
     virtual void onReceiveResponseMsg(const MsgpackRpc::Message&) = 0;
     virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
@@ -123,7 +123,7 @@ class MsgpackServerClient :
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
     
 protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseError, BaseException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionError, ResponseError);
     //indicates a serverside error
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotError, ResponseError);
@@ -224,7 +224,7 @@ public:
         uint16_t port);
 
 
-    NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionError, BaseException);
     NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionError);
 };
 
