@@ -9,7 +9,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-void MsgpackServer::onRecvMsg(const msgpack::object& o)
+void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
 {
     std::vector<msgpack::object> msgObj;
 
@@ -27,7 +27,7 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
 
         if(msgObj.size() < MsgpackRpc::Message::getMinimumMessageLength())
         {
-            throw MsgpackServerError(STRCATS("Expected a vector of size() >= " <<
+            throw MsgpackReceiverException(STRCATS("Expected a vector of size() >= " <<
                         MsgpackRpc::Message::getMinimumMessageLength() <<
                         " but size() == " << msgObj.size()));
         }
@@ -40,7 +40,7 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
         const auto checkMessageLength = [&msgObj, &type](int expectedSize){
             if(msgObj.size() != expectedSize)
             {
-                throw MsgpackServerError(STRCATS("Expected a vector of size " <<
+                throw MsgpackReceiverException(STRCATS("Expected a vector of size " <<
                         expectedSize << 
                         " for a message of type " << 
                         MsgpackRpc::Message::printType(type) << 
@@ -52,7 +52,7 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
         {
             //TODO
             case MsgpackRpc::Message::Type::Request:
-                throw MsgpackServerError("Request messages not implemented.");
+                throw MsgpackReceiverException("Request messages not implemented.");
 
             case MsgpackRpc::Message::Type::Response:
             {
@@ -70,7 +70,7 @@ void MsgpackServer::onRecvMsg(const msgpack::object& o)
                 {
                     if(!msgObj.at(3).is_nil())
                     {
-                        throw MsgpackServerError(
+                        throw MsgpackReceiverException(
                                 STRCATS("result object should be " <<
                                 "nil in a message of type " <<
                                 MsgpackRpc::Message::printType(type) << 
