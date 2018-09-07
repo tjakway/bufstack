@@ -19,24 +19,17 @@ protected:
 
 public:
     virtual ~ClientConnection() {}
-
-
-    NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionException, BaseException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionException);
 };
 
 class ClientTcpConnection 
     : public ClientConnection,
       public HasTcpConnection
 {
-    const std::string address;
-    const uint16_t port;
-    
 public:
     ClientTcpConnection(
-            const std::string& _address,
-            uint16_t _port)
-        : address(_address), port(_port)
+            const std::string& address,
+            uint16_t port)
+        : HasTcpConnection(address, port)
     {}
 
     virtual ~ClientTcpConnection() {}

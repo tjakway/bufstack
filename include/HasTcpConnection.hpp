@@ -29,6 +29,8 @@ public:
 
     virtual ~HasTcpConnection() {}
 
+    std::string getAddress() const noexcept { return address; }
+    uint16_t getPort() const noexcept { return port; }
 
     NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, 
             BaseException);
