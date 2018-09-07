@@ -25,7 +25,7 @@ class ClientTcpConnection
     : public ClientConnection,
       public HasTcpConnection
 {
-    void connect();
+    void _connect();
 public:
     ClientTcpConnection(
             const std::string& address,

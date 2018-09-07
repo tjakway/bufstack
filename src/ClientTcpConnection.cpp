@@ -11,7 +11,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-void ClientTcpConnection::connect()
+void ClientTcpConnection::_connect()
 {
     //don't forget to call this!
     onConnect();
@@ -69,7 +69,7 @@ ClientTcpConnection::ClientTcpConnection(
         uint16_t port)
     : HasTcpConnection(address, port)
 {
-    connect();
+    _connect();
 }
 
 BUFSTACK_END_NAMESPACE
