@@ -6,6 +6,8 @@ BUFSTACK_BEGIN_NAMESPACE
 
 void AsyncBufSender::reapFutures() noexcept
 {
+    std::lock_guard<std::mutex> {writeMutex};
+
     futures.erase(std::remove_if(futures.begin(),
         futures.end(), [](FutureType f){
             return (!f.valid()) || 
