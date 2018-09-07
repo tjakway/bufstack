@@ -6,6 +6,8 @@
 #include "NamespaceDefines.hpp"
 #include "MsgpackRpc.hpp"
 
+#include "Util/MsgpackUtil.hpp"
+#include "Util/Util.hpp"
 #include "Util/Strcat.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -13,8 +15,18 @@ BUFSTACK_BEGIN_NAMESPACE
 void MsgpackReceiver::handleRequestMessage(
         const std::vector<msgpack::object>& msgObj)
 {
+    uint32_t msgId;
+    msgObj.at(1).convert(msgId);
 
+    std::string method;
+    msgObj.at(2).convert(method);
+
+    std::vector<std::reference_wrapper<msgpack::object>> params =
+       MsgpackUtil::wrapObjects(msgObj.at(3).as<std::vector<msgpack::object>>);
+
+    onReceiveRequestMsg(MsgpackRpc::RequestMessage(msgId, method, params));
 }
+
 void MsgpackReceiver::handleResponseMessage(
         const std::vector<msgpack::object>& msgObj)
 {
@@ -53,6 +65,7 @@ void MsgpackReceiver::handleResponseMessage(
     onReceiveResponseMsg(
             MsgpackRpc::ResponseMessage(msgId, errorField, resultField));
 }
+
 void MsgpackReceiver::handleNotificationMessage(
         const std::vector<msgpack::object>& msgObj)
 {
@@ -115,10 +128,11 @@ void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
 
         switch(type)
         {
-            //TODO
             case MsgpackRpc::Message::Type::Request:
             {
                 checkMessageLength(MsgpackRpc::RequestMessage::messageSize);
+                handleRequestMessage(msgObj);
+                break;
             }
 
             case MsgpackRpc::Message::Type::Response:
@@ -134,6 +148,12 @@ void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
                 checkMessageLength(MsgpackRpc::NotificationMessage::messageSize);
                 handleNotificationMessage(msgObj);
                 break;
+            }
+
+            default:
+            {
+                throw MsgpackReceiverException(STRCATS("Unknown message type for "
+                            << "object " << Util::printVector(msgObj)));
             }
         }
 
