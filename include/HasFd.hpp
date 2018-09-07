@@ -57,6 +57,9 @@ public:
         }
         setFd(-1);
     }
+
+    //dummy method to mark the class abstract
+    virtual void abstract() = 0;
 };
 
 class HasClientFd : public HasFd
