@@ -60,8 +60,12 @@ protected:
     virtual void send(int, Buffer) = 0;
     virtual void send(int, const char*, std::size_t) = 0;
 
-    NEW_EXCEPTION_TYPE(ServerError);
-    NEW_EXCEPTION_TYPE_WITH_BASE(SocketError, ServerError);
+private:
+    NEW_EXCEPTION_TYPE(ServerException);
+protected:
+    //the base exception type should be accessed through this typedef
+    using BaseException = ServerException;
+    NEW_EXCEPTION_TYPE_WITH_BASE(SocketException, BaseException);
 
     static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
     virtual void readFd(int, std::function<void(const std::vector<msgpack::object_handle>&)>);
