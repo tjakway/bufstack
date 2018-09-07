@@ -1,12 +1,12 @@
-#include "Server.hpp"
+#include "MsgpackReaderUnpacker.hpp"
 
 #include "NamespaceDefines.hpp"
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
+#include "SocketException.hpp"
 
 
 #include <msgpack.hpp>
-#include <rpc/client.h>
 
 #include <iterator>
 #include <string>
@@ -87,8 +87,8 @@ std::vector<msgpack::object_handle> decode(
 BUFSTACK_BEGIN_NAMESPACE
 
 
-void Server::readFd(int fd, 
-        std::function<void(const std::vector<msgpack::object_handle>&)> callback)
+void MsgpackReaderUnpacker::readFd(int fd, 
+        std::function<void(const ObjectList&)> callback)
 {
     std::unique_ptr<char[]> buf 
         = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
@@ -113,7 +113,7 @@ void Server::readFd(int fd,
         }
         else if(amtRead != 0)
         {
-            throw SocketError(STRCAT("Error in ", __func__, ": ", strerror(errno)));
+            throw SocketException(STRCAT("Error in ", __func__, ": ", strerror(errno)));
         }
 
         //try and decode this message, recording how much we found
@@ -139,22 +139,5 @@ void Server::readFd(int fd,
     }
 
 }
-
-void Server::interrupt()
-{
-    done.store(true);
-}
-bool Server::interrupted()
-{
-    return done.load();
-}
-
-
-//TODO: add to Server
-void connect(const std::string& addr, uint16_t port)
-{
-    rpc::client nvimClient(addr, port);
-}
-
 
 BUFSTACK_END_NAMESPACE
