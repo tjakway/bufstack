@@ -6,13 +6,15 @@
 #include "Util/AtomicAccess.hpp"
 #include "Util/AtomicSequence.hpp"
 #include "HasFd.hpp"
+#include "AsyncBufSender.hpp"
 #include "MsgpackReceiver.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class AbstractMsgpackClient : 
     virtual public MsgpackReceiver,
-    virtual public HasClientFd
+    virtual public HasClientFd,
+    public AsyncBufSender
 {
     using MsgId = uint32_t;
 
@@ -30,6 +32,7 @@ class AbstractMsgpackClient :
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
     
 protected:
+    using BaseException = MsgpackReceiver::BaseException;
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseException, BaseException);
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionException, ResponseException);
     //indicates a serverside error
@@ -101,7 +104,7 @@ public:
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
 
-        AsyncWriteServer::send(getClientFd(), buffer->data(), buffer->size());
+        send(getClientFd(), buffer->data(), buffer->size());
 
         std::shared_ptr<std::promise<T>> thisPromise = 
             std::make_shared<std::promise<T>>();

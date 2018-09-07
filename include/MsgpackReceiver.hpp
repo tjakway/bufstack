@@ -24,7 +24,8 @@ class MsgpackReceiver :
     void handleNotificationMessage(const std::vector<msgpack::object>&);
 
 protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackReceiverException, BaseException);
+    NEW_EXCEPTION_TYPE(MsgpackReceiverException);
+    using BaseException = MsgpackReceiverException;
     NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackReceiverException);
 
     virtual void onReceiveRequestMsg(const MsgpackRpc::RequestMessage&) = 0;
