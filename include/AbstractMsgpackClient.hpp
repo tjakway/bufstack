@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 
 #include "Util/NewExceptionType.hpp"
+#include "Util/AtomicAccess.hpp"
 #include "HasFd.hpp"
 #include "MsgpackReceiver.hpp"
 
