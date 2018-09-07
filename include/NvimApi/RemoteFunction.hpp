@@ -18,10 +18,10 @@ BUFSTACK_BEGIN_NAMESPACE
 class AbstractRemoteApiFunction
 {
 protected:
-    NEW_EXCEPTION_TYPE(RemoteApiFunctionError);
-    NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedError, RemoteApiFunctionError);
-    NEW_EXCEPTION_TYPE_WITH_BASE(BadNameError, RemoteApiFunctionError);
-    NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoError, RemoteApiFunctionError);
+    NEW_EXCEPTION_TYPE(RemoteApiFunctionException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedException, RemoteApiFunctionException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(BadNameException, RemoteApiFunctionException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoException, RemoteApiFunctionException);
 
     bool initialized;
 
@@ -34,7 +34,7 @@ protected:
         //make sure we have a function name
         if(initialized && Util::StringTrim::trim_copy(name).empty())
         {
-            throw BadNameError("RemoteApiFunction constructor "
+            throw BadNameException("RemoteApiFunction constructor "
                     "called with empty name");
         }
     }
@@ -43,7 +43,7 @@ protected:
     {
         if(!initialized)
         {
-            throw RemoteFunctionUninitiliazedError(
+            throw RemoteFunctionUninitiliazedException(
                     "Uninitialized RemoteApiFunction called");
         }
 

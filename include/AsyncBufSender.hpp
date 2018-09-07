@@ -19,7 +19,7 @@ protected:
     virtual void send(int, Buffer) override;
     virtual void send(int, const char*, std::size_t) override;
 
-    NEW_EXCEPTION_TYPE_WITH_BASE(AsyncBufSenderError, ServerError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(AsyncBufSenderException, BaseException);
 
 private:
     std::size_t backlogSize;
