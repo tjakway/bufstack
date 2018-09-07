@@ -113,7 +113,7 @@ class AsyncWriteServer : public Server
 {
 protected:
     AsyncWriteServer(
-            int backlogSize = Config::Defaults::defaultBacklogSize,
+            std::size_t backlogSize = Config::Defaults::defaultBacklogSize,
             bool _forceAsync = false);
     virtual void send(int, Buffer) override;
     virtual void send(int, const char*, std::size_t) override;

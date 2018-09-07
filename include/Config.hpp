@@ -8,6 +8,8 @@
 #include <functional>
 #include <memory>
 
+#include <cstddef> //std::size_t
+
 BUFSTACK_BEGIN_NAMESPACE
 
 class Config
@@ -18,7 +20,7 @@ public:
     class Defaults
     {
     public:
-        static const int defaultBacklogSize;
+        static const std::size_t defaultBacklogSize;
         /*
          * time to sleep between file descriptor reads
          */
