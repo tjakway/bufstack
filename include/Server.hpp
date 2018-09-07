@@ -91,7 +91,7 @@ class MsgpackServer :
 {
 protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackBaseException, BaseException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageError, MsgpackBaseException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackBaseException);
 
     virtual void onReceiveResponseMsg(const MsgpackRpc::Message&) = 0;
     virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
@@ -123,10 +123,10 @@ class MsgpackServerClient :
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
     
 protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseError, BaseException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionError, ResponseError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseException, BaseException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionException, ResponseException);
     //indicates a serverside error
-    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotError, ResponseError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotException, ResponseException);
 
     virtual void addResponseCallback(BoundResponseCallback&& cb);
     virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) override;
@@ -147,7 +147,7 @@ protected:
             try {
                 if(responseMsg.isError())
                 {
-                    throw ResponseGotError(STRCATS(
+                    throw ResponseGotException(STRCATS(
                         "Server returned an error for request with " <<
                         "MsgId < " << responseMsg.msgId << 
                         " >.  Object received: " <<
@@ -161,7 +161,7 @@ protected:
                 }
                 catch(msgpack::type_error e)
                 {
-                    throw ResponseResultConversionError(
+                    throw ResponseResultConversionException(
                         STRCATS("Could not convert request " <<
                             "response to the desired " <<
                             "type for MsgId < " << responseMsg.msgId << 
@@ -224,8 +224,8 @@ public:
         uint16_t port);
 
 
-    NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionError, BaseException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionError);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ConnectionException, BaseException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionException);
 };
 
 BUFSTACK_END_NAMESPACE
