@@ -17,6 +17,12 @@ public:
      */
     static std::vector<std::reference_wrapper<const msgpack::object>> 
         wrapObjects(const std::vector<msgpack::object>&);
+
+    static std::vector<std::reference_wrapper<const msgpack::object>> 
+        wrapObjects(std::vector<msgpack::object>& v)
+        {
+            return wrapObjects(v);
+        }
 };
 
 BUFSTACK_END_NAMESPACE

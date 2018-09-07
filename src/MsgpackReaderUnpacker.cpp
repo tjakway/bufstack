@@ -4,6 +4,7 @@
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
 #include "SocketException.hpp"
+#include "Util/MsgpackUtil.hpp"
 
 
 #include <msgpack.hpp>
@@ -126,7 +127,14 @@ void MsgpackReaderUnpacker::readFd(int fd,
         //invoke the callback if we decoded anything
         if(!handles.empty())
         {
-            callback(handles);
+            std::vector<std::reference_wrapper<const msgpack::object>> vs;
+            std::transform(
+                handles.begin(), handles.end(), vs.begin(),
+                [](msgpack::object_handle& h) {
+                    return std::ref(h.get());
+                });
+
+            callback(vs);
         }
 
         //if there was any data left over make sure we prepend any subsequent messages
