@@ -7,6 +7,7 @@
 #include "Util/AtomicSequence.hpp"
 #include "Util/AtomicAccess.hpp"
 #include "Loggable.hpp"
+#include "HasFd.hpp"
 
 #include "MsgpackRpc.hpp"
 
