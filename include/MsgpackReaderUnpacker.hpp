@@ -3,22 +3,23 @@
 #include <utility>
 #include <msgpack.hpp>
 
-#include "Interruptible.hpp"
 #include "NamespaceDefines.hpp"
+#include "Interruptible.hpp"
 #include "Util/NewExceptionType.hpp"
+#include "Loggable.hpp"
 #include "HasFd.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class MsgpackReaderUnpacker : 
     virtual public HasClientFd,
+    virtual public Loggable,
     public Interruptible
 {
     const std::size_t backlogSize;
     const std::chrono::milliseconds sleepInterval;
 public:
-    using ObjectQueue = std::deque<std::reference_wrapper<msgpack::object>>;
-    using ObjectList = std::vector<std::reference_wrapper<msgpack::object>>;
+    using ObjectList = std::vector<std::reference_wrapper<const msgpack::object>>;
 
 protected:
     virtual void readFd(int, 
