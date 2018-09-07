@@ -35,8 +35,8 @@ void BufSender::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable&
         //"if count > SSIZE_MAX, the result is implementation-defined"
         //let's avoid that
         size_t amountToWrite = 
-            min(
-                    min(
+            std::min(
+                    std::min(
                         static_cast<decltype(maxWriteCycle)>(remaining), 
                         maxWriteCycle), 
                     static_cast<decltype(maxWriteCycle)>(SSIZE_MAX));
