@@ -85,26 +85,6 @@ public:
 
 
 
-/**
- * class that receives msgpack RPC messages
- */
-class MsgpackReceiver : 
-    public SingleConnectionServer, 
-    public AsyncWriteServer
-{
-protected:
-    NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackBaseException, BaseException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackBaseException);
-
-    virtual void onReceiveResponseMsg(const MsgpackRpc::ResponseMessage&) = 0;
-    virtual void onReceiveRequestMsg(const MsgpackRpc::RequestMessage&) = 0;
-    virtual void onReceiveNotificationMsg(const MsgpackRpc::NotificationMessage&) = 0;
-
-    virtual void onRecvMsg(const msgpack::object&);
-
-private:
-    msgpack::object_handle decode(Buffer);
-};
 
 class AbstractMsgpackClient : 
     virtual public MsgpackReceiver,
