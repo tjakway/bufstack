@@ -19,9 +19,11 @@ class AbstractRemoteApiFunction
 {
 protected:
     NEW_EXCEPTION_TYPE(RemoteApiFunctionException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedException, RemoteApiFunctionException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(RemoteFunctionUninitiliazedException, 
+            RemoteApiFunctionException);
     NEW_EXCEPTION_TYPE_WITH_BASE(BadNameException, RemoteApiFunctionException);
-    NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoException, RemoteApiFunctionException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NotInApiInfoException, 
+            RemoteApiFunctionException);
 
     bool initialized;
 
