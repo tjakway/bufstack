@@ -4,7 +4,6 @@
 
 #include "MsgpackRpc.hpp"
 #include "Util/NewExceptionType.hpp"
-#include "AsyncBufSender.hpp"
 #include "Loggable.hpp"
 
 #include <msgpack.hpp>
@@ -16,7 +15,6 @@ BUFSTACK_BEGIN_NAMESPACE
  * class that receives msgpack RPC messages
  */
 class MsgpackReceiver : 
-    public AsyncBufSender,
     virtual public Loggable
 {
     //handle*Message parse the message then pass it to the
