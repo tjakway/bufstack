@@ -96,9 +96,9 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackBaseException, BaseException);
     NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackBaseException);
 
-    virtual void onReceiveResponseMsg(const MsgpackRpc::Message&) = 0;
-    virtual void onReceiveRequestMsg(const MsgpackRpc::Message&) = 0;
-    virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) = 0;
+    virtual void onReceiveResponseMsg(const MsgpackRpc::ResponseMessage&) = 0;
+    virtual void onReceiveRequestMsg(const MsgpackRpc::RequestMessage&) = 0;
+    virtual void onReceiveNotificationMsg(const MsgpackRpc::NotificationMessage&) = 0;
 
     virtual void onRecvMsg(const msgpack::object&);
 
