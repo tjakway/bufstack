@@ -117,6 +117,9 @@ private:
 
     //newest futures will be at the front of the queue
     std::deque<std::future<void>> futures;
+
+public:
+    virtual ~AsyncWriteServer() {}
 };
 
 class MsgpackServer : 
