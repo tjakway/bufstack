@@ -22,7 +22,7 @@ void ClientTcpConnection::connect()
         if(sockFd < 0)
         {
             auto _errno = errno;
-            throw ConnectionError(
+            throw ConnectionException(
                     STRCATS("Could not create socket (" <<
                         "socket returned " << sockFd << ").  " <<
                         "Error description: " << strerror(_errno)));
@@ -37,7 +37,7 @@ void ClientTcpConnection::connect()
         {
             throw BadAddressException(STRCATS(
                         "Could not interpret " <<
-                        address << " as an IPv4" <<
+                        getAddress() << " as an IPv4" <<
                         " address"));
         }
 
@@ -45,7 +45,7 @@ void ClientTcpConnection::connect()
         if(connect(sockFd, (sockaddr*)&sock, sizeof(sock)) < 0)
         {
             auto _errno = errno;
-            throw ConnectionError(
+            throw ConnectionException(
                 STRCATS("Call to connect(2) failed with error description: " <<
                     strerror(_errno)));
         }
