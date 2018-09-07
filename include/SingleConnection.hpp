@@ -5,6 +5,8 @@
 #include "Util/NewExceptionType.hpp"
 #include "NamespaceDefines.hpp"
 
+#include <atomic>
+
 BUFSTACK_BEGIN_NAMESPACE
 
 /**
