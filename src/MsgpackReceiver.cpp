@@ -22,7 +22,7 @@ void MsgpackReceiver::handleRequestMessage(
     msgObj.at(2).convert(method);
 
     std::vector<std::reference_wrapper<msgpack::object>> params =
-       MsgpackUtil::wrapObjects(msgObj.at(3).as<std::vector<msgpack::object>>);
+       MsgpackUtil::wrapObjects(msgObj.at(3).as<std::vector<msgpack::object>>());
 
     onReceiveRequestMsg(MsgpackRpc::RequestMessage(msgId, method, params));
 }
