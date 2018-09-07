@@ -2,6 +2,7 @@
 
 #include "Server.hpp"
 
+#include <utility>
 #include <algorithm>
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -29,6 +30,8 @@ AsyncBufSender::AsyncBufSender(
 
 void AsyncBufSender::send(int clientFd, Server::Buffer buf)
 {
+    std::lock_guard<std::mutex> {writeMutex};
+
     //the function object to pass to std::async
     const auto doSendF = 
         std::bind(&AsyncBufSender::doSend, this, 
