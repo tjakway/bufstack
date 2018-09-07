@@ -45,7 +45,7 @@ public:
     virtual ~Interruptible() = 0;
 
 protected:
-    void throwInterruptedException(std::string msg) const noreturn
+    [[noreturn]] void throwInterruptedException(std::string msg) const
     {
         throw InterruptedException(msg);
     }
