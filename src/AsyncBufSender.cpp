@@ -12,7 +12,7 @@ void AsyncBufSender::reapFutures() noexcept
     std::lock_guard<std::mutex> {writeMutex};
 
     futures.erase(std::remove_if(futures.begin(),
-        futures.end(), [](FutureType f){
+        futures.end(), [](const FutureType& f){
             return (!f.valid()) || 
             //see https://stackoverflow.com/questions/10890242/get-the-status-of-a-stdfuture
             //re: checking if a future is ready
