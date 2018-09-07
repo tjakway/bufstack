@@ -45,7 +45,8 @@ void MsgpackReceiver::handleResponseMessage(
             throw MsgpackReceiverException(
                     STRCATS("result object should be " <<
                     "nil in a message of type " <<
-                    MsgpackRpc::Message::printType(type) << 
+                    MsgpackRpc::Message::printType(
+                        MsgpackRpc::Message::Response) << 
                     " but result == " << msgObj.at(3)));
         }
 
