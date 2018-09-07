@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "HasFd.hpp"
 #include "Loggable.hpp"
+#include "HasTcpConnection.hpp"
 
 #include <cstdint>
 #include <string>
@@ -24,7 +25,9 @@ public:
     NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, ConnectionException);
 };
 
-class ClientTcpConnection : public ClientConnection
+class ClientTcpConnection 
+    : public ClientConnection,
+      public HasTcpConnection
 {
     const std::string address;
     const uint16_t port;
