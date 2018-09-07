@@ -25,12 +25,11 @@ class ClientTcpConnection
     : public ClientConnection,
       public HasTcpConnection
 {
+    void connect();
 public:
     ClientTcpConnection(
             const std::string& address,
-            uint16_t port)
-        : HasTcpConnection(address, port)
-    {}
+            uint16_t port);
 
     virtual ~ClientTcpConnection() {}
 };
