@@ -50,7 +50,7 @@ protected:
         throw InterruptedException(msg);
     }
 
-    void throwInterruptedException() const noreturn
+    [[noreturn]] void throwInterruptedException() const
     {
         throw InterruptedException();
     }
