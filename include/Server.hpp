@@ -132,7 +132,7 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotException, ResponseException);
 
     virtual void addResponseCallback(BoundResponseCallback&& cb);
-    virtual void onReceiveNotificationMsg(const MsgpackRpc::Message&) override;
+    virtual void onReceiveNotificationMsg(const MsgpackRpc::NotificationMessage&) override;
 
     template <typename T>
     static void setResponseValue(
