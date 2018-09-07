@@ -12,15 +12,32 @@ BUFSTACK_BEGIN_NAMESPACE
 class Interruptible : virtual public Loggable
 {
     std::atomic<bool> flag;
+    bool logInterruptCalls;
 
     NEW_EXCEPTION_TYPE(InterruptedException);
 
+protected:
+    Interruptible(bool _flag, bool _logInterruptCalls)
+        : flag(_flag), logInterruptCalls(_logInterruptCalls)
+    {}
+
 public:
     bool interrupted() const noexcept { return flag.load(); }
-    void interrupt() { flag.store(true); }
+    void interrupt() 
+    { 
+        if(logInterruptCalls)
+        {
+            getLogger()->debug("interrupt() called");
+        }
+        flag.store(true); 
+    }
 
     Interruptible()
-        : flag(false)
+        : Interruptible(false, true)
+    {}
+
+    Interruptible(bool _logInterruptCalls)
+        : Interruptible(false, _logInterruptCalls)
     {}
 
     virtual ~Interruptible() {}
