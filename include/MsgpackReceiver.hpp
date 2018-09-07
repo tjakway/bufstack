@@ -3,7 +3,6 @@
 #include "NamespaceDefines.hpp"
 
 #include "Util/NewExceptionType.hpp"
-#include "SingleConnectionServer.hpp"
 #include "AsyncBufSender.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -12,7 +11,6 @@ BUFSTACK_BEGIN_NAMESPACE
  * class that receives msgpack RPC messages
  */
 class MsgpackReceiver : 
-    public SingleConnectionServer, 
     public AsyncBufSender,
     virtual public Loggable
 {
