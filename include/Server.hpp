@@ -36,10 +36,10 @@ class Server : public virtual Loggable
 private:
     std::atomic_bool done {false};
 protected:
-    const int backlogSize;
+    const std::size_t backlogSize;
     const std::chrono::milliseconds sleepInterval;
 
-    Server(int _backlogSize = Config::Defaults::defaultBacklogSize,
+    Server(std::size_t _backlogSize = Config::Defaults::defaultBacklogSize,
             std::chrono::milliseconds _sleepInterval = Config::Defaults::serverSleepInterval)
         : backlogSize(_backlogSize),
             sleepInterval(_sleepInterval)
