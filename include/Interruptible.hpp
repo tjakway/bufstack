@@ -52,7 +52,7 @@ protected:
 
     [[noreturn]] void throwInterruptedException() const
     {
-        throw InterruptedException();
+        throw InterruptedException("");
     }
 
     void throwIfInterrupted()
