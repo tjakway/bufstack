@@ -5,7 +5,7 @@
 #include <cerrno>
 #include <cstring>
 
-#define CLOSE_LOG_ERROR(fd) \
+#define SAFE_CLOSE_LOG_ERROR(fd) \
     if(fd > 0) { \
         if(close(getFd())res != 0) \
         { \
