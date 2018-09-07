@@ -21,7 +21,6 @@ protected:
 
     NEW_EXCEPTION_TYPE_WITH_BASE(AsyncBufSenderError, ServerError);
 
-    void doSend(int, Buffer);
 private:
     std::size_t backlogSize;
     /** determines whether or not to pass std::launch::async */
@@ -35,6 +34,7 @@ private:
 
     void reapFutures() noexcept;
 
+    void doSend(int, Buffer);
 public:
     virtual ~AsyncBufSender() {}
 };
