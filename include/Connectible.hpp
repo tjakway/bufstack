@@ -4,7 +4,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class OnConnect
+class Connectible
 {
 protected:
     virtual void onConnect(int fd) = 0;
