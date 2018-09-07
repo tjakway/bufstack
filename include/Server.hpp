@@ -34,17 +34,6 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class Server : public virtual Loggable, public virtual Interruptible
 {
-public:
-    class BufDeleter
-    {
-    public:
-        void operator()(std::pair<char*, std::size_t>* buf)
-        {
-            delete[] buf->first;
-            delete buf;
-        }
-    };
-    using Buffer = std::unique_ptr<std::pair<char*, std::size_t>, BufDeleter>;
 private:
     std::atomic_bool done {false};
 protected:
