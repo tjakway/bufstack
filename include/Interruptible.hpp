@@ -40,7 +40,9 @@ public:
         : Interruptible(false, _logInterruptCalls)
     {}
 
-    virtual ~Interruptible() {}
+    //make this class abstract
+    //see https://stackoverflow.com/questions/1219607/why-do-we-need-a-pure-virtual-destructor-in-c
+    virtual ~Interruptible() = 0;
 
 protected:
     void throwInterruptedException(std::string msg) const noreturn
