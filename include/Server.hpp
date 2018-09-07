@@ -46,9 +46,6 @@ protected:
             sleepInterval(_sleepInterval)
     {}
 
-
-    virtual Buffer onRecv(Buffer) = 0;
-
 private:
     NEW_EXCEPTION_TYPE(ServerException);
 protected:

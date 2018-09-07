@@ -27,12 +27,6 @@ public:
 
     virtual void onConnect(int /*clientFd*/) {}
 
-    virtual Buffer onRecv(Buffer) override
-    { 
-        //TODO: actually implement
-        return nullptr;
-    }
-
     virtual void send(int, const char*, std::size_t) override {}
 
     virtual void send(int, Buffer) {} 
