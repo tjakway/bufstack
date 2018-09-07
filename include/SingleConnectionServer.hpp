@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Server.hpp"
+#include "Connectible.hpp"
 
 #include "Util/NewExceptionType.hpp"
 #include "NamespaceDefines.hpp"
@@ -10,7 +10,7 @@ BUFSTACK_BEGIN_NAMESPACE
 /**
  * we only expect one neovim instance to connect at a time
  */
-class SingleConnectionServer : public Server
+class SingleConnection : public Connectible
 {
 protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(SingleConnectionServerException, BaseException);
