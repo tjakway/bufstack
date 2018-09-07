@@ -8,6 +8,7 @@
 #include "Util/AtomicAccess.hpp"
 #include "Loggable.hpp"
 #include "HasFd.hpp"
+#include "Interruptible.hpp"
 
 #include "MsgpackRpc.hpp"
 
@@ -31,7 +32,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class Server : public virtual Loggable
+class Server : public virtual Loggable, public virtual Interruptible
 {
 private:
     std::atomic_bool done {false};
@@ -73,9 +74,6 @@ public:
     virtual ~Server() {}
 
     void startListening();
-
-    void interrupt();
-    bool interrupted();
 
     //basically call join()
     virtual void waitUntilDone() = 0;
