@@ -27,6 +27,9 @@ protected:
 
 private:
     msgpack::object_handle decode(Buffer);
+
+public:
+    virtual ~MsgpackReceiver() {}
 };
 
 BUFSTACK_END_NAMESPACE
