@@ -32,7 +32,7 @@ protected:
         }
 
 public:
-        virtual std::shared_ptr<spdlog::logger> getLogger()
+        virtual std::shared_ptr<spdlog::logger> getLogger() const noexcept
         {
             return logger;
         }
