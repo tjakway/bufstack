@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "MsgpackReceiver.hpp"
 
 #include <type_traits>
 
@@ -9,6 +9,19 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
+void MsgpackReceiver::handleRequestMessage(const msgpack::object&)
+{
+
+}
+void MsgpackReceiver::handleResponseMessage(const msgpack::object&)
+{
+
+}
+void MsgpackReceiver::handleNotificationMessage(const msgpack::object&)
+{
+
+}
+
 void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
 {
     std::vector<msgpack::object> msgObj;
@@ -17,7 +30,7 @@ void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
 
     if(o.type != msgpack::type::object_type::ARRAY)
     {
-        throw NotMessageError(STRCATS(
+        throw NotMessageException(STRCATS(
             "Expected msgpack object of type " <<
             "ARRAY but got type code " << o.type));
     }

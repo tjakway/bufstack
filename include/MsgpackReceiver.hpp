@@ -13,8 +13,15 @@ BUFSTACK_BEGIN_NAMESPACE
  */
 class MsgpackReceiver : 
     public SingleConnectionServer, 
-    public AsyncBufSender
+    public AsyncBufSender,
+    virtual public Loggable
 {
+    //handle*Message parse the message then pass it to the
+    //appropriate callback
+    void handleRequestMessage(const msgpack::object&);
+    void handleResponseMessage(const msgpack::object&);
+    void handleNotificationMessage(const msgpack::object&);
+
 protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackReceiverException, BaseException);
     NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackReceiverException);
