@@ -4,18 +4,10 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-std::vector<std::reference_wrapper<msgpack::object>> 
+std::vector<std::reference_wrapper<const msgpack::object>> 
         MsgpackUtil::wrapObjects(const std::vector<msgpack::object>& v)
 {
-    std::vector<std::reference_wrapper<msgpack::object>> refs;
-    refs.reserve(v.size());
-
-    std::transform(v.begin(), v.end(), refs.begin(),
-        [](const msgpack::object& o) {
-            return std::ref(o);
-        });
-
-    return refs;
+    return std::vector<std::reference_wrapper<const msgpack::object>>(v.begin(), v.end()) ;
 }
 
 BUFSTACK_END_NAMESPACE
