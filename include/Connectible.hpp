@@ -9,7 +9,7 @@ class Connectible
 protected:
     virtual void onConnect(int fd) = 0;
 public:
-    virtual ~OnConnect() {}
+    virtual ~Connectible() {}
 
     NEW_EXCEPTION_TYPE(ConnectionException);
     using BaseException = ConnectionException;
