@@ -1,13 +1,24 @@
 #pragma once
 
 #include "NamespaceDefines.hpp"
+#include "Connectible.hpp"
+#include "Util/NewExceptionType.hpp"
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <string>
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class HasTcpConnection
+class HasTcpConnection : virtual public Connectible
 {
     const std::string address;
     const uint16_t port;
+
+protected:
+    static void decodeAddress(const std::string&, in_addr*);
 
 public:
     HasTcpConnection(
@@ -17,6 +28,10 @@ public:
     {}
 
     virtual ~HasTcpConnection() {}
+
+
+    NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, 
+            BaseException);
 
     static constexpr auto localhost = "127.0.0.1";
 };
