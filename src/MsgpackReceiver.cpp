@@ -1,6 +1,7 @@
 #include "MsgpackReceiver.hpp"
 
 #include <type_traits>
+#include <vector>
 
 #include "NamespaceDefines.hpp"
 #include "MsgpackRpc.hpp"
@@ -9,17 +10,68 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-void MsgpackReceiver::handleRequestMessage(const msgpack::object&)
+void MsgpackReceiver::handleRequestMessage(
+        const std::vector<msgpack::object>& msgObj)
 {
 
 }
-void MsgpackReceiver::handleResponseMessage(const msgpack::object&)
+void MsgpackReceiver::handleResponseMessage(
+        const std::vector<msgpack::object>& msgObj)
 {
+    uint32_t msgId;
+    msgObj.at(1).convert(msgId);
+    
+    const bool errorOccurred = msgObj.at(2).is_nil();
 
+    optional<std::string> errorField;
+    optional<std::reference_wrapper<msgpack::object>> resultField;
+
+    if(errorOccurred)
+    {
+        if(!msgObj.at(3).is_nil())
+        {
+            throw MsgpackReceiverException(
+                    STRCATS("result object should be " <<
+                    "nil in a message of type " <<
+                    MsgpackRpc::Message::printType(type) << 
+                    " but result == " << msgObj.at(3)));
+        }
+
+        errorField = make_optional(STRCAT(msgObj.at(2)));
+        resultField = nullopt;
+    }
+    else
+    {
+        errorField = nullopt;
+        auto resultObj = msgObj.at(3);
+        if(!resultObj.is_nil())
+        {
+            resultField = make_optional(std::ref(resultObj));
+        }
+    }
+
+    onReceiveResponseMsg(
+            MsgpackRpc::ResponseMessage(msgId, errorField, resultField));
 }
-void MsgpackReceiver::handleNotificationMessage(const msgpack::object&)
+void MsgpackReceiver::handleNotificationMessage(
+        const std::vector<msgpack::object>& msgObj)
 {
+    std::string method;
+    msgObj.at(1).convert(method);
 
+    
+    std::vector<msgpack::object> paramObjects;
+    msgObj.at(2).convert(paramObjects);
+
+    std::vector<std::reference_wrapper<msgpack::object>> params;
+    params.reserve(paramObjects.size());
+    for(auto& i : paramObjects)
+    {
+        params.emplace_back(std::reference_wrapper<msgpack::object>(i));
+    }
+
+    onReceiveNotificationMsg(
+            MsgpackRpc::NotificationMessage(method, params));
 }
 
 void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
@@ -65,46 +117,14 @@ void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
         {
             //TODO
             case MsgpackRpc::Message::Type::Request:
-                throw MsgpackReceiverException("Request messages not implemented.");
+            {
+                checkMessageLength(MsgpackRpc::RequestMessage::messageSize);
+            }
 
             case MsgpackRpc::Message::Type::Response:
             {
                 checkMessageLength(MsgpackRpc::ResponseMessage::messageSize);
-
-                uint32_t msgId;
-                msgObj.at(1).convert(msgId);
-                
-                const bool errorOccurred = msgObj.at(2).is_nil();
-
-                optional<std::string> errorField;
-                optional<std::reference_wrapper<msgpack::object>> resultField;
-
-                if(errorOccurred)
-                {
-                    if(!msgObj.at(3).is_nil())
-                    {
-                        throw MsgpackReceiverException(
-                                STRCATS("result object should be " <<
-                                "nil in a message of type " <<
-                                MsgpackRpc::Message::printType(type) << 
-                                " but result == " << msgObj.at(3)));
-                    }
-
-                    errorField = make_optional(STRCAT(msgObj.at(2)));
-                    resultField = nullopt;
-                }
-                else
-                {
-                    errorField = nullopt;
-                    auto resultObj = msgObj.at(3);
-                    if(!resultObj.is_nil())
-                    {
-                        resultField = make_optional(std::ref(resultObj));
-                    }
-                }
-
-                onReceiveResponseMsg(
-                        MsgpackRpc::ResponseMessage(msgId, errorField, resultField));
+                handleResponseMessage(msgObj);
                 break;
             }
 
@@ -112,23 +132,7 @@ void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
             case MsgpackRpc::Message::Type::Notification:
             {
                 checkMessageLength(MsgpackRpc::NotificationMessage::messageSize);
-
-                std::string method;
-                msgObj.at(1).convert(method);
-
-                
-                std::vector<msgpack::object> paramObjects;
-                msgObj.at(2).convert(paramObjects);
-
-                std::vector<std::reference_wrapper<msgpack::object>> params;
-                params.reserve(paramObjects.size());
-                for(auto& i : paramObjects)
-                {
-                    params.emplace_back(std::reference_wrapper<msgpack::object>(i));
-                }
-
-                onReceiveNotificationMsg(
-                        MsgpackRpc::NotificationMessage(method, params));
+                handleNotificationMessage(msgObj);
                 break;
             }
         }

@@ -18,9 +18,9 @@ class MsgpackReceiver :
 {
     //handle*Message parse the message then pass it to the
     //appropriate callback
-    void handleRequestMessage(const msgpack::object&);
-    void handleResponseMessage(const msgpack::object&);
-    void handleNotificationMessage(const msgpack::object&);
+    void handleRequestMessage(const std::vector<msgpack::object>&);
+    void handleResponseMessage(const std::vector<msgpack::object>&);
+    void handleNotificationMessage(const std::vector<msgpack::object>&);
 
 protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(MsgpackReceiverException, BaseException);
