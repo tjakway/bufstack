@@ -71,6 +71,8 @@ public:
     HasClientFd()
         : HasFd()
     {}
+
+    virtual ~HasClientFd() {}
 };
 
 class HasServerFd : public HasFd
@@ -86,6 +88,8 @@ public:
     HasServerFd()
         : HasFd()
     {}
+
+    virtual ~HasServerFd() {}
 };
 
 BUFSTACK_END_NAMESPACE
