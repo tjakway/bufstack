@@ -25,9 +25,6 @@ protected:
 
     virtual void onRecvMsg(const msgpack::object&);
 
-private:
-    msgpack::object_handle decode(Buffer);
-
 public:
     virtual ~MsgpackReceiver() {}
 };
