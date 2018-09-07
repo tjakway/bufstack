@@ -4,6 +4,7 @@
 
 #include "Util/NewExceptionType.hpp"
 #include "Util/AtomicAccess.hpp"
+#include "Util/AtomicSequence.hpp"
 #include "HasFd.hpp"
 #include "MsgpackReceiver.hpp"
 
@@ -111,10 +112,12 @@ public:
         return thisPromise->get_future();
     }
 
-    MsgpackServerClient()
+    AbstractMsgpackClient()
         : idSeq(0), responseCallbacks(
-                std::vector<BoundResponseCallback>{})
+            std::vector<BoundResponseCallback>{})
     {}
+
+    virtual ~AbstractMsgpackClient() {}
 };
 
 BUFSTACK_END_NAMESPACE
