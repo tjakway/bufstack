@@ -93,21 +93,6 @@ protected:
     virtual void onConnect(int clientFd) override;
 };
 
-class HasClientFd
-{
-    int clientFd;
-public:
-    int getClientFd();
-    void setClientFd(int);
-
-    HasClientFd(int _fd)
-        : clientFd(_fd)
-    {}
-
-    HasClientFd()
-        : HasClientFd(-1)
-    {}
-};
 
 class AsyncWriteServer : public Server
 {
