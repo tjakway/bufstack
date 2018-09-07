@@ -41,7 +41,7 @@ public:
     //see https://stackoverflow.com/questions/12340695/how-to-check-if-a-given-file-descriptor-stored-in-a-variable-is-still-valid
     static int fd_is_valid(int fd)
     {
-        return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+        return fd > 0 && fcntl(fd, F_GETFD) != -1 || errno != EBADF;
     }
 
 
