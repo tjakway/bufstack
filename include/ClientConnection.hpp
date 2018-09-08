@@ -32,11 +32,13 @@ class ClientTcpConnection
     : public ClientConnection,
       public HasTcpConnection
 {
+    virtual void abstract() override {}
     void _connect();
 public:
     ClientTcpConnection(
             const std::string& address,
             uint16_t port);
+    ClientTcpConnection(const ClientTcpConnection&) = delete;
 
     virtual ~ClientTcpConnection() {}
 };
@@ -47,10 +49,14 @@ public:
 class ClientUnixConnection
     : public ClientConnection
 {
+    virtual void abstract() override {}
+
     void _connect();
     const std::string path;
 public:
     ClientUnixConnection(const std::string&);
+    ClientUnixConnection(const ClientUnixConnection&) = delete;
+
     virtual ~ClientUnixConnection() {}
 
     std::string getPath() const noexcept { return path; }
