@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <cassert>
 
+#include <memory>
 #include <string>
 #include <sstream>
 #include <msgpack.hpp>
@@ -22,13 +23,29 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class PipeWriteTests : public PipeTest
+class PipeWriteTests 
+    : public PipeTest
 {
 public:
+    PipeWriteTests()
+        : loggerInstance("PipeWriteTests")
+    {}
+    virtual ~PipeWriteTests() {}
+
     using Callback = MsgpackReaderUnpacker::Callback;
     using ObjectList = MsgpackReaderUnpacker::ObjectList;
 
     MsgpackTestObject<std::string> helloWorld {std::string("hello, world!")};
+
+
+    //google test doesn't allow test fixtures to virtually inherit so we use
+    //this hack to get around it
+    Loggable loggerInstance;
+
+    virtual std::shared_ptr<spdlog::logger> getLogger() const noexcept override
+    {
+        return loggerInstance.getLogger();
+    }
 };
 
 
@@ -51,15 +68,16 @@ TEST_F(PipeWriteTests, TestWriteHelloWorld)
     bool foundTestObject = false;
     int vecSize;
     const msgpack::object_handle& expectedHandle = this->helloWorld.obj;
-    const auto callback = [&expectedHandle, &foundTestObject, &vecSize](
+    const auto callback = [this, &expectedHandle, &foundTestObject, &vecSize](
             const ObjectList& vecH)
     {
         vecSize = vecH.size();
+        this->getLogger()->debug("vecH: {}", Util::printVector(vecH));
         //can't compare object_handles for equality, need to compare
         //the references to the underlying objects
         std::string a, b;
-        vecH.front().get().convert(a);
 
+        vecH.front().get().convert(a);
         expectedHandle.get().convert(b);
         if(a == b)
         {
