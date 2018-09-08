@@ -14,7 +14,6 @@ class MsgpackClient :
     std::unique_ptr<ClientConnection> clientConnection;
 
 public:
-    //tcp connection
     MsgpackClient(ConnectionInfo);
 
     virtual ~MsgpackClient() {}
