@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <cstring>
 #include <string>
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -28,7 +29,8 @@ void ClientTcpConnection::_connect()
                         "Error description: " << strerror(_errno)));
         }
 
-        sockaddr_in sock {};
+        sockaddr_in sock;
+        memset(&sock, 0, sizeof(sockaddr_in));
         sock.sin_family = AF_INET; //tcp
         sock.sin_port = htons(getPort());
         
