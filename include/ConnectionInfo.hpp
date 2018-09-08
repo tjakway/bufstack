@@ -16,7 +16,8 @@ public:
          * unix domain sockets
          */
         Unix = 2
-    } connectionType;
+    };
+    const ConnectionType connectionType;
 
     struct TcpData
     {
@@ -29,11 +30,23 @@ public:
         std::string path;
     };
 
-    union data
+    union Data
     {
         TcpData tcpData;
         UnixData unixData;
-    } data;
+    };
+    const Data data;
+
+    static ConnectionInfo tcp(
+            std::string address,
+            uint16_t port);
+    static ConnectionInfo unix(std::string path);
+
+protected:
+    ConnectionInfo(ConnectionType, Data);
+
+private:
+    static Data zeroUnion();
 };
 
 BUFSTACK_END_NAMESPACE
