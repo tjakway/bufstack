@@ -11,6 +11,14 @@
 #include <cstring>
 #include <string>
 
+
+//un.h no longer defines UNIX_PATH_MAX
+//see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=233946
+#ifndef UNIX_PATH_MAX
+#define UNIX_PATH_MAX sizeof(sizecheck.sun_path)
+#endif
+
+
 BUFSTACK_BEGIN_NAMESPACE
 
 PrintableObject::Fields ClientUnixConnection::getFields() const noexcept
@@ -47,7 +55,7 @@ void ClientUnixConnection::_connect()
         sock.sun_family = AF_UNIX;
 
         //make sure our path isn't too long
-        //on linux UNIX_PATH_MAX is 108 (defined in un.h)
+        //on linux UNIX_PATH_MAX is 108
         //see https://stackoverflow.com/questions/34829600/why-is-the-maximal-path-length-allowed-for-unix-sockets-on-linux-108
         //+1 to include null terminator
         if((path.length()+1) > UNIX_PATH_MAX)
