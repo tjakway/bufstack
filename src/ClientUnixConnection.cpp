@@ -14,6 +14,7 @@
 
 //un.h no longer defines UNIX_PATH_MAX
 //see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=233946
+struct sockaddr_un sizecheck;
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX sizeof(sizecheck.sun_path)
 #endif
