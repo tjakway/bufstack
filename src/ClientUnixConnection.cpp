@@ -45,7 +45,23 @@ void ClientUnixConnection::_connect()
         memset(&sock, 0, sizeof(sockaddr_un));
 
         sock.sun_family = AF_UNIX;
-        sock.sun_path = path.c_str();
+
+        //make sure our path isn't too long
+        //on linux UNIX_PATH_MAX is 108 (defined in un.h)
+        //see https://stackoverflow.com/questions/34829600/why-is-the-maximal-path-length-allowed-for-unix-sockets-on-linux-108
+        //+1 to include null terminator
+        if((path.length()+1) > UNIX_PATH_MAX)
+        {
+            throw ConnectionException(STRCATS(
+                "Passed path < " << getPath() << " > exceeds " <<
+                "UNIX_PATH_MAX for this system (UNIX_PATH_MAX=" <<
+                UNIX_PATH_MAX << ")"));
+        }
+        else
+        {
+            const auto bytesToCopy = sizeof(char) * (path.length() + 1);
+            memcpy(&sock.sun_path, path.c_str(), bytesToCopy);
+        }
         
 
         if(connect(sockFd, (sockaddr*)&sock, sizeof(sock)) < 0)
