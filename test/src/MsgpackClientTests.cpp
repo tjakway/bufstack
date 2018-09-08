@@ -18,8 +18,8 @@ private:
 
     virtual void onReceiveRequestMsg(
             const MsgpackRpc::RequestMessage&) override {}
-    virtual void onReceiveResponseMsg(
-            const MsgpackRpc::ResponseMessage&) override {}
+    virtual void onReceiveNotificationMsg(
+            const MsgpackRpc::NotificationMessage&) override {}
 public:
     MockMsgpackClient(ConnectionInfo i)
         : Loggable("MockMsgpackClient"), MsgpackClient(i)
