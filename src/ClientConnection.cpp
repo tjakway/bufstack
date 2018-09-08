@@ -12,14 +12,14 @@ std::unique_ptr<ClientConnection>
     {
         case ConnectionInfo::Tcp:
             return make_unique<ClientTcpConnection>(
-                    i.tcpData.address, i.tcpData.port);
+                    i.data.tcpData.address, i.data.tcpData.port);
         case ConnectionInfo::Unix:
-            return make_unique<ClientUnixConnection>(i.unixData.path);
+            return make_unique<ClientUnixConnection>(i.data.unixData.path);
 
         default:
             throw ClientConnectionException(
                 STRCATS("Unrecognized ConnectionInfo::Type " <<
-                    i.type));
+                    i.connectionType));
     }
 }
 
