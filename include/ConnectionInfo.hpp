@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 
 #include <string>
+#include <cstring>
 #include <cstdint>
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -23,17 +24,28 @@ public:
     {
         std::string address;
         uint16_t port;
+        TcpData() = default;
+        TcpData(const TcpData&) = default;
+        ~TcpData() {}
     };
 
     struct UnixData
     {
         std::string path;
+        UnixData() = default;
+        UnixData(const UnixData&) = default;
+        ~UnixData() {}
     };
 
     union Data
     {
         TcpData tcpData;
         UnixData unixData;
+
+        //see https://stackoverflow.com/questions/321351/initializing-a-union-with-a-non-trivial-constructor
+        Data() { memset(this, 0, sizeof(Data)); }
+        Data(const Data& other) { memcpy(this, &other, sizeof(Data)); }
+        ~Data() {}
     };
     const Data data;
 
@@ -44,9 +56,6 @@ public:
 
 protected:
     ConnectionInfo(ConnectionType, Data);
-
-private:
-    static Data zeroUnion();
 };
 
 BUFSTACK_END_NAMESPACE

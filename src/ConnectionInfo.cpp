@@ -4,13 +4,6 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-Data ConnectionInfo::zeroUnion()
-{
-    Data data;
-    memset(&data, 0, sizeof(Data));
-    return data;
-}
-
 ConnectionInfo::ConnectionInfo(
     ConnectionType _type, Data _data)
     : connectionType(_type), data(_data)
@@ -20,19 +13,19 @@ ConnectionInfo ConnectionInfo::tcpConnection(
     std::string address,
     uint16_t port)
 {
-    auto d = zeroUnion();
+    Data d;
     d.tcpData.address = address;
     d.tcpData.port = port;
 
-    return ConnectionInfo(type, d);
+    return ConnectionInfo(ConnectionType::Tcp, d);
 }
 
-ConnectionInfo unixConnection(std::string path)
+ConnectionInfo ConnectionInfo::unixConnection(std::string path)
 {
-    auto d = zeroUnion();
+    Data d;
     d.unixData.path = path;
 
-    return ConnectionInfo(type, d);
+    return ConnectionInfo(ConnectionType::Unix, d);
 }
 
 BUFSTACK_END_NAMESPACE
