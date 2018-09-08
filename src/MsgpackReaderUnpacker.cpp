@@ -128,6 +128,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
         if(!handles.empty())
         {
             std::vector<std::reference_wrapper<const msgpack::object>> vs;
+            vs.reserve(handles.size());
             std::transform(
                 handles.begin(), handles.end(), vs.begin(),
                 [](msgpack::object_handle& h) {
