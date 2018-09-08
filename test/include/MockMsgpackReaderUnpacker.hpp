@@ -3,24 +3,37 @@
 
 #include "NamespaceDefines.hpp"
 
+#include "Loggable.hpp"
+#include "MsgpackReaderUnpacker.hpp"
+
+#include <functional>
+#include <vector>
 #include <memory>
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class MockMsgpackReaderUnpacker : public MsgpackReaderUnpacker
+class MockMsgpackReaderUnpacker 
+    : public MsgpackReaderUnpacker,
+    virtual public Loggable
 {
 public:
-    MsgpackReaderUnpacker() 
+    MockMsgpackReaderUnpacker() 
         : Loggable("MsgpackReaderUnpacker"), 
           MsgpackReaderUnpacker()
     {}
 
-    void readFd(int fd, std::function<void(const std::vector<msgpack::object_handle>&)> callback)
+    virtual ~MockMsgpackReaderUnpacker() {}
+
+    //expose protected method for testing
+    void readFd(int fd, 
+            std::function<void(const ObjectList&)> callback)
     {
         MsgpackReaderUnpacker::readFd(fd, callback);
     }
 
     virtual void waitUntilDone() {}
+
+    virtual void abstract() {}
 };
 
 BUFSTACK_END_NAMESPACE
