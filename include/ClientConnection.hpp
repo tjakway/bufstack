@@ -48,7 +48,7 @@ class ClientUnixConnection
     : public ClientConnection
 {
     void _connect();
-    std::string path;
+    const std::string path;
 public:
     ClientUnixConnection(const std::string&);
     virtual ~ClientUnixConnection() {}
