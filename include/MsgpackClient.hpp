@@ -11,7 +11,7 @@ class MsgpackClient :
     public AbstractMsgpackClient,
     virtual public HasClientFd
 {
-    std::unique_ptr<ClientConnection> clientConnection;
+    const std::unique_ptr<ClientConnection> clientConnection;
 
 public:
     MsgpackClient(ConnectionInfo);
