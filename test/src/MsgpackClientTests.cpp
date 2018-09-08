@@ -4,12 +4,26 @@
 
 #include <msgpack.hpp>
 
-#include "Server.hpp"
-
 #include "NamespaceDefines.hpp"
 #include "Loggable.hpp"
+#include "MsgpackClient.hpp"
+#include "ClientConnection.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
+
+class MockMsgpackClient : public MsgpackClient
+{
+private:
+    virtual void abstract() override {}
+
+    virtual void onReceiveRequestMsg(const MsgpackRpc::RequestMessage&) {}
+    virtual void onReceiveResponseMsg(const MsgpackRpc::ResponseMessage&) {}
+public:
+    MockMsgpackClient(ConnectionInfo i)
+        : Loggable("MockMsgpackClient"), MsgpackClient(i)
+    {}
+};
+
 
 class MsgpackClientTests : public ::testing::Test, public Loggable
 {
@@ -24,11 +38,11 @@ TEST_F(MsgpackClientTests, TestBadPort)
     bool exceptionThrown = false;
     //connecting to an out of range port should throw an exception
     try {
-        MsgpackClient(
-            Server::localhost,
-            std::numeric_limits<uint16_t>::max());
+        MockMsgpackClient(
+            ConnectionInfo::tcpConnection(HasTcpConnection::localhost,
+            std::numeric_limits<uint16_t>::max()));
     } 
-    catch(MsgpackClient::ConnectionError)
+    catch(ClientConnection::ClientConnectionException)
     {
         exceptionThrown = true;
     }
