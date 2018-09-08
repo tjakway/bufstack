@@ -28,6 +28,9 @@ public:
     int readFd;
     static const std::string apiInfoFilename;
 
+    using Callback = MsgpackReaderUnpacker::Callback;
+    using ObjectList = MsgpackReaderUnpacker::ObjectList;
+
     //can't use assertions in CTOR
     ReadApiInfoTests()
         : Loggable("ReadApiInfoTests"), readFd(-1)
@@ -49,11 +52,15 @@ public:
         }
     }
 
-    void readExpect(std::function<bool(const std::vector<msgpack::object_handle>&)> expect)
+    //expect is Callback but returning bool instead of void
+    void readExpect(
+            std::function<bool(const MsgpackReaderUnpacker::ObjectList&)> expect)
     {
         bool receivedMessage = false;
         bool expected = false;
-        const auto callback = [&receivedMessage, &expected, expect](const std::vector<msgpack::object_handle>& vecH)
+        const auto callback = 
+            [&receivedMessage, &expected, expect]
+            (const MsgpackReaderUnpacker::ObjectList& vecH)
         { 
             if(!vecH.empty())
             {
@@ -111,6 +118,10 @@ public:
         : ApiParser(handles.at(0).get())
     {}
 
+    MockApiParser(const MsgpackReaderUnpacker::ObjectList& handles)
+        : ApiParser(handles.at(0).get())
+    {}
+
     static ApiParser::ParseFunctions parseFunctions;
 };
 
@@ -119,7 +130,7 @@ ApiParser::ParseFunctions MockApiParser::parseFunctions;
 //make sure we can decode it without crashing
 TEST_F(ReadApiInfoTests, TestCallbackInvoked)
 {
-    readExpect([](const std::vector<msgpack::object_handle>&){ return true; });
+    readExpect([](const ObjectList&){ return true; });
 }
 
 /*
@@ -224,7 +235,7 @@ template <typename T> std::vector<typename T::key_type> extractKeys(T map)
 
 TEST_F(ReadApiInfoTests, TestParseFunctions)
 {
-    readExpect([](const std::vector<msgpack::object_handle>& vecH) -> bool {
+    readExpect([](const ObjectList& vecH) -> bool {
             std::map<std::string, msgpack::object> apiInfo;
 
             vecH.at(0).get().convert(apiInfo);
@@ -256,7 +267,7 @@ TEST_F(ReadApiInfoTests, TestHasBufferMethods)
         return true;
     };
 
-    readExpect([](const std::vector<msgpack::object_handle>& vecH){
+    readExpect([](const ObjectList& vecH){
             //std::find_if(vecH.begin(), vecH.end(), );
             return true;
             });
@@ -266,7 +277,7 @@ TEST_F(ReadApiInfoTests, TestHasBufferMethods)
 TEST_F(ReadApiInfoTests, TestParseCustomTypes)
 {
     //make sure the constructor doesn't throw any exceptions
-    readExpect([this](const std::vector<msgpack::object_handle>& vecH) -> bool {
+    readExpect([this](const ObjectList& vecH) -> bool {
             MockApiParser parser(vecH);
             const auto customTypes = parser.getCustomTypes();
             const auto expectedTypes = this->getAllExpectedTypes();
