@@ -120,7 +120,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
         //try and decode this message, recording how much we found
         char* unconsumedBuffer;
         std::size_t amountNotConsumed = -1;
-        std::vector<msgpack::object_handle> handles = 
+        const std::vector<msgpack::object_handle> handles = 
             decode(data.data(), data.size(),
                     &unconsumedBuffer, &amountNotConsumed, *this);
 
@@ -129,11 +129,11 @@ void MsgpackReaderUnpacker::readFd(int fd,
         {
             std::vector<std::reference_wrapper<const msgpack::object>> vs;
             vs.reserve(handles.size());
-            std::transform(
-                handles.begin(), handles.end(), vs.begin(),
-                [](msgpack::object_handle& h) {
-                    return std::ref(h.get());
-                });
+            
+            for(auto& h : handles)
+            {
+                vs.emplace_back(std::ref(h.get()));
+            }
 
             callback(vs);
         }
