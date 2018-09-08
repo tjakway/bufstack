@@ -8,7 +8,7 @@
 #define SAFE_CLOSE_LOG_ERROR(fd) \
     if(fd > 0) \
     { \
-        if(close(getFd()) != 0) \
+        if(close(fd) != 0) \
         { \
             auto _errno = errno; \
             getLogger()->warn(STRCATS("close returned" << \
