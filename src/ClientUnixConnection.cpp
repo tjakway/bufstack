@@ -85,7 +85,7 @@ void ClientUnixConnection::_connect()
         setClientFd(sockFd);
 
         getLogger()->debug(STRCATS("Unix domain client connection successful on " <<
-                    getPath());
+                    getPath()));
     }
     catch(...)
     {
