@@ -4,6 +4,8 @@
 
 #include "AsyncBufSender.hpp"
 
+#include <utility>
+
 BUFSTACK_BEGIN_NAMESPACE
 
 /**
@@ -31,7 +33,7 @@ public:
 
     virtual void send(int fd, Buffer b) override
     {
-        AsyncBufSender::send(fd, b);
+        AsyncBufSender::send(fd, std::move(b));
         waitFutures();
     }
     virtual void send(int fd, const char* buf, std::size_t len) override
