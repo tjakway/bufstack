@@ -38,7 +38,7 @@ void ClientTcpConnection::_connect()
         if(sockFd < 0)
         {
             auto _errno = errno;
-            throw ConnectionException(
+            throw ClientConnectionException(
                     STRCATS("Could not create socket (" <<
                         "socket returned " << sockFd << ").  " <<
                         "Error description: " << strerror(_errno)));
@@ -62,7 +62,7 @@ void ClientTcpConnection::_connect()
         if(connect(sockFd, (sockaddr*)&sock, sizeof(sock)) < 0)
         {
             auto _errno = errno;
-            throw ConnectionException(
+            throw ClientConnectionException(
                 STRCATS("Call to connect(2) failed with error description: " <<
                     strerror(_errno)));
         }

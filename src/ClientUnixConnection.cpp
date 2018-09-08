@@ -44,7 +44,7 @@ void ClientUnixConnection::_connect()
         if(sockFd < 0)
         {
             auto _errno = errno;
-            throw ConnectionException(
+            throw ClientConnectionException(
                     STRCATS("Could not create socket (" <<
                         "socket returned " << sockFd << ").  " <<
                         "Error description: " << strerror(_errno)));
@@ -61,7 +61,7 @@ void ClientUnixConnection::_connect()
         //+1 to include null terminator
         if((path.length()+1) > UNIX_PATH_MAX)
         {
-            throw ConnectionException(STRCATS(
+            throw ClientConnectionException(STRCATS(
                 "Passed path < " << getPath() << " > exceeds " <<
                 "UNIX_PATH_MAX for this system (UNIX_PATH_MAX=" <<
                 UNIX_PATH_MAX << ")"));
@@ -76,7 +76,7 @@ void ClientUnixConnection::_connect()
         if(connect(sockFd, (sockaddr*)&sock, sizeof(sock)) < 0)
         {
             auto _errno = errno;
-            throw ConnectionException(
+            throw ClientConnectionException(
                 STRCATS("Call to connect(2) failed with error description: " <<
                     strerror(_errno)));
         }
