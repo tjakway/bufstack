@@ -16,13 +16,6 @@ class Loggable
     std::string loggerName;
 
 protected:
-        Loggable(const std::string& name, 
-                std::function<
-                    std::shared_ptr<spdlog::logger>(const std::string&)> 
-                        initLogger = Config::Defaults::getLoggerConstructor())
-            : loggerName(name), logger(initLogger(name))
-        {}
-
         template <typename T> 
         std::string toString(const T& x)
         {
@@ -32,6 +25,14 @@ protected:
         }
 
 public:
+        Loggable(const std::string& name, 
+                std::function<
+                    std::shared_ptr<spdlog::logger>(const std::string&)> 
+                        initLogger = Config::Defaults::getLoggerConstructor())
+            : loggerName(name), logger(initLogger(name))
+        {}
+
+
         virtual std::shared_ptr<spdlog::logger> getLogger() const noexcept
         {
             return logger;
