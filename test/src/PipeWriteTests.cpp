@@ -22,7 +22,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class ServerWriteTests : public PipeTest
+class PipeWriteTests : public PipeTest
 {
 public:
     using Callback = MsgpackReaderUnpacker::Callback;
@@ -32,7 +32,7 @@ public:
 };
 
 
-TEST_F(ServerWriteTests, TestWriteHelloWorld)
+TEST_F(PipeWriteTests, TestWriteHelloWorld)
 {
     MockMsgpackReaderUnpacker reader;
     SyncBufSender sender;
@@ -83,9 +83,9 @@ TEST_F(ServerWriteTests, TestWriteHelloWorld)
     close(readFd);
 }
 
-TEST_F(ServerWriteTests, TestWriteNothing)
+TEST_F(PipeWriteTests, TestWriteNothing)
 {
-
+    //TODO
 }
 
 BUFSTACK_END_NAMESPACE
