@@ -33,7 +33,7 @@ public:
     {
         TcpData tcpData;
         UnixData unixData;
-    };
+    } data;
 };
 
 BUFSTACK_END_NAMESPACE
