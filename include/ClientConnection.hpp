@@ -4,6 +4,8 @@
 #include "HasFd.hpp"
 #include "Loggable.hpp"
 #include "HasTcpConnection.hpp"
+#include "ConnectionInfo.hpp"
+#include "Util/NewExceptionType.hpp"
 
 #include <cstdint>
 #include <string>
@@ -19,6 +21,11 @@ protected:
 
 public:
     virtual ~ClientConnection() {}
+
+    NEW_EXCEPTION_TYPE(ClientConnectionException);
+
+    static std::unique_ptr<ClientConnection> 
+        newClientConnection(ConnectionInfo);
 };
 
 class ClientTcpConnection 
@@ -33,5 +40,21 @@ public:
 
     virtual ~ClientTcpConnection() {}
 };
+
+/**
+ * connection over unix domain sockets
+ */
+class ClientUnixConnection
+    : public ClientConnection
+{
+    void _connect();
+    std::string path;
+public:
+    ClientUnixConnection(const std::string&);
+    virtual ~ClientUnixConnection() {}
+
+    std::string getPath() const noexcept { return path; }
+};
+
 
 BUFSTACK_END_NAMESPACE
