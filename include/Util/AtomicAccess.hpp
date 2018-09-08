@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Util/NewExceptionType.hpp"
+
 #include <future>
 
 /**
@@ -9,14 +11,24 @@ template <typename T>
 class AtomicAccess
 {
     std::unique_ptr<T> val;
+    NEW_EXCEPTION_TYPE(AtomicAccessException);
 
     std::mutex mut;
+
+    void checkVal()
+    {
+        if(!val)
+        {
+            throw AtomicAccessException("Underlying value is null");
+        }
+    }
 
 public:
     template <typename U>
     U access(std::function<U(T&)> f)
     {
         std::lock_guard<std::mutex> {mut};
+        checkVal();
         return f(*val);
     }
 

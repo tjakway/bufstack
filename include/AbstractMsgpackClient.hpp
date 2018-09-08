@@ -23,11 +23,11 @@ class AbstractMsgpackClient :
 
 
     template <typename T>
-    using UnboundResponseCallback = std::function<void(MsgId, 
+    using UnboundResponseCallback = std::function<bool(MsgId, 
             std::shared_ptr<std::promise<T>>,
             MsgpackRpc::ResponseMessage)>;
 
-    using BoundResponseCallback = std::function<void(MsgId)>;
+    using BoundResponseCallback = std::function<bool(MsgId)>;
 
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
     
@@ -39,10 +39,14 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotException, ResponseException);
 
     virtual void addResponseCallback(BoundResponseCallback&& cb);
-    virtual void onReceiveNotificationMsg(const MsgpackRpc::NotificationMessage&) override;
+    virtual void onReceiveResponseMsg(
+            const MsgpackRpc::ResponseMessage&) override;
 
+    /**
+     * returns true if this callback is finished
+     */
     template <typename T>
-    static void setResponseValue(
+    static bool setResponseValue(
             const MsgpackRpc::ResponseMessage& responseMsg,
             MsgId thisCallId,
             std::shared_ptr<std::promise<T>> promise)
@@ -68,6 +72,9 @@ protected:
                     //creates a new object of T
                     //see https://github.com/msgpack/msgpack-c/issues/480
                     promise->set_value(objectReceived.as<T>());
+
+                    //indicate that this callback is no longer needed
+                    return true;
                 }
                 catch(msgpack::type_error e)
                 {
@@ -82,6 +89,10 @@ protected:
             {
                 promise.set_exception(std::current_exception());
             }
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -109,8 +120,8 @@ public:
         std::shared_ptr<std::promise<T>> thisPromise = 
             std::make_shared<std::promise<T>>();
 
-        addResponseCallback(std::bind(thisMsgId, thisPromise,
-                    std::placeholders::_1));
+        addResponseCallback(std::bind(
+            thisMsgId, thisPromise, std::placeholders::_1));
 
         return thisPromise->get_future();
     }

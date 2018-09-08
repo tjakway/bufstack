@@ -8,7 +8,7 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 class MsgpackClient : 
-    protected AbstractMsgpackClient,
+    public AbstractMsgpackClient,
     virtual public HasClientFd
 {
     std::unique_ptr<ClientConnection> clientConnection;
