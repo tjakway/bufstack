@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "ClientConnection.hpp"
 #include "HasFd.hpp"
+#include "AbstractMsgpackClient.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
