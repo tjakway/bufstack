@@ -1,6 +1,8 @@
 #pragma once
 
 #include <utility>
+#include <functional>
+
 #include <msgpack.hpp>
 
 #include "NamespaceDefines.hpp"
@@ -20,10 +22,10 @@ class MsgpackReaderUnpacker :
     const std::chrono::milliseconds sleepInterval;
 public:
     using ObjectList = std::vector<std::reference_wrapper<const msgpack::object>>;
+    using Callback = std::function<void(const ObjectList&)>;
 
 protected:
-    virtual void readFd(int, 
-            std::function<void(const ObjectList&)>);
+    virtual void readFd(int, Callback);
 
 
 public:
