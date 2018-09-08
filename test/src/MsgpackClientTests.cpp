@@ -16,8 +16,10 @@ class MockMsgpackClient : public MsgpackClient
 private:
     virtual void abstract() override {}
 
-    virtual void onReceiveRequestMsg(const MsgpackRpc::RequestMessage&) {}
-    virtual void onReceiveResponseMsg(const MsgpackRpc::ResponseMessage&) {}
+    virtual void onReceiveRequestMsg(
+            const MsgpackRpc::RequestMessage&) override {}
+    virtual void onReceiveResponseMsg(
+            const MsgpackRpc::ResponseMessage&) override {}
 public:
     MockMsgpackClient(ConnectionInfo i)
         : Loggable("MockMsgpackClient"), MsgpackClient(i)
