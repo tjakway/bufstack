@@ -8,12 +8,12 @@ BUFSTACK_BEGIN_NAMESPACE
 std::unique_ptr<ClientConnection> 
         ClientConnection::newClientConnection(ConnectionInfo i)
 {
-    switch(i.type)
+    switch(i.connectionType)
     {
-        case Tcp:
+        case ConnectionInfo::Tcp:
             return make_unique<ClientTcpConnection>(
                     i.tcpData.address, i.tcpData.port);
-        case Unix:
+        case ConnectionInfo::Unix:
             return make_unique<ClientUnixConnection>(i.unixData.path);
 
         default:
