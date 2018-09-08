@@ -37,10 +37,10 @@ public:
     };
     const Data data;
 
-    static ConnectionInfo tcp(
+    static ConnectionInfo tcpConnection(
             std::string address,
             uint16_t port);
-    static ConnectionInfo unix(std::string path);
+    static ConnectionInfo unixConnection(std::string path);
 
 protected:
     ConnectionInfo(ConnectionType, Data);

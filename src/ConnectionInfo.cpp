@@ -16,7 +16,7 @@ ConnectionInfo::ConnectionInfo(
     : connectionType(_type), data(_data)
 {}
 
-ConnectionInfo ConnectionInfo::tcp(
+ConnectionInfo ConnectionInfo::tcpConnection(
     std::string address,
     uint16_t port)
 {
@@ -27,7 +27,7 @@ ConnectionInfo ConnectionInfo::tcp(
     return ConnectionInfo(type, d);
 }
 
-ConnectionInfo unix(std::string path)
+ConnectionInfo unixConnection(std::string path)
 {
     auto d = zeroUnion();
     d.unixData.path = path;
