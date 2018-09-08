@@ -12,25 +12,30 @@
 
 #include "Util/Util.hpp"
 #include "NamespaceDefines.hpp"
-#include "Server.hpp"
 #include "Loggable.hpp"
 
+#include "MsgpackReaderUnpacker.hpp"
+#include "MockMsgpackReaderUnpacker.hpp"
 #include "PipeTest.hpp"
-#include "MockServer.hpp"
 #include "MsgpackTestObject.hpp"
+#include "SyncBufSender.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class ServerWriteTests : public PipeTest
 {
 public:
+    using Callback = MsgpackReaderUnpacker::Callback;
+    using ObjectList = MsgpackReaderUnpacker::ObjectList;
+
     MsgpackTestObject<std::string> helloWorld {std::string("hello, world!")};
 };
 
 
 TEST_F(ServerWriteTests, TestWriteHelloWorld)
 {
-    MockServer server;
+    MockMsgpackReaderUnpacker reader;
+    SyncBufSender sender;
     std::stringstream buf;
     std::string original = "hello, world!";
 
@@ -39,21 +44,20 @@ TEST_F(ServerWriteTests, TestWriteHelloWorld)
     p.pack_str_body(original.c_str(), original.size());
 
     const std::string bufStr = buf.str();
-    MockServer::sendAll(writeFd, bufStr.c_str(), 
-            bufStr.size(), *this);
+    sender.send(writeFd, bufStr.c_str(), 
+            bufStr.size());
     close(writeFd);
 
     bool foundTestObject = false;
     int vecSize;
     const msgpack::object_handle& expectedHandle = this->helloWorld.obj;
-    const auto callback = [&expectedHandle, &server, &foundTestObject, &vecSize](
-            const std::vector<msgpack::object_handle>& vecH)
+    const auto callback = [&expectedHandle, &foundTestObject, &vecSize](
+            const ObjectList& vecH)
     {
         vecSize = vecH.size();
         //can't compare object_handles for equality, need to compare
         //the references to the underlying objects
         std::string a, b;
-        //vecH.front().get().convert(x);
         vecH.front().get().convert(a);
 
         expectedHandle.get().convert(b);
@@ -71,7 +75,7 @@ TEST_F(ServerWriteTests, TestWriteHelloWorld)
         }
     };
 
-    server.readFd(readFd, callback);
+    reader.readFd(readFd, callback);
 
     ASSERT_EQ(vecSize, 1);
     ASSERT_TRUE(foundTestObject);
