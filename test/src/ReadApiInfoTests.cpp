@@ -8,9 +8,8 @@
 #include <set>
 
 #include "NamespaceDefines.hpp"
-#include "Server.hpp"
 #include "FindNeovim.hpp"
-#include "MockServer.hpp"
+#include "MockMsgpackReaderUnpacker.hpp"
 #include "Util/Util.hpp"
 #include "NvimApi/ApiParser.hpp"
 #include "Loggable.hpp"
@@ -67,8 +66,9 @@ public:
                 expected = true;
             }
         };
-        MockServer server;
-        server.readFd(readFd, callback);
+
+        MockMsgpackReaderUnpacker reader; 
+        reader.readFd(readFd, callback);
         EXPECT_TRUE(receivedMessage);
         EXPECT_TRUE(expected);
     }
