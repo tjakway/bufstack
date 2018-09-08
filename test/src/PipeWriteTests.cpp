@@ -83,9 +83,4 @@ TEST_F(PipeWriteTests, TestWriteHelloWorld)
     close(readFd);
 }
 
-TEST_F(PipeWriteTests, TestWriteNothing)
-{
-    //TODO
-}
-
 BUFSTACK_END_NAMESPACE
