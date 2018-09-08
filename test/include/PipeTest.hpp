@@ -4,6 +4,7 @@
 
 
 #include "Util/Util.hpp"
+#include "Util/CloseLogError.hpp"
 #include "Loggable.hpp"
 
 #include <unistd.h>
@@ -32,13 +33,7 @@ public:
 
     ~PipeTest()
     {
-        if(Util::fd_is_valid(readFd))
-        {
-            close(readFd);
-        }
-        if(Util::fd_is_valid(writeFd))
-        {
-            close(writeFd);
-        }
+        SAFE_CLOSE_LOG_ERROR(readFd);
+        SAFE_CLOSE_LOG_ERROR(writeFd);
     }
 };
