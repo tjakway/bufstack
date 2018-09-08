@@ -13,7 +13,19 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-void ClientUnixConnection::connect()
+PrintableObject::Fields ClientUnixConnection::getFields() const noexcept
+{
+    return PrintableObject::Fields {
+        std::make_pair("path", getPath())
+    };
+}
+
+std::string ClientUnixConnection::getName() const noexcept
+{
+    return "ClientUnixConnection";
+}
+
+void ClientUnixConnection::_connect()
 {
     onConnect();
 
@@ -62,7 +74,7 @@ void ClientUnixConnection::connect()
 
 ClientUnixConnection::ClientUnixConnection(
         const std::string& _path)
-    : path(_path)
+    : Loggable(getName()), path(_path)
 {
     _connect();
 }

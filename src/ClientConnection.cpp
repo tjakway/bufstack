@@ -5,6 +5,12 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
+void ClientConnection::onConnect()
+{
+    getLogger()->debug(
+        STRCATS("connect called for " << printCompact()));
+}
+
 std::unique_ptr<ClientConnection> 
         ClientConnection::newClientConnection(ConnectionInfo i)
 {

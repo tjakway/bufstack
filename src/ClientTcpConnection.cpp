@@ -2,6 +2,7 @@
 
 #include "Util/Strcat.hpp"
 #include "Util/CloseLogError.hpp"
+#include "Util/PrintableObject.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -9,8 +10,22 @@
 
 #include <cstring>
 #include <string>
+#include <utility>
 
 BUFSTACK_BEGIN_NAMESPACE
+
+PrintableObject::Fields ClientTcpConnection::getFields() const noexcept
+{
+    return PrintableObject::Fields {
+        std::make_pair("address", getAddress()),
+        std::make_pair("port", std::to_string(getPort()))
+    };
+}
+
+std::string ClientTcpConnection::getName() const noexcept
+{
+    return "ClientTcpConnection";
+}
 
 void ClientTcpConnection::_connect()
 {
@@ -69,7 +84,8 @@ void ClientTcpConnection::_connect()
 ClientTcpConnection::ClientTcpConnection(
         const std::string& address,
         uint16_t port)
-    : HasTcpConnection(address, port)
+    : Loggable(getName()),
+    HasTcpConnection(address, port)
 {
     _connect();
 }
