@@ -11,7 +11,9 @@
 #include <fcntl.h>
 #include <cassert>
 
-class PipeTest : public ::testing::Test, public bufstack::Loggable
+class PipeTest 
+    : public ::testing::Test, 
+    public bufstack::Loggable
 {
 public:
     int readFd, writeFd;
@@ -31,7 +33,7 @@ public:
         //fcntl(readFd, F_SETFL, O_NONBLOCK);
     }
 
-    ~PipeTest()
+    virtual ~PipeTest()
     {
         SAFE_CLOSE_LOG_ERROR(readFd);
         SAFE_CLOSE_LOG_ERROR(writeFd);
