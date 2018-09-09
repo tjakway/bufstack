@@ -113,7 +113,7 @@ public:
         return convert<T>(h.get()); 
     }
     
-    std::future<T> async_call(const Args&... args) const 
+    std::future<T> asyncCall(const Args&... args) const 
     { 
         check(); 
     
@@ -121,7 +121,7 @@ public:
             return HasReturnValueRemoteApiFunction::convert<T>(h.get()); 
         }; 
         
-        return runAfter(rpcClient->async_call(name, args...), conv); 
+        return runAfter(rpcClient->asyncCall(name, args...), conv); 
     } 
 
     T operator()(const Args&... args) const 
@@ -144,13 +144,13 @@ public:
         rpcClient->call(name, args...); 
     }
     
-    void async_call(const Args&... args) const 
+    void asyncCall(const Args&... args) const 
     { 
         check(); 
     
         //don't need a conversion step here because we're discarding
         //the return value
-        rpcClient->async_call(name, args...); 
+        rpcClient->asyncCall(name, args...); 
     } 
 
     void operator()(const Args&... args) const 
