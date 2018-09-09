@@ -28,7 +28,7 @@ class NvimFunction;
 
 class NvimFunctionSpec : public PrintableObject
 {
-    const bool method,
+    const bool method;
     const optional<std::string> returnType;
     const std::vector<std::string> parameters;
     const std::string name;
