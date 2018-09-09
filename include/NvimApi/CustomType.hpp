@@ -74,6 +74,8 @@ public:
                 other.prefix)
     {}
 
+    virtual ~PrefixType() {}
+
     bool operator==(const PrefixType& other) const
     {
         return id == other.id &&
