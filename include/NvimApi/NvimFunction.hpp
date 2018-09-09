@@ -24,6 +24,22 @@ BUFSTACK_BEGIN_NAMESPACE
 
 using ApiInfoPacket = msgpack::object;
 
+
+class NvimFunctionSpec : public PrintableObject
+{
+protected:
+    virtual Fields getFields() const noexcept override;
+    virtual std::string getName() const noexcept override;
+
+public:
+    NvimFunctionSpec(bool _method,
+            //nullopt = void return type
+            optional<std::string> _returnType,
+            std::vector<std::string> _parameters = 
+                std::vector<std::string>{},
+            std::string _name)
+};
+
 class NvimFunction : public PrintableObject
 {
 protected:
@@ -80,7 +96,9 @@ public:
             name == other.name;
     }
 
-    bool deprecated() const { return deprecatedSince.has_value(); }
+    bool deprecated() const noexcept { return deprecatedSince.has_value(); }
+
+    bool method() const noexcept { return method.value_or(false) };
 };
 
 std::ostream& operator <<(std::ostream&, const NvimFunction&);
