@@ -5,9 +5,12 @@
 #include "HasFd.hpp"
 #include "AbstractMsgpackClient.hpp"
 
-#include "NvimApi/RemoteFunction.hpp"
+#include "NvimApi/NvimFunction.hpp"
+#include "NvimApi/RemoteFunction_decl.hpp"
+#include "NvimApi/ApiInfo_decl.hpp"
 
 #include <memory>
+#include <unordered_set>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -32,7 +35,7 @@ protected:
 public:
     MsgpackClient(ConnectionInfo);
 
-    virtual ~MsgpackClient() {}
+    virtual ~MsgpackClient();
 };
 
 BUFSTACK_END_NAMESPACE

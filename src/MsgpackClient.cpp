@@ -2,6 +2,7 @@
 #include "NamespaceDefines.hpp"
 
 #include "ClientConnection.hpp"
+#include "NvimApi/ApiParser.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -13,11 +14,15 @@ MsgpackClient::MsgpackClient(ConnectionInfo ci)
     : clientConnection(ClientConnection::newClientConnection(ci))
 {}
 
+MsgpackClient::~MsgpackClient()
+{}
+
 void MsgpackClient::onConnect()
 {
     std::function<void(void)> init = 
         [this]() -> void {
-            msgpack::object_handle apiInfoObject = client->call("nvim_get_api_info");
+            msgpack::object_handle apiInfoObject = 
+                this->call<("nvim_get_api_info");
 
             ApiParser parser(apiInfoObject.get());
             ApiInfo apiInfo = parser.getApiInfo();
