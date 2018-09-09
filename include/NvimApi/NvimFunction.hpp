@@ -38,10 +38,9 @@ protected:
     virtual std::string getName() const noexcept override;
 
 public:
-    NvimFunctionSpec(bool _method,
+    NvimFunctionSpec(std::string _name, bool _method,
             //nullopt = void return type
             optional<std::string> _returnType,
-            std::string _name,
             std::vector<std::string> _parameters = 
                 std::vector<std::string>{})
         : method(_method), returnType(_returnType),
