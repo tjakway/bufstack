@@ -27,6 +27,11 @@ using ApiInfoPacket = msgpack::object;
 
 class NvimFunctionSpec : public PrintableObject
 {
+    const bool method,
+    const optional<std::string> returnType;
+    const std::vector<std::string> parameters;
+    const std::string name;
+
 protected:
     virtual Fields getFields() const noexcept override;
     virtual std::string getName() const noexcept override;
@@ -38,6 +43,11 @@ public:
             std::vector<std::string> _parameters = 
                 std::vector<std::string>{},
             std::string _name)
+        : method(_method), returnType(_returnType),
+        parameters(_parameters), name(_name)
+    {}
+
+    NvimFunction toFunction() const noexcept;
 };
 
 class NvimFunction : public PrintableObject
