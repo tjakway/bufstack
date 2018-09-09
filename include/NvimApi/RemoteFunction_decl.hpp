@@ -9,7 +9,7 @@ class AbstractRemoteApiFunction;
 template <typename T, typename... Args>
 class HasReturnValueRemoteApiFunction;
 
-template <typename T, typename... Args>
+template <typename... Args>
 class NoReturnRemoteApiFunction;
 
 class RemoteFunctionInstances;
