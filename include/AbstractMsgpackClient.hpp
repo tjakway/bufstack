@@ -25,6 +25,18 @@ public:
 };
 
 template <>
+class ConvertResponseValue<void>
+{
+public:
+    void operator()(
+        std::shared_ptr<std::promise<void>> promise,
+        const msgpack::object& objectReceived)
+    {
+        promise->set_value();
+    }
+};
+
+template <>
 class ConvertResponseValue<msgpack::object_handle>
 {
 public:
@@ -129,15 +141,8 @@ protected:
         }
     }
 
-public:
-
-    //TODO: implement
-    template <typename... Args>
-    void asyncCallVoidReturn(const std::string& name, 
-            Args... args);
-
     template <typename T, typename... Args>
-    std::future<T> asyncCall(const std::string& name, Args... args)
+    MsgId sendCall(const std::string& name, Args... args)
     {
         const auto thisMsgId = idSeq.nextAndIncrement();
 
@@ -151,11 +156,33 @@ public:
 
         send(getClientFd(), buffer->data(), buffer->size());
 
+        return thisMsgId;
+    }
+
+public:
+
+    //TODO: implement
+    template <typename... Args>
+    void asyncCallVoidReturn(const std::string& name, 
+            Args... args);
+
+    template <typename T, typename... Args>
+    std::future<T> asyncCall(const std::string& name, Args... args)
+    {
+        MsgId thisMsgId = sendCall<T, Args...>(name, args...);
+
         std::shared_ptr<std::promise<T>> thisPromise = 
             std::make_shared<std::promise<T>>();
 
-        addResponseCallback(std::bind(
-            thisMsgId, thisPromise, std::placeholders::_1));
+
+        BoundResponseCallback cb = 
+            [thisMsgId, thisPromise](MsgpackRpc::ResponseMessage& m)
+        {
+            return AbstractMsgpackClient::setResponseValue(
+                    thisMsgId, thisPromise, m);
+        };
+
+        addResponseCallback(std::move(cb));
 
 
         return thisPromise->get_future();
@@ -171,7 +198,7 @@ public:
     template <typename... Args>
     void callVoidReturn(const std::string& name, Args... args)
     {
-        call<void>(name, args...).get();
+        sendCall(name, args...);
     }
 
     AbstractMsgpackClient()
