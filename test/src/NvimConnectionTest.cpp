@@ -17,9 +17,6 @@ namespace {
 
 BUFSTACK_BEGIN_NAMESPACE
 
-//std::atomic<std::unique_ptr<Client>> NvimConnectionTest::client {nullptr};
-const std::string NvimConnectionTest::localhost = "127.0.0.1";
-
 Client& NvimConnectionTest::getClientInstance()
 {
     std::lock_guard<std::mutex> {clientPtrMutex};
@@ -58,6 +55,14 @@ void NvimConnectionTest::connect(
         //launch neovim then connect the client to that address and port
         launchNeovim(nvimPath.c_str(), address, port);
         clientPtr = make_unique<Client>(address, port);
+    }
+}
+
+NvimConnectionTest::~NvimConnectionTest()
+{
+    if(nvimPid != nullptr && (*nvimPid) > 0)
+    {
+
     }
 }
 
