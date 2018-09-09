@@ -14,6 +14,7 @@ include("${CMAKE_SOURCE_DIR}/cmake/depends_rpclib.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/depends_spdlog.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/default_build_type.cmake")
 include("${CMAKE_SOURCE_DIR}/cmake/process_warnings.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/clang_libstdcpp_hack.cmake")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
