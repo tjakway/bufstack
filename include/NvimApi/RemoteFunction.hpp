@@ -141,7 +141,7 @@ public:
     { 
         check(); 
         
-        rpcClient->call(name, args...); 
+        rpcClient->callVoidReturn(name, args...); 
     }
     
     void asyncCall(const Args&... args) const 
@@ -150,7 +150,7 @@ public:
     
         //don't need a conversion step here because we're discarding
         //the return value
-        rpcClient->asyncCall(name, args...); 
+        rpcClient->asyncCallVoidReturn(name, args...); 
     } 
 
     void operator()(const Args&... args) const 

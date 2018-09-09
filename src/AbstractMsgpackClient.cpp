@@ -31,7 +31,7 @@ void AbstractMsgpackClient::onReceiveResponseMsg(
         [&msg](std::vector<BoundResponseCallback>& callbacks){
             std::remove_if(callbacks.begin(), callbacks.end(),
                 [&msg](BoundResponseCallback& thisCallback){
-                    return thisCallback(msg.msgId);
+                    return thisCallback(msg);
                 });
         });
 }

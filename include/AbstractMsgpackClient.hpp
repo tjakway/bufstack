@@ -176,7 +176,7 @@ public:
 
 
         BoundResponseCallback cb = 
-            [thisMsgId, thisPromise](MsgpackRpc::ResponseMessage& m)
+            [thisMsgId, thisPromise](const MsgpackRpc::ResponseMessage& m)
             -> bool
         {
             return AbstractMsgpackClient::setResponseValue(
