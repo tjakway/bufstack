@@ -6,36 +6,25 @@
 
 #include "NamespaceDefines.hpp"
 #include "Loggable.hpp"
-#include "MsgpackClient.hpp"
+#include "MockMsgpackClient.hpp"
 #include "ClientConnection.hpp"
 #include "NvimConnectionTest.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class MockMsgpackClient 
-    : public MsgpackClient,
-    public NvimConnectionTest
-{
-private:
-    virtual void abstract() override {}
-
-    virtual void onReceiveRequestMsg(
-            const MsgpackRpc::RequestMessage&) override {}
-    virtual void onReceiveNotificationMsg(
-            const MsgpackRpc::NotificationMessage&) override {}
-public:
-    MockMsgpackClient(ConnectionInfo i)
-        : Loggable("MockMsgpackClient"), MsgpackClient(i)
-    {}
-};
 
 
-class MsgpackClientTests : public ::testing::Test, public Loggable
+class MsgpackClientTests 
+    : public ::testing::Test, 
+    public NvimConnectionTest,
+    public Loggable
 {
 public:
     MsgpackClientTests()
         : Loggable("MsgpackClientTests")
     {}
+
+    virtual Loggable* getLoggableInstance() override { return this; }
 };
 
 TEST_F(MsgpackClientTests, TestBadPort)
@@ -57,7 +46,7 @@ TEST_F(MsgpackClientTests, TestBadPort)
 
 TEST_F(MsgpackClientTests, TestLaunchNeovim)
 {
-    Client inst = getClientInstance();
+    std::shared_ptr<MsgpackClient> inst = getClientInstance();
 }
 
 BUFSTACK_END_NAMESPACE
