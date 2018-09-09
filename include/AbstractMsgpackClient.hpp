@@ -64,7 +64,8 @@ class AbstractMsgpackClient :
             std::shared_ptr<std::promise<T>>,
             MsgpackRpc::ResponseMessage)>;
 
-    using BoundResponseCallback = std::function<bool(MsgId)>;
+    using BoundResponseCallback = 
+        std::function<bool(MsgpackRpc::ResponseMessage)>;
 
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
     
@@ -91,10 +92,9 @@ protected:
      * returns true if this callback is finished
      */
     template <typename T>
-    static bool setResponseValue(
-            const MsgpackRpc::ResponseMessage& responseMsg,
-            MsgId thisCallId,
-            std::shared_ptr<std::promise<T>> promise)
+    static bool setResponseValue(MsgId thisCallId,
+            std::shared_ptr<std::promise<T>> promise,
+            const MsgpackRpc::ResponseMessage& responseMsg)
     {
         //check if this is the response we're waiting for
         if(responseMsg.msgId == thisCallId)
@@ -132,7 +132,7 @@ protected:
             }
             catch(...)
             {
-                promise.set_exception(std::current_exception());
+                promise->set_exception(std::current_exception());
             }
         }
         else
@@ -141,7 +141,7 @@ protected:
         }
     }
 
-    template <typename T, typename... Args>
+    template <typename... Args>
     MsgId sendCall(const std::string& name, Args... args)
     {
         const auto thisMsgId = idSeq.nextAndIncrement();
@@ -169,7 +169,7 @@ public:
     template <typename T, typename... Args>
     std::future<T> asyncCall(const std::string& name, Args... args)
     {
-        MsgId thisMsgId = sendCall<T, Args...>(name, args...);
+        MsgId thisMsgId = sendCall<Args...>(name, args...);
 
         std::shared_ptr<std::promise<T>> thisPromise = 
             std::make_shared<std::promise<T>>();
@@ -177,6 +177,7 @@ public:
 
         BoundResponseCallback cb = 
             [thisMsgId, thisPromise](MsgpackRpc::ResponseMessage& m)
+            -> bool
         {
             return AbstractMsgpackClient::setResponseValue(
                     thisMsgId, thisPromise, m);
@@ -198,7 +199,7 @@ public:
     template <typename... Args>
     void callVoidReturn(const std::string& name, Args... args)
     {
-        sendCall(name, args...);
+        sendCall<Args...>(name, args...);
     }
 
     AbstractMsgpackClient()
