@@ -98,6 +98,7 @@ protected:
 
 public:
 
+    //TODO: implement
     template <typename... Args>
     void asyncCallVoidReturn(const std::string& name, 
             Args... args);
@@ -124,6 +125,19 @@ public:
             thisMsgId, thisPromise, std::placeholders::_1));
 
         return thisPromise->get_future();
+    }
+
+    template <typename T, typename... Args>
+    T call(const std::string& name, Args... args)
+    {
+        return asyncCall(name, args...).get();
+    }
+
+
+    template <typename T, typename... Args>
+    void callVoidReturn(const std::string& name, Args... args)
+    {
+        call(name, args...).get();
     }
 
     AbstractMsgpackClient()
