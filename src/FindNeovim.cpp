@@ -14,6 +14,7 @@
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
 #include "Util/SplitString.hpp"
+#include "Loggable.hpp"
 
 #include "CommonDefines.hpp"
 
@@ -29,6 +30,12 @@
 
 
 BUFSTACK_BEGIN_NAMESPACE
+
+bool FindNeovim::dontWarn(const std::string& path)
+{
+    //don't warn for directories with blank names (probably bogus path entries)
+    return Util::StringTrim::trim_copy(path).empty();
+}
 
 bool FindNeovim::isDirectory(const std::string& path)
 {
@@ -67,21 +74,29 @@ std::vector<std::string> FindNeovim::getPathEntries()
     }
 }
 
-std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath)
+std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath,
+        Loggable& logger)
 {
     DIR* dir = opendir(dirPath.c_str());
     if(dir == nullptr)
     {
-        std::cerr << "Warning: opendir returned NULL in " << __func__ << " for " << dirPath
-            << ", skipping this path entry."
-            << std::endl << "Reason for error: "
-            << strerror(errno) << std::endl;
+        if(!dontWarn(dirPath))
+        {
+            logger.getLogger()->warn(
+                STRCATS("Warning: opendir returned NULL in " << 
+                    __func__ << " for " << dirPath <<
+                    ", skipping this path entry." <<
+                    std::endl << "Reason for error: " <<
+                    strerror(errno)))
+        }
+        
 
         return std::vector<std::string>();
     }
     else
     {
         std::vector<std::string> files;
+    
 
         dirent* ent = nullptr;
         do {
@@ -118,9 +133,10 @@ const std::string FindNeovim::neovimExeName {"nvim"};
 
 std::unique_ptr<std::string> FindNeovim::getFirstOnPath(std::string target)
 {
+    Loggable logger("FindNeovim");
     for(const std::string& pathEntry : getPathEntries())
     {
-        std::vector<std::string> contents = getFilesInDirectory(pathEntry);
+        std::vector<std::string> contents = getFilesInDirectory(pathEntry, logger);
         auto res = std::find(contents.begin(), contents.end(), target);
         
         //found neovim
