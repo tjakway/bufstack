@@ -35,7 +35,13 @@ public:
 
     virtual ~PipeTest()
     {
-        SAFE_CLOSE_LOG_ERROR(readFd);
-        SAFE_CLOSE_LOG_ERROR(writeFd);
+        if(Util::fd_is_valid(readFd))
+        {
+            close(readFd);
+        }
+        if(Util::fd_is_valid(writeFd))
+        {
+            close(writeFd);
+        }
     }
 };
