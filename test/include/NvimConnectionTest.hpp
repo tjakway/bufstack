@@ -10,7 +10,7 @@
 
 #include "TestConfig.hpp"
 #include "HasTcpConnection.hpp"
-#include "Client.hpp"
+#include "MsgpackClient.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
