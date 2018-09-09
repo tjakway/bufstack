@@ -7,9 +7,9 @@
 #include "NvimApi/ApiParser.hpp"
 #include "NvimApi/NvimFunction.hpp"
 
+#include "MsgpackClient.hpp"
+
 #include <msgpack.hpp>
-//NOTE: must include msgpack before rpc
-#include <rpc/client.h>
 
 using namespace nonstd;
 
@@ -29,7 +29,7 @@ protected:
 
     std::string name;
     optional<NvimFunction> functionSpecification;
-    std::shared_ptr<rpc::client> rpcClient;
+    std::shared_ptr<MsgpackClient> rpcClient;
 
     void checkName() const
     {
@@ -55,7 +55,7 @@ protected:
     AbstractRemoteApiFunction(bool _initialized,
             const std::string& _name,
             optional<NvimFunction> spec,
-            std::shared_ptr<rpc::client> _client)
+            std::shared_ptr<MsgpackClient> _client)
         : initialized(_initialized),
         name(_name), 
         functionSpecification(spec),
@@ -77,7 +77,7 @@ public:
     {}
 
     AbstractRemoteApiFunction(const NvimFunction& spec, 
-            std::shared_ptr<rpc::client> rpcClient,
+            std::shared_ptr<MsgpackClient> rpcClient,
             const ApiInfo& info)
         : AbstractRemoteApiFunction(true, spec.name, make_optional(spec), rpcClient)
     {
@@ -87,7 +87,7 @@ public:
 
     //ctor that skips the api info check
     AbstractRemoteApiFunction(const std::string& _name,
-            std::shared_ptr<rpc::client> client)
+            std::shared_ptr<MsgpackClient> client)
         : AbstractRemoteApiFunction(true, _name, nullopt, client)
     {}
 };
@@ -189,7 +189,7 @@ public:
     const NoReturnRemoteApiFunction<std::string> subscribe;
 
     RemoteFunctionInstances(
-        std::shared_ptr<rpc::client> client,
+        std::shared_ptr<MsgpackClient> client,
         const ApiInfo& info)
         : bufIsValid(bufIsValidSpec, client, info),
         subscribe(subscribeSpec, client, info)
