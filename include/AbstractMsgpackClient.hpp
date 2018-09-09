@@ -42,6 +42,24 @@ protected:
     virtual void onReceiveResponseMsg(
             const MsgpackRpc::ResponseMessage&) override;
 
+    template <typename T>
+    void convertResponseValue(
+            std::shared_ptr<std::promise<T>> promise,
+            const msgpack::object& objectReceived)
+    {
+        promise->set_value(objectReceived.as<T>());
+    }
+
+    /**
+     * overload for T=msgpack::object: skip conversion
+     */
+    void convertResponseValue(
+            std::shared_ptr<std::promise<msgpack::object>> promise,
+            const msgpack::object& objectReceived)
+    {
+        promise->set_value(objectReceived);
+    }
+
     /**
      * returns true if this callback is finished
      */
@@ -71,7 +89,7 @@ protected:
                 try {
                     //creates a new object of T
                     //see https://github.com/msgpack/msgpack-c/issues/480
-                    promise->set_value(objectReceived.as<T>());
+                    convertResponseValue(promise, objectReceived);
 
                     //indicate that this callback is no longer needed
                     return true;
@@ -134,7 +152,7 @@ public:
     }
 
 
-    template <typename T, typename... Args>
+    template <typename... Args>
     void callVoidReturn(const std::string& name, Args... args)
     {
         call(name, args...).get();
