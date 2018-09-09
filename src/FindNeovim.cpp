@@ -87,7 +87,7 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
                     __func__ << " for " << dirPath <<
                     ", skipping this path entry." <<
                     std::endl << "Reason for error: " <<
-                    strerror(errno)))
+                    strerror(errno)));
         }
         
 
