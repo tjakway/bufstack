@@ -150,10 +150,13 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
 
 const std::string FindNeovim::neovimExeName {"nvim"};
 
+
+Loggable FindNeovim::logger("FindNeovim");
+
 std::unique_ptr<std::string> FindNeovim::getFirstOnPath(std::string target)
 {
-    Loggable logger("FindNeovim");
-    for(const std::string& pathEntry : getPathEntries())
+    logger.getLogger()->set_level(spdlog::level::debug);
+    for(const std::string& pathEntry : getPathEntries(logger))
     {
         std::vector<std::string> contents = getFilesInDirectory(pathEntry, logger);
         auto res = std::find(contents.begin(), contents.end(), target);
