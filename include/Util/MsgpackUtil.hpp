@@ -54,7 +54,7 @@ public:
      *  DEALINGS IN THE SOFTWARE.
      *
      */
-    msgpack::object_handle clone(msgpack::object const&);
+    static msgpack::object_handle clone(msgpack::object const&);
 };
 
 BUFSTACK_END_NAMESPACE
