@@ -150,7 +150,7 @@ std::unordered_set<NvimFunction> ApiParser::ParseFunctions::parseNvimFunctions(
     for(const auto& h : handles)
     {
         const auto f = parseNvimFunction(h);
-        getLogger()->info("parsed function {}", f.printCompact());
+        getLogger()->debug("parsed function {}", f.printCompact());
         parsedFunctions.emplace(f);
     }
 
@@ -175,7 +175,7 @@ ApiParser::CustomTypeSet
         }
         else
         {
-            getLogger()->info("parsed custom type {}", f->printCompact());
+            getLogger()->debug("parsed custom type {}", f->printCompact());
             parsedTypes.emplace(std::move(f));
         }
     }
@@ -272,7 +272,6 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
         deprecated = make_optional(deprecatedSinceVersion);
     }
 
-    getLogger()->set_level(spdlog::level::debug);
     std::ostringstream ss;
     ss << function.at(Keys::Function::parameters);
     getLogger()->debug("parameters object for {}: {}", printOptional(name),
