@@ -53,16 +53,15 @@ TEST_F(PipeWriteTests, TestWriteHelloWorld)
 {
     MockMsgpackReaderUnpacker reader;
     SyncBufSender sender;
-    std::stringstream buf;
     std::string original = "hello, world!";
 
-    msgpack::packer<std::stringstream> p(buf);
+    msgpack::sbuffer buf;
+    msgpack::packer<msgpack::sbuffer> p(buf);
     p.pack_str(original.size());
     p.pack_str_body(original.c_str(), original.size());
 
-    const std::string bufStr = buf.str();
-    sender.send(writeFd, bufStr.c_str(), 
-            bufStr.size());
+    sender.send(writeFd, buf.data(), 
+            buf.size());
     close(writeFd);
 
     bool foundTestObject = false;
@@ -72,6 +71,7 @@ TEST_F(PipeWriteTests, TestWriteHelloWorld)
             const ObjectList& vecH)
     {
         vecSize = vecH.size();
+        this->getLogger()->set_level(spdlog::level::debug);
         this->getLogger()->debug("vecH: {}", Util::printVector(vecH));
         //can't compare object_handles for equality, need to compare
         //the references to the underlying objects
