@@ -54,10 +54,10 @@ protected:
      * overload for T=msgpack::object: skip conversion
      */
     static void convertResponseValue(
-            std::shared_ptr<std::promise<msgpack::object>> promise,
+            std::shared_ptr<std::promise<msgpack::object_handle>> promise,
             const msgpack::object& objectReceived)
     {
-        promise->set_value(objectReceived);
+        promise->set_value(MsgpackUtil::clone(objectReceived));
     }
 
     /**
