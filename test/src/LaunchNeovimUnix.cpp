@@ -32,6 +32,8 @@ void NvimConnectionTest::launchNeovim(
         int ret = setenv(envVar, addrString.c_str(), 1);
         if(ret < 0)
         {
+            //print an error message instead of throwing an exception
+            //because we've already forked
             const auto _errno = errno;
             const auto errStr = strerror(_errno);
             const char* errMsg = STRCATS("Error calling setenv with " << envVar
