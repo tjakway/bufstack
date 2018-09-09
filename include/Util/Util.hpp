@@ -37,6 +37,14 @@ public:
         static std::string trim_copy(std::string);
     };
 
+    /**
+     * returns true if the string is .empty() or if it contains only whitespace
+     */
+    static bool stringIsEmpty(const std::string& str)
+    {
+        return StringTrim::trim_copy(str).empty();
+    }
+
 
     //see https://stackoverflow.com/questions/12340695/how-to-check-if-a-given-file-descriptor-stored-in-a-variable-is-still-valid
     static int fd_is_valid(int fd)
