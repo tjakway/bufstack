@@ -7,6 +7,6 @@ BUFSTACK_BEGIN_NAMESPACE
  * passed function specification
  */
 //TODO: implement
-void checkApiInfo(const ApiInfo&) {}
+void AbstractRemoteApiFunction::checkApiInfo(const ApiInfo&) {}
 
 BUFSTACK_END_NAMESPACE

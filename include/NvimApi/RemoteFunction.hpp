@@ -68,6 +68,7 @@ protected:
      * throw a NotInApiInfoError if the api info doesn't contain the 
      * passed function specification
      */
+    //TODO: implement
     void checkApiInfo(const ApiInfo&);
 
 public:
