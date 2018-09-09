@@ -8,6 +8,7 @@
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
 
+#include "TestConfig.hpp"
 #include "HasTcpConnection.hpp"
 #include "Client.hpp"
 
@@ -28,8 +29,7 @@ class NvimConnectionTest : virtual public Loggable
         const std::string& _address,
         uint16_t _port);
 
-protected:
-
+public:
     NEW_EXCEPTION_TYPE(NvimConnectionTestException);
     NEW_EXCEPTION_TYPE_WITH_BASE(CannotFindNeovimException,
             NvimConnectionTestException);
@@ -37,15 +37,15 @@ protected:
             NvimConnectionTestException);
     NEW_EXCEPTION_TYPE_WITH_BASE(NvimLaunchException,
             NvimConnectionTestException);
-    Client& getClientInstance();
 
-public:
-    NvimConnectionTest()
-        : Loggable("NvimConnectionTest"),
-        nvimPid(nullptr)
-    {}
+
+    NvimConnectionTest(
+        const std::string& _address = TestConfig::nvimConnectionAddress,
+        uint16_t _port = TestConfig::nvimConnectionPort);
 
     virtual ~NvimConnectionTest();
+
+    std::shared_ptr<Client> getClientInstance();
 };
 
 BUFSTACK_END_NAMESPACE
