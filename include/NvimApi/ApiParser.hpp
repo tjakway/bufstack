@@ -6,6 +6,7 @@
 #include "Util/Util.hpp"
 #include "NvimApi/NvimFunction.hpp"
 #include "NvimApi/CustomType.hpp"
+#include "NvimApi/ApiInfo_decl.hpp"
 
 #include <msgpack.hpp>
 
@@ -23,8 +24,6 @@
 using namespace nonstd;
 
 BUFSTACK_BEGIN_NAMESPACE
-
-class ApiInfo;
 
 class ApiParser : public Loggable
 {
