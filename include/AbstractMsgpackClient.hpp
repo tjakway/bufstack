@@ -5,11 +5,36 @@
 #include "Util/NewExceptionType.hpp"
 #include "Util/AtomicAccess.hpp"
 #include "Util/AtomicSequence.hpp"
+#include "Util/MsgpackUtil.hpp"
 #include "HasFd.hpp"
 #include "AsyncBufSender.hpp"
 #include "MsgpackReceiver.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
+
+template <typename T>
+class ConvertResponseValue
+{
+public:
+    void operator()(
+        std::shared_ptr<std::promise<T>> promise,
+        const msgpack::object& objectReceived)
+    {
+        promise->set_value(objectReceived.as<T>());
+    }
+};
+
+template <>
+class ConvertResponseValue<msgpack::object_handle>
+{
+public:
+    void operator()(
+        std::shared_ptr<std::promise<object_handle>> promise,
+        const msgpack::object& objectReceived)
+    {
+        promise->set_value(MsgpackUtil::clone(objectReceived));
+    }
+};
 
 class AbstractMsgpackClient : 
     virtual public MsgpackReceiver,
@@ -47,17 +72,7 @@ protected:
             std::shared_ptr<std::promise<T>> promise,
             const msgpack::object& objectReceived)
     {
-        promise->set_value(objectReceived.as<T>());
-    }
-
-    /**
-     * overload for T=msgpack::object: skip conversion
-     */
-    static void convertResponseValue(
-            std::shared_ptr<std::promise<msgpack::object_handle>> promise,
-            const msgpack::object& objectReceived)
-    {
-        promise->set_value(MsgpackUtil::clone(objectReceived));
+        ConvertResponseValue<T>()(promise, objectReceived);
     }
 
     /**
@@ -142,20 +157,21 @@ public:
         addResponseCallback(std::bind(
             thisMsgId, thisPromise, std::placeholders::_1));
 
+
         return thisPromise->get_future();
     }
 
     template <typename T, typename... Args>
     T call(const std::string& name, Args... args)
     {
-        return asyncCall(name, args...).get();
+        return asyncCall<T, Args...>(name, args...).get();
     }
 
 
     template <typename... Args>
     void callVoidReturn(const std::string& name, Args... args)
     {
-        call(name, args...).get();
+        call<void>(name, args...).get();
     }
 
     AbstractMsgpackClient()
