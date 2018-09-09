@@ -41,9 +41,9 @@ public:
     NvimFunctionSpec(bool _method,
             //nullopt = void return type
             optional<std::string> _returnType,
+            std::string _name,
             std::vector<std::string> _parameters = 
-                std::vector<std::string>{},
-            std::string _name)
+                std::vector<std::string>{})
         : method(_method), returnType(_returnType),
         parameters(_parameters), name(_name)
     {}
