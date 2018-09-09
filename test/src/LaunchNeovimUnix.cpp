@@ -3,6 +3,7 @@
  */
 #include "NvimConnectionTest.hpp"
 
+#include "Util/Util.hpp"
 #include "Util/Strcat.hpp"
 
 #include <string>
@@ -24,7 +25,7 @@ void NvimConnectionTest::launchNeovim(
     const std::string addrString = 
         address + std::string(":") + std::to_string(port);
 
-    int pid = fork();
+    pid_t pid = fork();
     //child
     if(pid == 0)
     {
@@ -43,13 +44,29 @@ void NvimConnectionTest::launchNeovim(
             perror(errMsg);
             exit(1);
         }
-        execl(path.c_str(), 
+        int execRet = execl(path.c_str(), 
                 //don't forget to pass the executable path as argv[0]
                 path.c_str(), "--headless", NULL);
+        
+        //only reached if there's an error in exec
+        auto _errno = errno;
+        throw NvimLaunchException(
+            STRCATS("Error launching nvim at path " << 
+                path << " with NVIM_LISTEN_ADDRESS=" << 
+                addrString << " (execl returned " << execRet << ")"));
+    }
+    else if(pid < 0)
+    {
+        auto _errno = errno;
+        throw NvimLaunchException(
+            STRCATS("Fork returned <0, error message: " << 
+                strerror(_errno)));
     }
     //parent
     else
-    {}
+    {
+        nvimPid = make_unique<pid_t>(pid);
+    }
 }
 
 BUFSTACK_END_NAMESPACE
