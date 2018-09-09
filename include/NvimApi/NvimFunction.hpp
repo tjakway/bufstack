@@ -120,7 +120,7 @@ public:
 
     bool deprecated() const noexcept { return deprecatedSince.has_value(); }
 
-    bool method() const noexcept { return method.value_or(false) };
+    bool isMethod() const noexcept { return method.value_or(false) };
 };
 
 std::ostream& operator <<(std::ostream&, const NvimFunction&);
