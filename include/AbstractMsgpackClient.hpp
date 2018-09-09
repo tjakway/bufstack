@@ -29,7 +29,7 @@ class ConvertResponseValue<msgpack::object_handle>
 {
 public:
     void operator()(
-        std::shared_ptr<std::promise<object_handle>> promise,
+        std::shared_ptr<std::promise<msgpack::object_handle>> promise,
         const msgpack::object& objectReceived)
     {
         promise->set_value(MsgpackUtil::clone(objectReceived));
