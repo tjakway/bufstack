@@ -126,7 +126,7 @@ public:
     {
         //set the log level before returning
         ApiParser::ParseFunctions parseFunctions;
-        parseFunctions.getLogger()->set_level(spdlog::level::err);
+        parseFunctions.getLogger()->set_level(spdlog::level::critical);
         return parseFunctions;
     }
 
