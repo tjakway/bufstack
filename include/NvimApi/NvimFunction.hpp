@@ -47,7 +47,16 @@ public:
         parameters(_parameters), name(_name)
     {}
 
+    NvimFunctionSpec(const NvimFunctionSpec& other)
+        : NvimFunctionSpec(other.method,
+                other.returnType, other.parameters,
+                other.name)
+    {}
+
     NvimFunction toFunction() const noexcept;
+
+    bool matches(const NvimFunctionSpec&) const noexcept;
+    bool matches(const NvimFunction&) const noexcept;
 };
 
 class NvimFunction : public PrintableObject
