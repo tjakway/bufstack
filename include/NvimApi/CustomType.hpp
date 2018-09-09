@@ -29,6 +29,8 @@ public:
         : CustomType(other.id, other.name)
     {}
 
+    virtual ~CustomType() {}
+
     bool operator==(const CustomType& other) const
     {
         return id == other.id &&
@@ -36,6 +38,20 @@ public:
     }
 
     virtual std::unique_ptr<CustomType> clone() const;
+
+    /**
+     * equality check ignoring id (which may vary between versions or
+     * vim implementations)
+     */
+    bool nameMatches(const CustomType& other) const noexcept
+    {
+        return name == other.name;
+    }
+
+    bool matches(const CustomType& other) const noexcept
+    {
+        return matches(other);
+    }
 };
 
 class PrefixType : public CustomType
