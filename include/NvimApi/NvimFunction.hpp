@@ -54,6 +54,8 @@ public:
                 other.name)
     {}
 
+    virtual ~NvimFunctionSpec() {}
+
     NvimFunction toFunction() const noexcept;
 
     bool matches(const NvimFunctionSpec&) const noexcept;
