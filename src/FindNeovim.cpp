@@ -52,7 +52,7 @@ bool FindNeovim::isDirectory(const std::string& path)
     }
 }
 
-std::vector<std::string> FindNeovim::getPathEntries()
+std::vector<std::string> FindNeovim::getPathEntries(Loggable& logger)
 {
     char* path = GETENV_FUNC(PATH_VAR_NAME);
     if(path == nullptr)
@@ -62,13 +62,33 @@ std::vector<std::string> FindNeovim::getPathEntries()
     else
     {
         std::string pathStr(path);
-        std::vector<std::string> pathEntries = split(pathStr, PATH_VAR_SEPARATOR);
+        if(Util::stringIsEmpty(path))
+        {
+            throw NoPathVariable("Path variable is empty");
+        }
+
+        std::vector<std::string> pathEntries = 
+            split(pathStr, PATH_VAR_SEPARATOR);
+        const auto pathEntriesSize = pathEntries.size();
+        if(pathEntriesSize == 0)
+        {
+            logger.getLogger()->warn("Your path variable (%s) doesn't "
+                    "seem to have any entries", pathStr);
+        }
 
         //filter bad path entries
         std::remove_if(pathEntries.begin(), pathEntries.end(), [](const std::string& p){
                 const auto x = Util::StringTrim::trim_copy(p);
                 return x.empty() || !isDirectory(x);
                 });
+        const auto newSize = pathEntries.size();
+        logger.getLogger()->debug("Filtered {} path entries", pathEntriesSize - newSize);
+
+        if(pathEntries.empty())
+        {
+            logger.getLogger()->warn("Your path variable (%s) doesn't "
+                    "seem to have any valid entries", pathStr);
+        }
 
         return pathEntries;
     }
@@ -89,7 +109,6 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
                     std::endl << "Reason for error: " <<
                     strerror(errno)));
         }
-        
 
         return std::vector<std::string>();
     }

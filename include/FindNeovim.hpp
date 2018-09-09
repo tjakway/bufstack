@@ -19,7 +19,7 @@ class FindNeovim
      */
     static bool dontWarn(const std::string&);
     static bool isDirectory(const std::string&);
-    static std::vector<std::string> getPathEntries();
+    static std::vector<std::string> getPathEntries(Loggable&);
     static std::vector<std::string> getFilesInDirectory(const std::string&,
             Loggable&);
 public:
