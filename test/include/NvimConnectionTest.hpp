@@ -8,13 +8,16 @@
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
 
+#include "HasTcpConnection.hpp"
 #include "Client.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class NvimConnectionTest : virtual public Loggable
 {
-    static const std::string localhost;
+    std::unique_ptr<pid_t> nvimPid;
+
+    static constexpr auto localhost = HasTcpConnection::localhost;
 
     //atomically initialize the client
     void connect(
@@ -32,12 +35,17 @@ protected:
             NvimConnectionTestException);
     NEW_EXCEPTION_TYPE_WITH_BASE(NvimNotInitialized,
             NvimConnectionTestException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(NvimLaunchException,
+            NvimConnectionTestException);
     Client& getClientInstance();
 
 public:
     NvimConnectionTest()
-        : Loggable("NvimConnectionTest")
+        : Loggable("NvimConnectionTest"),
+        nvimPid(nullptr)
     {}
+
+    virtual ~NvimConnectionTest();
 };
 
 BUFSTACK_END_NAMESPACE
