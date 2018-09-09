@@ -43,7 +43,7 @@ protected:
             const MsgpackRpc::ResponseMessage&) override;
 
     template <typename T>
-    void convertResponseValue(
+    static void convertResponseValue(
             std::shared_ptr<std::promise<T>> promise,
             const msgpack::object& objectReceived)
     {
@@ -53,7 +53,7 @@ protected:
     /**
      * overload for T=msgpack::object: skip conversion
      */
-    void convertResponseValue(
+    static void convertResponseValue(
             std::shared_ptr<std::promise<msgpack::object>> promise,
             const msgpack::object& objectReceived)
     {
