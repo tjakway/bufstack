@@ -122,10 +122,17 @@ public:
         : ApiParser(handles.at(0).get())
     {}
 
-    static ApiParser::ParseFunctions parseFunctions;
+    static ApiParser::ParseFunctions getParseFunctionsInstance()
+    {
+        //set the log level before returning
+        ApiParser::ParseFunctions parseFunctions;
+        parseFunctions.getLogger()->set_level(spdlog::level::err);
+        return parseFunctions;
+    }
+
 };
 
-ApiParser::ParseFunctions MockApiParser::parseFunctions;
+//ApiParser::ParseFunctions MockApiParser::parseFunctions;
 
 //make sure we can decode it without crashing
 TEST_F(ReadApiInfoTests, TestCallbackInvoked)
@@ -242,7 +249,7 @@ TEST_F(ReadApiInfoTests, TestParseFunctions)
             const auto keyVec = extractKeys(apiInfo);
             const std::set<std::string> keySet(keyVec.cbegin(), keyVec.cend());
 
-            assert(MockApiParser::parseFunctions.keysAreApiInfo(keySet));
+            assert(MockApiParser::getParseFunctionsInstance().keysAreApiInfo(keySet));
 
             std::vector<msgpack::object> functionObjects;
             apiInfo.at("functions").convert(functionObjects);
@@ -253,7 +260,9 @@ TEST_F(ReadApiInfoTests, TestParseFunctions)
                 refs.emplace_back(std::reference_wrapper<msgpack::object>(it));
             }
 
-            std::unordered_set<NvimFunction> functions = MockApiParser::parseFunctions.parseNvimFunctions(refs);
+            std::unordered_set<NvimFunction> functions = 
+                MockApiParser::getParseFunctionsInstance()
+                    .parseNvimFunctions(refs);
             assert(functions.size() > 0);
             return true;
     });
