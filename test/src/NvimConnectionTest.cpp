@@ -3,6 +3,7 @@
 #include <msgpack.hpp>
 #include <mutex>
 #include <memory>
+#include <iostream>
 
 //process signaling
 #include <sys/types.h>
@@ -69,8 +70,7 @@ void NvimConnectionTest::connect(
 NvimConnectionTest::NvimConnectionTest(
     const std::string& address,
     uint16_t port)
-    : Loggable("NvimConnectionTest"),
-    nvimPid(nullptr)
+    : nvimPid(nullptr)
 {
     connect(address, port);
 }
@@ -83,9 +83,10 @@ NvimConnectionTest::~NvimConnectionTest()
         if(!kill(*nvimPid, SIGTERM))
         {
             auto _errno = errno;
-            getLoggableInstance()->critical(
-                "Failed to kill child nvim instance,"
-                " error message: {}", strerror(_errno));
+            //calls to pure virtual functions are not available in destructors
+            //so we can't use getLoggableInstance() here
+            std::cerr << "Failed to kill child nvim instance," <<
+                " error message: {}" << strerror(_errno) << std::endl;
         }
     }
 }
