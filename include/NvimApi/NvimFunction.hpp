@@ -24,6 +24,7 @@ BUFSTACK_BEGIN_NAMESPACE
 
 using ApiInfoPacket = msgpack::object;
 
+class NvimFunction;
 
 class NvimFunctionSpec : public PrintableObject
 {
