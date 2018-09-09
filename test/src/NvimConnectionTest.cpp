@@ -15,6 +15,7 @@
 #include "Util/Util.hpp"
 #include "ConnectionInfo.hpp"
 #include "MsgpackClient.hpp"
+#include "MockMsgpackClient.hpp"
 
 namespace {
     static std::mutex clientPtrMutex;
@@ -60,7 +61,7 @@ void NvimConnectionTest::connect(
         const std::string nvimPath = *nvimDest;
         //launch neovim then connect the client to that address and port
         launchNeovim(nvimPath.c_str(), address, port);
-        clientPtr = std::make_shared(
+        clientPtr = std::make_shared<MockMsgpackClient>(
                 ConnectionInfo::tcpConnection(address, port));
     }
 }
@@ -82,7 +83,7 @@ NvimConnectionTest::~NvimConnectionTest()
         if(!kill(*nvimPid, SIGTERM))
         {
             auto _errno = errno;
-            getLogger()->critical(
+            getLoggableInstance()->critical(
                 "Failed to kill child nvim instance,"
                 " error message: {}", strerror(_errno));
         }

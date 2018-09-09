@@ -14,7 +14,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class NvimConnectionTest : virtual public Loggable
+class NvimConnectionTest
 {
     std::unique_ptr<pid_t> nvimPid;
 
@@ -46,6 +46,8 @@ public:
     virtual ~NvimConnectionTest();
 
     std::shared_ptr<MsgpackClient> getClientInstance();
+
+    virtual Loggable* getLoggableInstance() = 0;
 };
 
 BUFSTACK_END_NAMESPACE
