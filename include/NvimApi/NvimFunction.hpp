@@ -49,9 +49,8 @@ public:
     {}
 
     NvimFunctionSpec(const NvimFunctionSpec& other)
-        : NvimFunctionSpec(other.method,
-                other.returnType, other.parameters,
-                other.name)
+        : NvimFunctionSpec(other.name, other.method,
+                other.returnType, other.parameters)
     {}
 
     virtual ~NvimFunctionSpec() {}
