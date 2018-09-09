@@ -62,7 +62,7 @@ class AbstractMsgpackClient :
     template <typename T>
     using UnboundResponseCallback = std::function<bool(MsgId, 
             std::shared_ptr<std::promise<T>>,
-            MsgpackRpc::ResponseMessage)>;
+            const MsgpackRpc::ResponseMessage&)>;
 
     using BoundResponseCallback = 
         std::function<bool(MsgpackRpc::ResponseMessage)>;
