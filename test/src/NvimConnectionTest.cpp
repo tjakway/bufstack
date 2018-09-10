@@ -89,7 +89,7 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
             std::chrono::duration_cast<std::chrono::milliseconds>(connectTime - start);
         logger->getLogger()->debug(
             STRCATS("nvim connection successful: took " << attempts << 
-                " and " << timeToConnect.count() << " milliseconds"));
+                " attempts and " << timeToConnect.count() << " milliseconds"));
 
         return client;
     }
@@ -135,8 +135,11 @@ NvimConnectionTest::NvimConnectionTest(
     uint16_t port)
     : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr)
 {
-    connect(address, port);
+    //set log levels before connecting
+    logger->getLogger()->set_level(spdlog::level::debug);
     findNeovim.getLogger()->set_level(spdlog::level::warn);
+
+    connect(address, port);
 }
 
 NvimConnectionTest::~NvimConnectionTest()
