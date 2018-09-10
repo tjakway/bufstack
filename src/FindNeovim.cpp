@@ -102,6 +102,24 @@ std::vector<std::string> FindNeovim::getPathEntries()
 std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath)
 {
     DIR* dir = nullptr;
+
+    auto funcName = __func__;
+    std::function<void(void)> closeDir = 
+        [&dir, funcName, this](){
+            if(dir != nullptr)
+            {
+                if(!closedir(dir))
+                {
+                    auto _errno = errno;
+                    this->getLogger()->warn(STRCATS(
+                        "closedir(dir) failed in " <<
+                        funcName << ", error message: " <<
+                        strerror(_errno)));
+                }
+                dir = nullptr;
+            }
+        };
+
     dir = opendir(dirPath.c_str());
     if(dir == nullptr)
     {
@@ -130,7 +148,7 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
                 if(ent == nullptr && errno != 0)
                 {
                     auto _errno = errno;
-                    closedir(dir);
+                    closeDir();
                     throw DirectoryException(STRCAT("Error in ", __func__, " in call to readdir: ",
                             strerror(_errno)));
                 }
@@ -151,19 +169,11 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
             } while(ent != nullptr);
         } catch(...)
         {
-            if(dir != nullptr)
-            {
-                closedir(dir);
-                dir = nullptr;
-            }
+            closeDir();
             throw;
         }
 
-        if(dir != nullptr)
-        {
-            closedir(dir);
-            dir = nullptr;
-        }
+        closeDir();
         return files;
     }
 }
