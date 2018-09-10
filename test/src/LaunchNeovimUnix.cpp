@@ -47,14 +47,14 @@ namespace {
         }
 
         //swap the old ones
-        if(!dup2(STDOUT_FILENO, newStdoutFd))
+        if(dup2(STDOUT_FILENO, newStdoutFd) != newStdoutFd)
         {
             auto _errno = errno;
             onError(STRCATS("could not swap stdout file descriptor," <<
                         " error message: " << strerror(_errno)));
         }
 
-        if(!dup2(STDERR_FILENO, newStderrFd))
+        if(dup2(STDERR_FILENO, newStderrFd) != newStderrFd)
         {
             auto _errno = errno;
             onError(STRCATS("could not swap stderr file descriptor," <<
