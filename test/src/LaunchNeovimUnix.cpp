@@ -9,13 +9,34 @@
 #include <string>
 #include <iostream>
 
-#include <cstring> //strerror(int)
-#include <cstdlib> //exit(int)
+#include <cstring> 
+#include <cstdlib> 
 
 #include <errno.h>
 #include <unistd.h>
 
 BUFSTACK_BEGIN_NAMESPACE
+
+
+NvimConnectionTest::NvimArgs NvimConnectionTest::mkNvimArgs(const std::string& path)
+{
+    const int numOptions = sizeof(nvimOptions);
+
+    //2 extra args: argv[0] and a NULL at the end of the array
+    const int arraySize = numOptions + 2;
+
+    NvimArgs args(new char*[arraySize], NvimArgsDeleter(arraySize));
+
+    memcpy(args[0], path.c_str(), path.size() + 1); //+1 for the null terminator
+
+    for(int i = 1; i < numOptions; i++)
+    {
+        memcpy(args[i], nvimOptions[i - 1], sizeof(nvimOptions[i - 1]));
+    }
+    args[arraySize - 1] = NULL;
+
+    return args;
+}
 
 void NvimConnectionTest::launchNeovim(
     const std::string& path,
@@ -44,6 +65,10 @@ void NvimConnectionTest::launchNeovim(
             perror(errMsg);
             exit(1);
         }
+
+        //format the argument array
+        char *const nvimArgs[] = { NULL };
+        
         int execRet = execl(path.c_str(), 
                 //don't forget to pass the executable path as argv[0]
                 path.c_str(), "--headless", NULL);

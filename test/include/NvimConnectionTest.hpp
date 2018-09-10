@@ -20,9 +20,34 @@ class NvimConnectionTest
     std::unique_ptr<pid_t> nvimPid;
 
     static constexpr auto localhost = HasTcpConnection::localhost;
+    static constexpr char nvimOptions[][] = 
+        { "--headless", "--noplugin", "-u", "NONE" };
 
     FindNeovim findNeovim;
     std::unique_ptr<Loggable> logger;
+
+    class NvimArgsDeleter
+    {
+        int arraySize;
+    public:
+        NvimArgsDeleter(int _arraySize)
+            : arraySize(_arraySize)
+        {}
+
+        void operator()(char*[]* ptr)
+        {
+            //arraySize - 1 because the last entry is NULL
+            for(int i = 0; i < (arraySize - 1); i++)
+            {
+                delete[] (*ptr)[i];
+            }
+            delete[] *ptr;
+
+            delete ptr;
+        }
+    };
+    using NvimArgs = std::unique_ptr<char*[], NvimArgsDeleter>;
+    NvimArgs mkNvimArgs(const std::string& path);
 
     //atomically initialize the client
     void connect(
@@ -32,6 +57,7 @@ class NvimConnectionTest
         const std::string& path,
         const std::string& _address,
         uint16_t _port);
+
 
 public:
     NEW_EXCEPTION_TYPE(NvimConnectionTestException);
@@ -48,6 +74,8 @@ public:
         uint16_t _port = TestConfig::nvimConnectionPort);
 
     virtual ~NvimConnectionTest();
+
+    void killNvimInstance();
 
     std::shared_ptr<MsgpackClient> getClientInstance();
 };
