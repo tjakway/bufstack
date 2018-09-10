@@ -22,6 +22,7 @@ class NvimConnectionTest
     static constexpr auto localhost = HasTcpConnection::localhost;
 
     FindNeovim findNeovim;
+    std::unique_ptr<Loggable> logger;
 
     //atomically initialize the client
     void connect(

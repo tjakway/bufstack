@@ -65,7 +65,7 @@ void NvimConnectionTest::connect(
 
         if(nvimPid != nullptr)
         {
-            getLoggableInstance()->getLogger()->debug("Launched nvim instance with pid " + 
+            logger->getLogger()->debug("Launched nvim instance with pid " + 
                     std::to_string(*nvimPid));
         }
 
@@ -77,7 +77,7 @@ void NvimConnectionTest::connect(
 NvimConnectionTest::NvimConnectionTest(
     const std::string& address,
     uint16_t port)
-    : nvimPid(nullptr)
+    : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr)
 {
     connect(address, port);
     findNeovim.getLogger()->set_level(spdlog::level::warn);
