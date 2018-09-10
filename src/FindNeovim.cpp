@@ -57,8 +57,7 @@ bool FindNeovim::isDirectory(const std::string& path)
     }
 }
 
-std::vector<std::string> FindNeovim::getPathEntries(const std::string& pathVarName,
-        Loggable& logger)
+std::vector<std::string> FindNeovim::getPathEntries()
 {
     const char* path = GETENV_FUNC(pathVarName.c_str());
     if(path == nullptr)
@@ -78,21 +77,21 @@ std::vector<std::string> FindNeovim::getPathEntries(const std::string& pathVarNa
         const auto pathEntriesSize = pathEntries.size();
         if(pathEntriesSize == 0)
         {
-            logger.getLogger()->warn("Your path variable (%s) doesn't "
+            getLogger()->warn("Your path variable (%s) doesn't "
                     "seem to have any entries", pathStr);
         }
 
         //filter bad path entries
-        std::remove_if(pathEntries.begin(), pathEntries.end(), [](const std::string& p){
+        std::remove_if(pathEntries.begin(), pathEntries.end(), [this](const std::string& p){
                 const auto x = Util::StringTrim::trim_copy(p);
-                return x.empty() || !isDirectory(x);
+                return x.empty() || !this->isDirectory(x);
                 });
         const auto newSize = pathEntries.size();
-        logger.getLogger()->debug("Filtered {} path entries", pathEntriesSize - newSize);
+        getLogger()->debug("Filtered {} path entries", pathEntriesSize - newSize);
 
         if(pathEntries.empty())
         {
-            logger.getLogger()->warn("Your path variable (%s) doesn't "
+            getLogger()->warn("Your path variable (%s) doesn't "
                     "seem to have any valid entries", pathStr);
         }
 
@@ -100,15 +99,14 @@ std::vector<std::string> FindNeovim::getPathEntries(const std::string& pathVarNa
     }
 }
 
-std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath,
-        Loggable& logger)
+std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath)
 {
     DIR* dir = opendir(dirPath.c_str());
     if(dir == nullptr)
     {
         if(!dontWarn(dirPath))
         {
-            logger.getLogger()->warn(
+            getLogger()->warn(
                 STRCATS("Warning: opendir returned NULL in " << 
                     __func__ << " for " << dirPath <<
                     ", skipping this path entry." <<
@@ -158,9 +156,9 @@ std::unique_ptr<std::string> FindNeovim::getFirstOnPath()
 {
     const std::string target = neovimExeName;
 
-    for(const std::string& pathEntry : getPathEntries(logger))
+    for(const std::string& pathEntry : getPathEntries())
     {
-        std::vector<std::string> contents = getFilesInDirectory(pathEntry, logger);
+        std::vector<std::string> contents = getFilesInDirectory(pathEntry);
         auto res = std::find(contents.begin(), contents.end(), target);
         
         //found neovim

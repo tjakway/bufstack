@@ -16,13 +16,10 @@ class FindNeovim
     /**
      * suppress warnings for this directory if dontWarn returns true
      */
-    static bool dontWarn(const std::string&);
+    bool dontWarn(const std::string&);
     bool isDirectory(const std::string&);
-    static std::vector<std::string> getPathEntries(
-            const std::string& pathVarName,
-            Loggable&);
-    static std::vector<std::string> getFilesInDirectory(const std::string&,
-            Loggable&);
+    std::vector<std::string> getPathEntries();
+    std::vector<std::string> getFilesInDirectory(const std::string&);
 public:
     NEW_EXCEPTION_TYPE(FindNeovimException);
     NEW_EXCEPTION_TYPE_WITH_BASE(NoPathVariable, FindNeovimException);
