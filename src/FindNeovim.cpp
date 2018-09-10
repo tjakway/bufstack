@@ -196,7 +196,10 @@ std::unique_ptr<std::string> FindNeovim::getFirstOnPath()
     for(const std::string& pathEntry : getPathEntries())
     {
         std::vector<std::string> contents = getFilesInDirectory(pathEntry);
-        auto res = std::find(contents.begin(), contents.end(), target);
+        auto res = std::find_if(contents.begin(), contents.end(), 
+                [target](const std::string& s) { 
+                    return Util::stringEndsWith(s, target);
+        });
         
         //found neovim
         if(res != contents.end())

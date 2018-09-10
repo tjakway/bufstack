@@ -55,6 +55,18 @@ public:
         return substrings;
     }
 
+    static bool stringEndsWith(const std::string& value, const std::string& ending)
+    {
+        if (ending.size() > value.size())
+        {
+            return false;
+        }
+        else
+        {
+            return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+        }
+    }
+
     /**
      * returns true if the string is .empty() or if it contains only whitespace
      */
