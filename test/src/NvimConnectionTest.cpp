@@ -50,14 +50,22 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
     std::shared_ptr<MsgpackClient> client = nullptr;
     const auto start = std::chrono::steady_clock::now();
 
+    unsigned int attempts = 0;
+    std::chrono::steady_clock::time_point connectTime;
+
     std::string lastErrorMessage;
     while(!client && 
         (start - std::chrono::steady_clock::now()) 
             < TestConfig::nvimMaxStartupTime)
     {
         try {
+            attempts++;
+
             client = std::make_shared<MockMsgpackClient>(
                 ConnectionInfo::tcpConnection(address, port));
+
+            //this will only be assigned if the connection is successful
+            connectTime = std::chrono::steady_clock::now();
         } 
         catch(ClientConnection::ClientConnectionException ex) 
         {
@@ -77,6 +85,12 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
     }
     else
     {
+        const std::chrono::milliseconds timeToConnect = 
+            std::chrono::duration_cast<std::chrono::milliseconds>(connectTime - start);
+        logger->getLogger()->debug(
+            STRCATS("nvim connection successful: took " << attempts << 
+                " and " << timeToConnect.count() << " milliseconds"));
+
         return client;
     }
 }
