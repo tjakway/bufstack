@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <iostream>
 
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 
@@ -41,13 +42,17 @@ bool FindNeovim::isDirectory(const std::string& path)
     //see https://stackoverflow.com/questions/3828192/checking-if-a-directory-exists-in-unix-system-call
     struct stat sb;
 
-stat(path.c_str(), &sb)
-    if ( == 0 && S_ISDIR(sb.st_mode))
+    auto statRes = stat(path.c_str(), &sb);
+    if(statRes == 0)
     {
-        return true;
+        return S_ISDIR(sb.st_mode);
     }
     else
     {
+        auto _errno = errno;
+        getLogger()->warn("stat(2) returned %d for "
+                "%s, error message: %s", 
+                statRes, path.c_str(), strerror(_errno));
         return false;
     }
 }

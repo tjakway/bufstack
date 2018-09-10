@@ -17,7 +17,7 @@ class FindNeovim
      * suppress warnings for this directory if dontWarn returns true
      */
     static bool dontWarn(const std::string&);
-    static bool isDirectory(const std::string&);
+    bool isDirectory(const std::string&);
     static std::vector<std::string> getPathEntries(
             const std::string& pathVarName,
             Loggable&);
@@ -31,7 +31,7 @@ public:
     static constexpr auto defaultNeovimExeName = "nvim";
     static constexpr auto defaultPathVarName = "PATH";
 
-    const std::string pathVarToSearch; 
+    const std::string pathVarName; 
     const std::string neovimExeName;
 
     /**
