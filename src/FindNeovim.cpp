@@ -205,7 +205,7 @@ std::unique_ptr<std::string> FindNeovim::getFirstOnPath()
         if(res != contents.end())
         {
             //return now so we don't keep looking
-            return make_unique<std::string>(STRCAT(pathEntry, PATH_SEPARATOR, *res));
+            return make_unique<std::string>(*res);
         }
     }
 
