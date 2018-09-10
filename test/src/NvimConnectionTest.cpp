@@ -87,7 +87,7 @@ NvimConnectionTest::~NvimConnectionTest()
             //calls to pure virtual functions are not available in destructors
             //so we can't use getLoggableInstance() here
             std::cerr << "Failed to kill child nvim instance," <<
-                " error message: {}" << strerror(_errno) << std::endl;
+                " error message: " << strerror(_errno) << std::endl;
         }
     }
 }
