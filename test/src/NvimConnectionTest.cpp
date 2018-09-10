@@ -62,6 +62,13 @@ void NvimConnectionTest::connect(
         const std::string nvimPath = *nvimDest;
         //launch neovim then connect the client to that address and port
         launchNeovim(nvimPath.c_str(), address, port);
+
+        if(nvimPid != nullptr)
+        {
+            getLoggableInstance()->getLogger()->debug("Launched nvim instance with pid " + 
+                    std::to_string(*nvimPid));
+        }
+
         clientPtr = std::make_shared<MockMsgpackClient>(
                 ConnectionInfo::tcpConnection(address, port));
     }
@@ -81,7 +88,7 @@ NvimConnectionTest::~NvimConnectionTest()
     if(nvimPid != nullptr && (*nvimPid) > 0)
     {
         //signal the child process
-        if(!kill(*nvimPid, SIGTERM))
+        if(kill(*nvimPid, SIGTERM) != 0)
         {
             auto _errno = errno;
             //calls to pure virtual functions are not available in destructors
