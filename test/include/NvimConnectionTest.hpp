@@ -7,6 +7,7 @@
 #include "NamespaceDefines.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
+#include "FindNeovim.hpp"
 
 #include "TestConfig.hpp"
 #include "HasTcpConnection.hpp"
