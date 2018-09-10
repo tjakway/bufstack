@@ -14,6 +14,8 @@ class FindNeovim
 {
     FindNeovim() = delete;
 
+    static Loggable logger;
+
     /**
      * suppress warnings for this directory if dontWarn returns true
      */
