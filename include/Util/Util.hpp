@@ -45,7 +45,11 @@ public:
         std::string item;
         while (std::getline(ss, item, delim)) 
         {
-            substrings.emplace_back(item);
+            //don't insert blank items
+            if(!item.empty())
+            {
+                substrings.emplace_back(item);
+            }
         }
 
         return substrings;
@@ -75,7 +79,7 @@ public:
     {
         std::ostringstream stream;
         stream << header;
-
+ 
         if(vec.size() > 1)
         {
             for(auto it = vec.begin(); it < (vec.end() - 1); ++it)
