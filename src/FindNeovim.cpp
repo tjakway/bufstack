@@ -41,7 +41,8 @@ bool FindNeovim::isDirectory(const std::string& path)
     //see https://stackoverflow.com/questions/3828192/checking-if-a-directory-exists-in-unix-system-call
     struct stat sb;
 
-    if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+stat(path.c_str(), &sb)
+    if ( == 0 && S_ISDIR(sb.st_mode))
     {
         return true;
     }
@@ -51,9 +52,10 @@ bool FindNeovim::isDirectory(const std::string& path)
     }
 }
 
-std::vector<std::string> FindNeovim::getPathEntries(Loggable& logger)
+std::vector<std::string> FindNeovim::getPathEntries(const std::string& pathVarName,
+        Loggable& logger)
 {
-    const char* path = GETENV_FUNC(PATH_VAR_NAME);
+    const char* path = GETENV_FUNC(pathVarName.c_str());
     if(path == nullptr)
     {
         throw NoPathVariable(STRCAT("Error in ", __func__));
@@ -147,14 +149,10 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
     }
 }
 
-const std::string FindNeovim::neovimExeName {"nvim"};
-
-
-Loggable FindNeovim::logger("FindNeovim");
-
-std::unique_ptr<std::string> FindNeovim::getFirstOnPath(std::string target)
+std::unique_ptr<std::string> FindNeovim::getFirstOnPath()
 {
-    logger.getLogger()->set_level(spdlog::level::debug);
+    const std::string target = neovimExeName;
+
     for(const std::string& pathEntry : getPathEntries(logger))
     {
         std::vector<std::string> contents = getFilesInDirectory(pathEntry, logger);
