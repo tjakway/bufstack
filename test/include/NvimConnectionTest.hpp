@@ -24,6 +24,10 @@ class NvimConnectionTest
     FindNeovim findNeovim;
     std::unique_ptr<Loggable> logger;
 
+    std::shared_ptr<MsgpackClient> tryCreateClient(
+        const std::string& _address,
+        uint16_t _port);
+
     //atomically initialize the client
     void connect(
         const std::string& _address,
@@ -40,6 +44,8 @@ public:
     NEW_EXCEPTION_TYPE_WITH_BASE(NvimNotInitialized,
             NvimConnectionTestException);
     NEW_EXCEPTION_TYPE_WITH_BASE(NvimLaunchException,
+            NvimConnectionTestException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(CannotConnectException,
             NvimConnectionTestException);
 
 

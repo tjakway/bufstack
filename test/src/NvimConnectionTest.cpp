@@ -4,6 +4,8 @@
 #include <mutex>
 #include <memory>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 //process signaling
 #include <sys/types.h>
@@ -17,6 +19,7 @@
 #include "ConnectionInfo.hpp"
 #include "MsgpackClient.hpp"
 #include "MockMsgpackClient.hpp"
+#include "TestConfig.hpp"
 
 namespace {
     static std::mutex clientPtrMutex;
@@ -39,6 +42,44 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::getClientInstance()
     }
 }
 
+
+std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
+    const std::string& address,
+    uint16_t port)
+{
+    std::shared_ptr<MsgpackClient> client = nullptr;
+    auto start = std::chrono::steady_clock::now();
+
+    std::string lastErrorMessage;
+    while(!client && 
+        (start - std::chrono::steady_clock::now()) 
+            < TestConfig::nvimMaxStartupTime)
+    {
+        try {
+            client = std::make_shared<MockMsgpackClient>(
+                ConnectionInfo::tcpConnection(address, port));
+        } 
+        catch(ClientConnection::ClientConnectionException ex) 
+        {
+            lastErrorMessage = ex.what();
+
+            //wait before trying to connect again
+            std::this_thread::sleep_for(
+                    TestConfig::waitBetweenNvimConnectionAttempts);
+        }
+    }
+
+    if(!client)
+    {
+        throw CannotConnectException(
+            std::string("tryCreateClient failed, last error message was: ") + 
+            lastErrorMessage);
+    }
+    else
+    {
+        return client;
+    }
+}
 
 void NvimConnectionTest::connect(
         const std::string& address,
@@ -69,8 +110,9 @@ void NvimConnectionTest::connect(
                     std::to_string(*nvimPid));
         }
 
-        clientPtr = std::make_shared<MockMsgpackClient>(
-                ConnectionInfo::tcpConnection(address, port));
+        
+        
+        clientPtr = tryCreateClient(address, port);
     }
 }
 
