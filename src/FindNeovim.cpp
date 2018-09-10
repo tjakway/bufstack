@@ -54,7 +54,7 @@ bool FindNeovim::isDirectory(const std::string& path)
 
 std::vector<std::string> FindNeovim::getPathEntries(Loggable& logger)
 {
-    char* path = GETENV_FUNC(PATH_VAR_NAME);
+    const char* path = GETENV_FUNC(PATH_VAR_NAME);
     if(path == nullptr)
     {
         throw NoPathVariable(STRCAT("Error in ", __func__));
