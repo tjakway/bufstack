@@ -101,11 +101,14 @@ std::vector<std::string> FindNeovim::getPathEntries()
 
 bool FindNeovim::skipEntry(const std::string& entry)
 {
-    return entry == std::string("..") || entry == std::string(".");
+    return entry == std::string("..") || 
+        entry == std::string(".") ||
+        Util::stringIsEmpty(entry);
 }
 
 std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath)
 {
+    const char* dirPathCStr = dirPath.c_str();
     DIR* dir = nullptr;
 
     auto funcName = __func__;
