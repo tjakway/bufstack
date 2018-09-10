@@ -48,7 +48,7 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
     uint16_t port)
 {
     std::shared_ptr<MsgpackClient> client = nullptr;
-    auto start = std::chrono::steady_clock::now();
+    const auto start = std::chrono::steady_clock::now();
 
     std::string lastErrorMessage;
     while(!client && 
