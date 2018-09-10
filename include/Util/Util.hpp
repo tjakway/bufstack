@@ -45,7 +45,7 @@ public:
         std::string item;
         while (std::getline(ss, item, delim)) 
         {
-            substrings.emplace_back(item)
+            substrings.emplace_back(item);
         }
 
         return substrings;
