@@ -108,7 +108,7 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
         [&dir, funcName, this](){
             if(dir != nullptr)
             {
-                if(!closedir(dir))
+                if(closedir(dir) != 0)
                 {
                     auto _errno = errno;
                     this->getLogger()->warn(STRCATS(
