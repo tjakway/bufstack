@@ -50,7 +50,7 @@ bool FindNeovim::isDirectory(const std::string& path)
     else
     {
         auto _errno = errno;
-        getLogger()->warn(STRCATS("stat(2) returned " << statRes <<
+        getLogger()->info(STRCATS("stat(2) returned " << statRes <<
                     " for " << path << ", error message: " <<
                     strerror(_errno)));
         return false;
