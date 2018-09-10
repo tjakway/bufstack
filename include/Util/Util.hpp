@@ -12,6 +12,7 @@
 #include <set>
 #include <iterator>
 #include <utility>
+#include <sstream>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -36,6 +37,19 @@ public:
         static std::string rtrim_copy(std::string);
         static std::string trim_copy(std::string);
     };
+
+    std::vector<std::string> splitString(const std::string &s, char delim)
+    {
+        std::vector<std::string> substrings;
+        std::stringstream ss(s);
+        std::string item;
+        while (std::getline(ss, item, delim)) 
+        {
+            substrings.emplace_back(item)
+        }
+
+        return substrings;
+    }
 
     /**
      * returns true if the string is .empty() or if it contains only whitespace
