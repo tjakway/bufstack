@@ -12,6 +12,12 @@ DEFAULT_CMAKE_COMPILERS=$(shell command -v clang 1> /dev/null 2>&1 \
 				&& echo -n "-DCMAKE_CXX_COMPILER=clang++ " \
 				|| echo -n "-DCMAKE_C_COMPILER=g++ " )
 
+#if lldb is installed and we're building with clang then use it
+#otherwise use gdb
+DEBUGGER=$(shell echo "$(DEFAULT_CMAKE_COMPILERS)" | \
+	 grep -q "clang" && ( command -v lldb || echo "gdb" ) \
+	 || echo "gdb")
+
 EXPORT_COMPILE_COMMANDS=-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
 DEFAULT_CMAKE_BUILD_TARGET=Debug
@@ -66,3 +72,7 @@ build: cmake_gen
 .PHONY: check
 check: build
 	cmake --build $(BIN_DIR) --target check
+
+.PHONY: debug
+debug: build
+	cd $(BIN_DIR)/test/src && $(DEBUGGER) ./bufstack_test
