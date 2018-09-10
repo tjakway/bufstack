@@ -7,17 +7,15 @@
 #include <vector>
 #include <iterator>
 
-template<typename Out>
-void split(const std::string &s, char delim, Out result) {
+std::vector<std::string> split(const std::string &s, char delim) 
+{
+    std::vector<std::string> substrings;
     std::stringstream ss(s);
     std::string item;
-    while (std::getline(ss, item, delim)) {
-        *(result++) = item;
+    while (std::getline(ss, item, delim)) 
+    {
+        substrings.emplace_back(item)
     }
-}
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
+    return substrings;
 }
