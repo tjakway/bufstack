@@ -23,8 +23,6 @@ public:
     MsgpackClientTests()
         : Loggable("MsgpackClientTests")
     {}
-
-    virtual Loggable* getLoggableInstance() override { return this; }
 };
 
 TEST_F(MsgpackClientTests, TestBadPort)

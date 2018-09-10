@@ -49,8 +49,6 @@ public:
     virtual ~NvimConnectionTest();
 
     std::shared_ptr<MsgpackClient> getClientInstance();
-
-    virtual Loggable* getLoggableInstance() = 0;
 };
 
 BUFSTACK_END_NAMESPACE
