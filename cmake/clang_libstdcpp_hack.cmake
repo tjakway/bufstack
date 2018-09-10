@@ -7,5 +7,5 @@
 #TODO: refactor out the CMAKE_BUILD_TYPE check to a separate function that also
 #checks for debug-related targets like DebugWithWarnings[Optimized]
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG" AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "-D_GLIBCXX_DEBUG ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-D_GLIBCXX_DEBUG -fstandalone-debug ${CMAKE_CXX_FLAGS}")
 endif()
