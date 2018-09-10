@@ -8,14 +8,60 @@
 
 #include <string>
 #include <iostream>
+#include <functional>
 
 #include <cstring> //strerror(int)
 #include <cstdlib> //exit(int)
+#include <cstdio>
 
 #include <errno.h>
 #include <unistd.h>
 
 BUFSTACK_BEGIN_NAMESPACE
+
+namespace {
+
+    void redirectFds(const std::string& stdoutDest, 
+            const std::string& stderrDest,
+            std::function<void(std::string)> onError)
+    {
+        const int flags = O_APPEND | O_WRONLY;
+
+        //open the new file descriptors
+        int newStdoutFd = open(stdoutDest.c_str(), flags);
+        if(newStdoutFd < 0)
+        {
+            auto _errno = errno;
+            onError(STRCATS("failed to open file descriptor at " <<
+                        stdoutDest << ", error message: " <<
+                        strerror(_errno)));
+        }
+
+        int newStderrFd = open(stderrDest.c_str(), flags);
+        if(newStderrFd < 0)
+        {
+            auto _errno = errno;
+            onError(STRCATS("failed to open file descriptor at " <<
+                        stderrDest << ", error message: " <<
+                        strerror(_errno)));
+        }
+
+        //swap the old ones
+        if(!dup2(STDOUT_FILENO, newStdoutFd))
+        {
+            auto _errno = errno;
+            onError(STRCATS("could not swap stdout file descriptor," <<
+                        " error message: " << strerror(_errno)));
+        }
+
+        if(!dup2(STDERR_FILENO, newStderrFd))
+        {
+            auto _errno = errno;
+            onError(STRCATS("could not swap stderr file descriptor," <<
+                        " error message: " << strerror(_errno)));
+        }
+    }
+}
 
 void NvimConnectionTest::launchNeovim(
     const std::string& path,
@@ -44,6 +90,10 @@ void NvimConnectionTest::launchNeovim(
             perror(errMsg);
             exit(1);
         }
+
+        redirectFds("/dev/null", "/dev/null", 
+                [](std::string msg) { throw NvimLaunchException(msg); });
+
         int execRet = execl(path.c_str(), 
                 //don't forget to pass the executable path as argv[0]
                 path.c_str(), "--headless", "--noplugin", "-u", "NONE", NULL);
