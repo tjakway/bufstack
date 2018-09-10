@@ -73,6 +73,7 @@ NvimConnectionTest::NvimConnectionTest(
     : nvimPid(nullptr)
 {
     connect(address, port);
+    findNeovim.getLogger()->set_level(spdlog::level::warn);
 }
 
 NvimConnectionTest::~NvimConnectionTest()
