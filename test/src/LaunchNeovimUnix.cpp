@@ -96,7 +96,11 @@ void NvimConnectionTest::launchNeovim(
 
         int execRet = execl(path.c_str(), 
                 //don't forget to pass the executable path as argv[0]
-                path.c_str(), "--headless", "--noplugin", "-u", "NONE", NULL);
+                path.c_str(), 
+                "--headless", "--noplugin", 
+                //no vimrc or shada
+                "-u", "NONE", "-i", "NONE",
+                NULL);
         
         //only reached if there's an error in exec
         auto _errno = errno;
