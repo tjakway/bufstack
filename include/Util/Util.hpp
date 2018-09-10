@@ -38,7 +38,7 @@ public:
         static std::string trim_copy(std::string);
     };
 
-    std::vector<std::string> splitString(const std::string &s, char delim)
+    static td::vector<std::string> splitString(const std::string &s, char delim)
     {
         std::vector<std::string> substrings;
         std::stringstream ss(s);
