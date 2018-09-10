@@ -52,7 +52,7 @@ void NvimConnectionTest::connect(
         return;
     }
 
-    auto nvimDest = FindNeovim::getFirstOnPath();
+    auto nvimDest = findNeovim.getFirstOnPath();
     if(nvimDest == nullptr)
     {
         throw CannotFindNeovimException("Could not find neovim on path");
