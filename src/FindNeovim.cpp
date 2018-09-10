@@ -13,7 +13,6 @@
 
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
-#include "Util/SplitString.hpp"
 #include "Loggable.hpp"
 
 #include "CommonDefines.hpp"
@@ -68,7 +67,7 @@ std::vector<std::string> FindNeovim::getPathEntries(Loggable& logger)
         }
 
         std::vector<std::string> pathEntries = 
-            split(pathStr, PATH_VAR_SEPARATOR);
+            Util::splitString(pathStr, PATH_VAR_SEPARATOR);
         const auto pathEntriesSize = pathEntries.size();
         if(pathEntriesSize == 0)
         {
