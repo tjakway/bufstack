@@ -17,6 +17,7 @@ class FindNeovim
      * suppress warnings for this directory if dontWarn returns true
      */
     bool dontWarn(const std::string&);
+    bool skipEntry(const std::string&);
     bool isDirectory(const std::string&);
     std::vector<std::string> getPathEntries();
     std::vector<std::string> getFilesInDirectory(const std::string&);

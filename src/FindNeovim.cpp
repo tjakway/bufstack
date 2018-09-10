@@ -99,6 +99,11 @@ std::vector<std::string> FindNeovim::getPathEntries()
     }
 }
 
+bool FindNeovim::skipEntry(const std::string& entry)
+{
+    return entry == std::string("..") || entry == std::string(".");
+}
+
 std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath)
 {
     DIR* dir = nullptr;
@@ -160,10 +165,13 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
                     //make sure this entry is a file and not another directory
                     std::string entryName(ent->d_name);
 
-                    std::string absPath = STRCAT(dirPath, PATH_SEPARATOR, entryName);
-                    if(!isDirectory(absPath))
+                    if(!skipEntry(entryName))
                     {
-                        files.push_back(absPath);
+                        std::string absPath = STRCAT(dirPath, PATH_SEPARATOR, entryName);
+                        if(!isDirectory(absPath))
+                        {
+                            files.push_back(absPath);
+                        }
                     }
                 }
             } while(ent != nullptr);
