@@ -101,7 +101,8 @@ std::vector<std::string> FindNeovim::getPathEntries()
 
 std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirPath)
 {
-    DIR* dir = opendir(dirPath.c_str());
+    DIR* dir = nullptr;
+    dir = opendir(dirPath.c_str());
     if(dir == nullptr)
     {
         if(!dontWarn(dirPath))
@@ -122,32 +123,46 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
     
 
         dirent* ent = nullptr;
-        do {
-            errno = 0;
-            ent = readdir(dir);
-            if(ent == nullptr && errno != 0)
+        try {
+            do {
+                errno = 0;
+                ent = readdir(dir);
+                if(ent == nullptr && errno != 0)
+                {
+                    closedir(dir);
+                    throw DirectoryException(STRCAT("Error in ", __func__, " in call to readdir: ",
+                            strerror(errno)));
+                }
+                //readdir returns null when done
+                //no more entries left
+                else if(ent == nullptr) {}
+                else
+                {
+                    //make sure this entry is a file and not another directory
+                    std::string entryName(ent->d_name);
+
+                    std::string absPath = STRCAT(dirPath, PATH_SEPARATOR, entryName);
+                    if(!isDirectory(absPath))
+                    {
+                        files.push_back(absPath);
+                    }
+                }
+            } while(ent != nullptr);
+        } catch(...)
+        {
+            if(dir != nullptr)
             {
                 closedir(dir);
-                throw DirectoryException(STRCAT("Error in ", __func__, " in call to readdir: ",
-                        strerror(errno)));
+                dir = nullptr;
             }
-            //readdir returns null when done
-            //no more entries left
-            else if(ent == nullptr) {}
-            else
-            {
-                //make sure this entry is a file and not another directory
-                std::string entryName(ent->d_name);
+            throw;
+        }
 
-                std::string absPath = STRCAT(dirPath, PATH_SEPARATOR, entryName);
-                if(!isDirectory(absPath))
-                {
-                    files.push_back(absPath);
-                }
-            }
-        } while(ent != nullptr);
-
-        closedir(dir);
+        if(dir != nullptr)
+        {
+            closedir(dir);
+            dir = nullptr;
+        }
         return files;
     }
 }
