@@ -129,9 +129,10 @@ std::vector<std::string> FindNeovim::getFilesInDirectory(const std::string& dirP
                 ent = readdir(dir);
                 if(ent == nullptr && errno != 0)
                 {
+                    auto _errno = errno;
                     closedir(dir);
                     throw DirectoryException(STRCAT("Error in ", __func__, " in call to readdir: ",
-                            strerror(errno)));
+                            strerror(_errno)));
                 }
                 //readdir returns null when done
                 //no more entries left
