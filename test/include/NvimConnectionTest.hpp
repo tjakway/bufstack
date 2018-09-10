@@ -22,7 +22,6 @@ class NvimConnectionTest
     static constexpr auto localhost = HasTcpConnection::localhost;
 
     FindNeovim findNeovim;
-    std::unique_ptr<Loggable> logger;
 
     std::shared_ptr<MsgpackClient> tryCreateClient(
         const std::string& _address,
@@ -36,6 +35,9 @@ class NvimConnectionTest
         const std::string& path,
         const std::string& _address,
         uint16_t _port);
+
+protected:
+    std::unique_ptr<Loggable> logger;
 
 public:
     NEW_EXCEPTION_TYPE(NvimConnectionTestException);
