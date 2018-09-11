@@ -9,6 +9,7 @@
 #include "HasFd.hpp"
 #include "AsyncBufSender.hpp"
 #include "MsgpackReceiver.hpp"
+#include "ClientConnection.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -50,7 +51,6 @@ public:
 
 class AbstractMsgpackClient : 
     virtual public MsgpackReceiver,
-    virtual public HasClientFd,
     public AsyncBufSender
 {
     using MsgId = uint32_t;
@@ -87,6 +87,8 @@ protected:
     {
         ConvertResponseValue<T>()(promise, objectReceived);
     }
+
+    virtual ClientConnection& getClientConnection() const = 0;
 
     /**
      * returns true if this callback is finished
@@ -154,7 +156,7 @@ protected:
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
 
-        send(getClientFd(), buffer->data(), buffer->size());
+        send(getClientConnection().getClientFd(), buffer->data(), buffer->size());
 
         return thisMsgId;
     }
@@ -199,6 +201,7 @@ public:
     template <typename... Args>
     void callVoidReturn(const std::string& name, Args... args)
     {
+        //TODO: wait to hear for response
         sendCall<Args...>(name, args...);
     }
 

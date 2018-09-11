@@ -13,31 +13,36 @@ const std::string MsgpackClient::subscribedEvents =
 
 MsgpackClient::MsgpackClient(ConnectionInfo ci)
     : clientConnection(ClientConnection::newClientConnection(ci))
-{}
+{
+    connectFuture = onConnect();
+}
 
 MsgpackClient::~MsgpackClient()
 {}
 
-void MsgpackClient::onConnect()
+std::future<void> MsgpackClient::onConnect()
 {
     std::function<void(void)> init = 
         [this]() -> void {
-            msgpack::object_handle apiInfoObject = 
-                this->call<msgpack::object_handle>("nvim_get_api_info");
+        this->getLogger()->set_level(spdlog::level::debug);
+    
+        msgpack::object_handle apiInfoObject = 
+            this->call<msgpack::object_handle>("nvim_get_api_info");
 
+        this->getLogger()->debug("Received api info object");
 
-            ApiParser parser(apiInfoObject.get());
-            ApiInfo apiInfo = parser.getApiInfo();
+        ApiParser parser(apiInfoObject.get());
+        ApiInfo apiInfo = parser.getApiInfo();
 
-            //make sure function signatures match what we expect
-            std::unordered_set<NvimFunction> functions = parser.getFunctions();
-            this->checkFunctions(functions);
+        //make sure function signatures match what we expect
+        std::unordered_set<NvimFunction> functions = parser.getFunctions();
+        this->checkFunctions(functions);
 
-            this->initializeRemoteFunctions(apiInfo);
-            this->subscribeEvents();
-        };
+        this->initializeRemoteFunctions(apiInfo);
+        this->subscribeEvents();
+    };
 
-    std::async(std::launch::async, init);
+    return std::async(std::launch::async, init);
 //    std::future<void> x = then<msgpack::object_handle, std::function<void(msgpack::object_handle)>>
 //        (apiInfoCall, init);
 }
@@ -57,6 +62,20 @@ void MsgpackClient::checkFunctions(const std::unordered_set<NvimFunction>&)
 void MsgpackClient::subscribeEvents()
 {
     remoteFunctions->subscribe(subscribedEvents);
+}
+
+
+ClientConnection& MsgpackClient::getClientConnection() const
+{
+    if(!clientConnection)
+    {
+        throw ClientConnection::ClientConnectionException(
+                "Client connection pointer is null");
+    }
+    else
+    {
+        return *clientConnection;
+    }
 }
 
 BUFSTACK_END_NAMESPACE

@@ -16,7 +16,6 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class MsgpackClient : 
     public AbstractMsgpackClient,
-    virtual public HasClientFd,
     //needed to initialize remote functions
     public std::enable_shared_from_this<MsgpackClient>
 {
@@ -26,11 +25,14 @@ class MsgpackClient :
     static const std::string subscribedEvents;
 
 
-    void onConnect();
+    std::future<void> connectFuture;
+    std::future<void> onConnect();
 protected:
     void initializeRemoteFunctions(const ApiInfo&);
     void subscribeEvents();
     void checkFunctions(const std::unordered_set<NvimFunction>&);
+
+    virtual ClientConnection& getClientConnection() const override;
 
 public:
     MsgpackClient(ConnectionInfo);
