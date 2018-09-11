@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 #include <functional>
+#include <string>
 #include <sstream>
 
 BUFSTACK_BEGIN_NAMESPACE
