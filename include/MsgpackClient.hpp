@@ -25,14 +25,15 @@ class MsgpackClient :
     static const std::string subscribedEvents;
 
 
-    std::future<void> connectFuture;
-    std::future<void> onConnect();
+    void onConnect();
 protected:
     void initializeRemoteFunctions(const ApiInfo&);
     void subscribeEvents();
     void checkFunctions(const std::unordered_set<NvimFunction>&);
 
     virtual ClientConnection& getClientConnection() const override;
+
+    MsgpackClient(ConnectionInfo, bool);
 
 public:
     MsgpackClient(ConnectionInfo);

@@ -17,7 +17,7 @@ private:
             const MsgpackRpc::NotificationMessage&) override {}
 public:
     MockMsgpackClient(ConnectionInfo i)
-        : Loggable("MockMsgpackClient"), MsgpackClient(i)
+        : Loggable("MockMsgpackClient"), MsgpackClient(i, true)
     {}
 };
 

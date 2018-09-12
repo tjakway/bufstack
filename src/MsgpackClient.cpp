@@ -5,25 +5,41 @@
 #include "NvimApi/ApiParser.hpp"
 #include "NvimApi/RemoteFunction.hpp"
 
+namespace {
+    class MsgpackOnConnectThread 
+    {
+
+    };
+}
+
 BUFSTACK_BEGIN_NAMESPACE
 
 
 const std::string MsgpackClient::subscribedEvents = 
         "BufEnter,BufLeave,TabEnter,TabLeave,WinEnter,WinLeave";
 
-MsgpackClient::MsgpackClient(ConnectionInfo ci)
+MsgpackClient::MsgpackClient(ConnectionInfo ci, bool skipOnConnect)
     : clientConnection(ClientConnection::newClientConnection(ci))
 {
-    connectFuture = onConnect();
+    if(!skipOnConnect)
+    {
+        //since the client connection is constructed, we've already connected
+        onConnect();
+    }
 }
+
+MsgpackClient::MsgpackClient(ConnectionInfo ci)
+    : MsgpackClient(ci, false)
+{}
 
 MsgpackClient::~MsgpackClient()
 {}
 
-std::future<void> MsgpackClient::onConnect()
+void MsgpackClient::onConnect()
 {
+    /*
     std::function<void(void)> init = 
-        [this]() -> void {
+        [this]() -> void {*/
         this->getLogger()->set_level(spdlog::level::debug);
     
         msgpack::object_handle apiInfoObject = 
@@ -40,9 +56,9 @@ std::future<void> MsgpackClient::onConnect()
 
         this->initializeRemoteFunctions(apiInfo);
         this->subscribeEvents();
-    };
+    //};
 
-    return std::async(std::launch::async, init);
+    //std::async(init).wait();
 //    std::future<void> x = then<msgpack::object_handle, std::function<void(msgpack::object_handle)>>
 //        (apiInfoCall, init);
 }
