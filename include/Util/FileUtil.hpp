@@ -13,7 +13,7 @@ class FileUtil
     using SizeType = unsigned long;
 
 public:
-    std::pair<std::unique_ptr<unsigned char[]>, SizeType>
+    static std::pair<std::unique_ptr<unsigned char[]>, SizeType>
         readBinaryFile(const std::string& filename)
     {
         ifstream in;
