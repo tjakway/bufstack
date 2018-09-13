@@ -2,13 +2,14 @@
 
 #include <limits>
 
-#include <msgpack.hpp>
 
 #include "NamespaceDefines.hpp"
 #include "Loggable.hpp"
 #include "MockMsgpackClient.hpp"
 #include "ClientConnection.hpp"
 #include "NvimConnectionTest.hpp"
+
+#include <msgpack.hpp>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -44,7 +45,7 @@ TEST_F(MsgpackClientTests, TestBadPort)
 
 TEST_F(MsgpackClientTests, TestLaunchNeovim)
 {
-    std::shared_ptr<MsgpackClient> inst = getClientInstance();
+    //std::shared_ptr<MsgpackClient> inst = getClientInstance();
 }
 
 BUFSTACK_END_NAMESPACE

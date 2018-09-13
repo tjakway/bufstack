@@ -22,6 +22,8 @@ public:
      * only try to connect at most once per this period
      */
     static const std::chrono::milliseconds waitBetweenNvimConnectionAttempts;
+
+    static constexpr uint16_t rpclibTestPort = 56395;
 };
 
 BUFSTACK_END_NAMESPACE
