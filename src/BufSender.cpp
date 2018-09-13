@@ -21,7 +21,7 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
     }
     else if(bufLen == std::numeric_limits<std::size_t>::max())
     {
-        log.getLogger()->warn("bufLen == std::numeric_limits<ssize_t>::max()");
+        log.getLogger()->warn("bufLen == std::numeric_limits<std::size_t>::max()");
     }
 
     //don't write more than this at once
