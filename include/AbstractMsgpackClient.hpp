@@ -201,8 +201,7 @@ public:
     template <typename... Args>
     void callVoidReturn(const std::string& name, Args... args)
     {
-        //TODO: wait to hear for response
-        sendCall<Args...>(name, args...);
+        call<void, Args...>(name, args...);
     }
 
     AbstractMsgpackClient()
