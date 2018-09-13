@@ -65,7 +65,7 @@ void PipeTest::writeCheck(const char* data, std::size_t len)
 
     ASSERT_EQ(amountRead, len) << strerror(_errno);
 
-    ASSERT_EQ(memcmp(data, readBuf.data(), len), 0) 
+    ASSERT_EQ(memcmp(data, readBuf.get(), len), 0) 
         << "written buf: < " << printBuf(data, len) << " >;"
         << "  read buf: < " << printBuf(readBuf.get(), len) << " >";
 }
