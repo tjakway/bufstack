@@ -62,6 +62,7 @@ void AsyncBufSender::send(int clientFd, const char* buf, std::size_t len)
     Buffer ptr = Buffer(
             new Buffer::element_type(
                 std::make_pair(new char[len], len)));
+    memcpy(ptr->first, buf, len);
     AsyncBufSender::send(clientFd, std::move(ptr));
 }
 
