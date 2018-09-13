@@ -20,6 +20,7 @@ public:
     virtual void send(int, Buffer) = 0;
     virtual void send(int, const char*, std::size_t) = 0;
 
+    virtual ~BufSender() {}
 };
 
 BUFSTACK_END_NAMESPACE
