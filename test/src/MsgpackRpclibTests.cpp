@@ -24,6 +24,8 @@ public:
     MsgpackRpclibTests()
         : Loggable("MsgpackRpclibTests")
     {}
+
+    virtual ~MsgpackRpclibTests() {}
 };
 
 TEST_F(MsgpackRpclibTests, TestCallOneFunction)
