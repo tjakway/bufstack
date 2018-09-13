@@ -2,6 +2,7 @@
 
 #include "PipeTest.hpp"
 #include "BufSender.hpp"
+#include "SyncBufSender.hpp"
 
 #include "Util/Util.hpp"
 #include "NamespaceDefines.hpp"
@@ -29,17 +30,7 @@ TEST_F(PipeTest, TestWriteCheck_Large)
 class BufSenderTests
     : public PipeTest
 {
-    class MockBufSender : public BufSender
-    {
-    public:
-        MockBufSender()
-            : Loggable("MockBufSender")
-        {}
-
-        virtual ~MockBufSender() {}
-    };
-
-    std::unique_ptr<BufSender> bufSender = make_unique<MockBufSender>();
+    std::unique_ptr<BufSender> bufSender = make_unique<SyncBufSender>();
 
 public:
     //use BufSender::send to write data to the file descriptor
