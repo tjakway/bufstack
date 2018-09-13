@@ -42,7 +42,7 @@ public:
     //this hack to get around it
     Loggable loggerInstance;
 
-    virtual std::shared_ptr<spdlog::logger> getLogger() const noexcept override
+    virtual std::shared_ptr<spdlog::logger> getLogger() const noexcept
     {
         return loggerInstance.getLogger();
     }
