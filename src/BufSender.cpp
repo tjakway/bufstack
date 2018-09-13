@@ -6,11 +6,12 @@
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
 
+#include <cstddef>
 
 BUFSTACK_BEGIN_NAMESPACE
 
 //low level socket write function with error checking
-void BufSender::sendAll(int clientFd, const char* buf, ssize_t bufLen, Loggable& log)
+void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Loggable& log)
 {
     if(bufLen <= 0)
     {

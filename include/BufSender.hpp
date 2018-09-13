@@ -15,7 +15,7 @@ protected:
     NEW_EXCEPTION_TYPE(BufSenderException);
     using BaseException = BufSenderException;
 
-    static void sendAll(int, const char* buf, ssize_t bufLen, Loggable&);
+    static void sendAll(int, const char* buf, std::size_t bufLen, Loggable&);
 public:
     virtual void send(int, Buffer) = 0;
     virtual void send(int, const char*, std::size_t) = 0;
