@@ -28,7 +28,7 @@ public:
     virtual ~MsgpackRpclibTests() {}
 };
 
-TEST_F(MsgpackRpclibTests, TestCallOneFunction)
+TEST_F(MsgpackRpclibTests, TestCallVoidReturn)
 {
     std::atomic_bool called(false);
 
@@ -36,7 +36,7 @@ TEST_F(MsgpackRpclibTests, TestCallOneFunction)
     rpc::server server(HasTcpConnection::localhost, port);
 
     const std::string fName = "foo";
-    const auto f = [&called](){
+    const auto f = [&called]() -> void {
         called.store(true);
     };
 
@@ -51,6 +51,33 @@ TEST_F(MsgpackRpclibTests, TestCallOneFunction)
     client.callVoidReturn(fName);
 
     ASSERT_TRUE(called);
+
+    server.stop();
+    server.close_sessions();
+} 
+
+
+TEST_F(MsgpackRpclibTests, TestCallReturnString)
+{
+    const auto port = TestConfig::rpclibTestPort;
+    rpc::server server(HasTcpConnection::localhost, port);
+
+    const std::string msg = "hello, world!";
+    const std::string fName = "foo";
+    const auto f = [msg]() -> std::string {
+        return msg;
+    };
+
+    server.bind(fName, f);
+
+    server.async_run();
+
+    MockMsgpackClient client(
+        ConnectionInfo::tcpConnection(HasTcpConnection::localhost,
+            port));
+
+    std::string res = client.call<std::string>(fName);
+    ASSERT_EQ(res, msg);
 
     server.stop();
     server.close_sessions();
