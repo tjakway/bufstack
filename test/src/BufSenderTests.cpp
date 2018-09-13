@@ -35,6 +35,7 @@ class BufSenderTests
         MockBufSender()
             : Loggable("MockBufSender")
         {}
+
         virtual ~MockBufSender() {}
     };
 
