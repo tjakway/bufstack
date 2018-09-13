@@ -6,20 +6,23 @@
 #include "Util/Util.hpp"
 #include "Util/CloseLogError.hpp"
 #include "Loggable.hpp"
+#include "NamespaceDefines.hpp"
+
+#include <cstddef>
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <cassert>
 
+BUFSTACK_BEGIN_NAMESPACE
+
 class PipeTest 
-    : public ::testing::Test, 
-    public bufstack::Loggable
+    : public ::testing::Test 
 {
 public:
     int readFd, writeFd;
     
     PipeTest()
-        : Loggable("PipeTest")
     {
         //test reading and writing across a pipe
         int pipeFds[2];
@@ -33,6 +36,8 @@ public:
         //fcntl(readFd, F_SETFL, O_NONBLOCK);
     }
 
+    void writeCheck(const char* data, std::size_t len);
+
     virtual ~PipeTest()
     {
         if(Util::fd_is_valid(readFd))
@@ -45,3 +50,5 @@ public:
         }
     }
 };
+
+BUFSTACK_END_NAMESPACE
