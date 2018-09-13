@@ -6,6 +6,7 @@
 #include "Loggable.hpp"
 #include "ClientConnection.hpp"
 #include "HasTcpConnection.hpp"
+#include "Util/FileUtil.hpp"
 
 #include <atomic>
 #include <thread>
@@ -51,6 +52,6 @@ TEST_F(MsgpackRpclibTests, TestCallOneFunction)
 
     server.stop();
     server.close_sessions();
-}
+} 
 
 BUFSTACK_END_NAMESPACE
