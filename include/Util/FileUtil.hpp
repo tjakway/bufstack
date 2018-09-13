@@ -30,10 +30,10 @@ public:
         std::unique_ptr<unsigned char[]> buf(new unsigned char[fileSize]);
 
         //rewind
-        in.seekg(std::ios_base::seekdir::beg);
+        in.seekg(std::ios::beg);
 
         in.read(buf.get(), fileSize);
 
         return std::make_pair(std::move(buf), fileSize);
     }
-}
+};
