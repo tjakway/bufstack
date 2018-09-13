@@ -37,6 +37,7 @@ public:
     }
 
     void writeCheck(const char* data, std::size_t len);
+    void assertRead(const char* data, std::size_t len);
 
     virtual ~PipeTest()
     {

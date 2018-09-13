@@ -46,6 +46,8 @@ void PipeTest::writeCheck(const char* data, std::size_t len)
 
     while(amountLeft > 0)
     {
+        ASSERT_LT(offset, len);
+
         ssize_t amountWritten = write(writeFd, &data[offset], amountLeft);
         auto _errno = errno;
         
@@ -56,9 +58,15 @@ void PipeTest::writeCheck(const char* data, std::size_t len)
         offset += amountWritten;
 
         ASSERT_GE(amountLeft, 0);
-        ASSERT_LT(offset, len);
+
+        ASSERT_LE(offset, len);
     }
 
+    assertRead(data, len);
+}
+
+void PipeTest::assertRead(const char* data, std::size_t len)
+{
     std::unique_ptr<char[]> readBuf(new char[len]);
     ssize_t amountRead = read(readFd, readBuf.get(), len);
     auto _errno = errno;
@@ -66,7 +74,7 @@ void PipeTest::writeCheck(const char* data, std::size_t len)
     ASSERT_EQ(amountRead, len) << strerror(_errno);
 
     ASSERT_EQ(memcmp(data, readBuf.get(), len), 0) 
-        << "written buf: < " << printBuf(data, len) << " >;"
+        << "passed buf: < " << printBuf(data, len) << " >;"
         << "  read buf: < " << printBuf(readBuf.get(), len) << " >";
 }
 
