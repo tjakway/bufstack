@@ -2,8 +2,9 @@ if(USE_SYSTEM_RPCLIB)
     #note: system rpclib is untested
     find_package(rpc 2.2.1 REQUIRED)
 else()
-    set(RPCLIB_CXX_STANDARD 11 CACHE BOOL "Require C++11" FORCE)
-
+    #set rpclib options
+    set(RPCLIB_CXX_STANDARD 11 CACHE STRING "Require C++11" FORCE)
+    set(RPCLIB_ENABLE_LOGGING ON CACHE BOOL "Enable rpclib logging" FORCE)
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/lib/rpclib 
         ${CMAKE_BINARY_DIR}/rpclib
@@ -25,6 +26,7 @@ function(depends_rpclib TARGET_NAME_PARAM)
         #but when adding a subdirectory all the targets go into the global namespace so its
         #just rpc
         target_link_libraries(${TARGET_NAME_PARAM} PRIVATE rpc)
-        target_compile_definitions(${TARGET_NAME_PARAM} PUBLIC RPCLIB_MSGPACK=msgpack)
+        target_compile_definitions(${TARGET_NAME_PARAM} 
+            PUBLIC RPCLIB_MSGPACK=msgpack RPCLIB_FMT=fmt)
     endif()
 endfunction()
