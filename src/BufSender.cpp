@@ -19,7 +19,7 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
                 STRCAT("Could not write to socket file descriptor ", 
                     clientFd, ": buffer length <= 0 (actual: ", bufLen, ")"));
     }
-    else if(bufLen == std::numeric_limits<ssize_t>::max())
+    else if(bufLen == std::numeric_limits<std::size_t>::max())
     {
         log.getLogger()->warn("bufLen == std::numeric_limits<ssize_t>::max()");
     }
