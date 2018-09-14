@@ -15,6 +15,10 @@ protected:
     NEW_EXCEPTION_TYPE(BufSenderException);
     using BaseException = BufSenderException;
 
+    BufSender()
+        : Loggable("BufSender")
+    {}
+
     static void sendAll(int, const char* buf, std::size_t bufLen, Loggable&);
 public:
     virtual void send(int, Buffer) = 0;
