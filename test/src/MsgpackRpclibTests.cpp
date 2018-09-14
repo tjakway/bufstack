@@ -14,6 +14,7 @@
 
 #include <msgpack.hpp>
 #include <rpc/server.h>
+#include <rpc/client.h>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -27,6 +28,15 @@ public:
     {}
 
     virtual ~MsgpackRpclibTests() {}
+
+    const uint16_t port = TestConfig::rpclibTestPort;
+
+    std::unique_ptr<rpc::server> mkServer() const
+    {
+        return make_unique<rpc::server>(
+                HasTcpConnection::localhost, TestConfig::rpclibTestPort);
+    }
+
 
 
     class SetFlagTest
@@ -54,30 +64,37 @@ public:
  */
 TEST_F(MsgpackRpclibTests, TestRpclibOnly)
 {
+    SetFlagTest flagTest;
+    auto server = mkServer();
 
+    server->bind(flagTest.fName, flagTest.f);
+    server->async_run();
+
+    rpc::client client(HasTcpConnection::localhost, port);
+    ASSERT_EQ(client.get_connection_state(), 
+            rpc::client::connection_state::connected);
+    client.call(flagTest.fName);
+
+    ASSERT_TRUE(flagTest.passes());
 }
 
 TEST_F(MsgpackRpclibTests, TestCallVoidReturn)
 {
     SetFlagTest flagTest;
 
-    const auto port = TestConfig::rpclibTestPort;
-    rpc::server server(HasTcpConnection::localhost, port);
+    auto server = mkServer();
 
-    server.bind(flagTest.fName, flagTest.f);
-
-    server.async_run();
+    server->bind(flagTest.fName, flagTest.f);
+    server->async_run();
 
     MockMsgpackClient client(
-        ConnectionInfo::tcpConnection(HasTcpConnection::localhost,
+        ConnectionInfo::tcpConnection(
+            HasTcpConnection::localhost,
             port));
 
     client.callVoidReturn(flagTest.fName);
 
     ASSERT_TRUE(flagTest.passes());
-
-    server.stop();
-    server.close_sessions();
 } 
 
 
