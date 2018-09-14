@@ -14,4 +14,7 @@ const std::chrono::milliseconds TestConfig::waitBetweenNvimConnectionAttempts {
     std::chrono::milliseconds(100)
 };
 
+constexpr uint16_t TestConfig::rpclibTestPort;
+
+
 BUFSTACK_END_NAMESPACE

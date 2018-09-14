@@ -7,6 +7,8 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
+constexpr const char HasTcpConnection::localhost[];
+
 void HasTcpConnection::decodeAddress(
         const std::string& address, in_addr* addr)
 {

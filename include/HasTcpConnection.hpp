@@ -35,7 +35,7 @@ public:
     NEW_EXCEPTION_TYPE_WITH_BASE(BadAddressException, 
             BaseException);
 
-    static constexpr auto localhost = "127.0.0.1";
+    static constexpr const char localhost[] = "127.0.0.1";
 };
 
 BUFSTACK_END_NAMESPACE
