@@ -10,6 +10,7 @@
 
 #include <atomic>
 #include <thread>
+#include <iostream>
 
 #include <msgpack.hpp>
 #include <rpc/server.h>
@@ -26,21 +27,44 @@ public:
     {}
 
     virtual ~MsgpackRpclibTests() {}
+
+
+    class SetFlagTest
+    {
+    public:
+        std::atomic_bool called;
+
+        const std::string fName;
+        const std::function<void(void)> f;
+
+        SetFlagTest()
+            : called(false),
+            fName("foo"),
+            f([this]() -> void {
+                    this->called.store(true);
+                })
+        {}
+
+        bool passes() const { return called.load(); }
+    };
 };
+
+/**
+ * use rpclib for both the server and client
+ */
+TEST_F(MsgpackRpclibTests, TestRpclibOnly)
+{
+
+}
 
 TEST_F(MsgpackRpclibTests, TestCallVoidReturn)
 {
-    std::atomic_bool called(false);
+    SetFlagTest flagTest;
 
     const auto port = TestConfig::rpclibTestPort;
     rpc::server server(HasTcpConnection::localhost, port);
 
-    const std::string fName = "foo";
-    const auto f = [&called]() -> void {
-        called.store(true);
-    };
-
-    server.bind(fName, f);
+    server.bind(flagTest.fName, flagTest.f);
 
     server.async_run();
 
@@ -48,9 +72,9 @@ TEST_F(MsgpackRpclibTests, TestCallVoidReturn)
         ConnectionInfo::tcpConnection(HasTcpConnection::localhost,
             port));
 
-    client.callVoidReturn(fName);
+    client.callVoidReturn(flagTest.fName);
 
-    ASSERT_TRUE(called);
+    ASSERT_TRUE(flagTest.passes());
 
     server.stop();
     server.close_sessions();
@@ -59,6 +83,7 @@ TEST_F(MsgpackRpclibTests, TestCallVoidReturn)
 
 TEST_F(MsgpackRpclibTests, TestCallReturnString)
 {
+    try {
     const auto port = TestConfig::rpclibTestPort;
     rpc::server server(HasTcpConnection::localhost, port);
 
@@ -81,6 +106,10 @@ TEST_F(MsgpackRpclibTests, TestCallReturnString)
 
     server.stop();
     server.close_sessions();
+    } catch(std::exception& e)
+    {
+        std::cerr << "Caught exception: " << e.what() << std::endl;
+    }
 } 
 
 BUFSTACK_END_NAMESPACE
