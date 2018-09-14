@@ -28,6 +28,10 @@ protected:
     using BaseException = MsgpackReceiverException;
     NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackReceiverException);
 
+    MsgpackReceiver()
+        : Loggable("MsgpackReceiver")
+    {}
+
     virtual void onReceiveRequestMsg(const MsgpackRpc::RequestMessage&) = 0;
     virtual void onReceiveResponseMsg(const MsgpackRpc::ResponseMessage&) = 0;
     virtual void onReceiveNotificationMsg(const MsgpackRpc::NotificationMessage&) = 0;
