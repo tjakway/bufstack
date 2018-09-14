@@ -29,14 +29,13 @@ public:
 
     virtual ~MsgpackRpclibTests() {}
 
-    const uint16_t port = TestConfig::rpclibTestPort;
-
     std::unique_ptr<rpc::server> mkServer() const
     {
         return make_unique<rpc::server>(
                 HasTcpConnection::localhost, TestConfig::rpclibTestPort);
     }
 
+    static const uint16_t port;
 
 
     class SetFlagTest
@@ -59,6 +58,8 @@ public:
     };
 };
 
+const uint16_t MsgpackRpclibTests::port = TestConfig::rpclibTestPort;
+
 /**
  * use rpclib for both the server and client
  */
@@ -73,7 +74,7 @@ TEST_F(MsgpackRpclibTests, TestRpclibOnly)
     rpc::client client(HasTcpConnection::localhost, port);
     ASSERT_EQ(client.get_connection_state(), 
             rpc::client::connection_state::connected);
-    client.call(flagTest.fName);
+    client.call(flagTest.fName).get();
 
     ASSERT_TRUE(flagTest.passes());
 }
