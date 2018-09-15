@@ -13,6 +13,15 @@ MsgpackFdReader::MsgpackFdReader(
     fd(_fd)
 {}
 
+MsgpackFdReader::MsgpackFdReader(
+        int _fd,
+        Callback onDecode)
+: Loggable("MsgpackFdReader"),
+    //call with default args
+    MsgpackReaderUnpacker(), 
+    fd(_fd)
+{}
+
 void MsgpackFdReader::startListening()
 {
     while(!interrupted())
