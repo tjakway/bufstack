@@ -33,7 +33,10 @@ protected:
 
     virtual ClientConnection& getClientConnection() const override;
 
-    MsgpackClient(ConnectionInfo, bool);
+    /**
+     * skipOnConnect: whether to call onConnect()
+     */
+    MsgpackClient(ConnectionInfo, bool skipOnConnect);
 
 public:
     MsgpackClient(ConnectionInfo);
