@@ -3,6 +3,7 @@
 #include "Util/Strcat.hpp"
 #include "Util/CloseLogError.hpp"
 #include "Util/PrintableObject.hpp"
+#include "TcpSocket.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -36,30 +37,9 @@ void ClientTcpConnection::_connect()
 
     int sockFd = -1;
     try {
-        sockFd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-        if(sockFd < 0)
-        {
-            auto _errno = errno;
-            throw ClientConnectionException(
-                    STRCATS("Could not create socket (" <<
-                        "socket returned " << sockFd << ").  " <<
-                        "Error description: " << strerror(_errno)));
-        }
-
-        sockaddr_in sock;
-        memset(&sock, 0, sizeof(sockaddr_in));
-        sock.sin_family = AF_INET; //tcp
-        sock.sin_port = htons(getPort());
-        
-        decodeAddress(getAddress(), &sock.sin_addr);
-        if(inet_aton(getAddress().c_str(), &sock.sin_addr) != 1)
-        {
-            throw BadAddressException(STRCATS(
-                        "Could not interpret " <<
-                        getAddress() << " as an IPv4" <<
-                        " address"));
-        }
-
+        auto res = TcpSocket::newTcpSocket(getAddress(), getPort());
+        sockFd = res.first;
+        sockaddr_in sock = res.second;
 
         if(connect(sockFd, (sockaddr*)&sock, sizeof(sock)) < 0)
         {
