@@ -40,9 +40,6 @@ public:
     void done();
 
     virtual void startListening() = 0;
-
-    //basically call join()
-    virtual void waitUntilDone() = 0;
 };
 
 BUFSTACK_END_NAMESPACE
