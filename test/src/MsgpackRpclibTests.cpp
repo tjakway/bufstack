@@ -7,6 +7,7 @@
 #include "ClientConnection.hpp"
 #include "HasTcpConnection.hpp"
 #include "Util/FileUtil.hpp"
+#include "Util/Util.hpp"
 
 #include <atomic>
 #include <thread>
@@ -71,10 +72,11 @@ TEST_F(MsgpackRpclibTests, TestRpclibOnly)
     server->bind(flagTest.fName, flagTest.f);
     server->async_run();
 
-    rpc::client client(HasTcpConnection::localhost, port);
-    ASSERT_EQ(client.get_connection_state(), 
+    std::unique_ptr<rpc::client> client = 
+        make_unique<rpc::client>(HasTcpConnection::localhost, port);
+    ASSERT_EQ(client->get_connection_state(), 
             rpc::client::connection_state::connected);
-    client.call(flagTest.fName).get();
+    client->call(flagTest.fName).get();
 
     ASSERT_TRUE(flagTest.passes());
 }
@@ -127,6 +129,7 @@ TEST_F(MsgpackRpclibTests, TestCallReturnString)
     } catch(std::exception& e)
     {
         std::cerr << "Caught exception: " << e.what() << std::endl;
+        throw;
     }
 } 
 
