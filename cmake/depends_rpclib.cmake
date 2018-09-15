@@ -19,6 +19,9 @@ function(depends_rpclib TARGET_NAME_PARAM)
         set(THREADS_PREFER_PTHREAD_FLAG ON)
         find_package(Threads REQUIRED)
         target_link_libraries(${TARGET_NAME_PARAM} INTERFACE Threads::Threads)
+
+        #shouldn't have to manually add include directories if rpclib handles
+        #transitive dependencies properly
        #target_include_directories(${TARGET_NAME_PARAM} SYSTEM PUBLIC
        #    ${CMAKE_SOURCE_DIR}/lib/rpclib/include)
 
