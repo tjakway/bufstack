@@ -12,7 +12,10 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class AsyncBufSender : public BufSender, public Interruptible
+class AsyncBufSender 
+    : public BufSender, 
+    public Interruptible,
+    virtual public Loggable
 {
 protected:
     AsyncBufSender(
