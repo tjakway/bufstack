@@ -3,17 +3,21 @@
 #include "NamespaceDefines.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
+#include "HasFd.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class ServerConnection
     : virtual public Loggable,
-    virtual public Connectible
+    virtual public Connectible,
+    public HasFd
 {
 protected:
     ServerConnection(int serverFd)
         : Loggable("ServerConnection")
-    {}
+    {
+        setServerFd(serverFd);
+    }
 
     virtual void onClientConnect(int clientFd) = 0;
 
@@ -22,6 +26,11 @@ public:
 
     NEW_EXCEPTION_TYPE(ServerConnectionException);
     using BaseException = ServerConnectionException;
+
+    /**
+     * named startListen to disambiguate it from listen(2)
+     */
+    virtual void startListen() = 0;
 };
 
 BUFSTACK_END_NAMESPACE
