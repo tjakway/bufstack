@@ -3,6 +3,12 @@
 #include "NamespaceDefines.hpp"
 BUFSTACK_BEGIN_NAMESPACE
 
-Interruptible::~Interruptible() {}
+/**
+ * dtor stops the loop
+ */
+Interruptible::~Interruptible()
+{
+    interrupt();
+}
 
 BUFSTACK_END_NAMESPACE
