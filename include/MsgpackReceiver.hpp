@@ -27,6 +27,13 @@ protected:
     NEW_EXCEPTION_TYPE(MsgpackReceiverException);
     using BaseException = MsgpackReceiverException;
     NEW_EXCEPTION_TYPE_WITH_BASE(NotMessageException, MsgpackReceiverException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(MessageNotHandledException, MsgpackReceiverException);
+
+    /**
+     * can be thrown by subclasses to indicate they don't
+     * receive that type of message
+     */
+    void throwMsgNotHandledException(const MsgpackRpc::Message&) const;
 
     MsgpackReceiver()
         : Loggable("MsgpackReceiver")

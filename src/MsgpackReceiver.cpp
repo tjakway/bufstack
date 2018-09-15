@@ -12,6 +12,16 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
+
+void MsgpackReceiver::throwMsgNotHandledException(
+        const MsgpackRpc::Message& msg) const
+{
+    throw MessageNotHandledException(STRCATS(
+        "This class does not handle messages of type " <<
+        MsgpackRpc::Message::printType(msg.getType()) << 
+        ".  Message received: " << msg.printCompact()));
+}
+
 void MsgpackReceiver::handleRequestMessage(
         const std::vector<msgpack::object>& msgObj)
 {
