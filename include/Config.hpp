@@ -30,6 +30,8 @@ public:
          * default logger configuration
          */
         static std::function<std::shared_ptr<spdlog::logger>(const std::string&)> getLoggerConstructor();
+
+        static constexpr int serverBacklog = 128;
     };
 };
 
