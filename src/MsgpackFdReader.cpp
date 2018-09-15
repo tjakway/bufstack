@@ -5,6 +5,7 @@ BUFSTACK_BEGIN_NAMESPACE
 
 MsgpackFdReader::MsgpackFdReader(
         int _fd,
+        Callback onDecode,
         std::size_t _backlogSize,
         std::chrono::milliseconds _sleepInterval)
 : Loggable("MsgpackFdReader"),
@@ -16,7 +17,7 @@ void MsgpackFdReader::startListening()
 {
     while(!interrupted())
     {
-        readFd(_fd, cb);
+        readFd(fd, cb);
     }
 }
 
