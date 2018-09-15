@@ -32,9 +32,11 @@ all: $(BIN_DIR)/Makefile $(BIN_DIR)/compile_commands.json build
 clean:
 	rm -r -f $(BIN_DIR)
 
+#exclude the compilation database from tag generation
 .PHONY: tags
 tags:
 	ctags -R --exclude=bin \
+	    --exclude=compile_commands.json \
 	    --file-scope=yes \
 	    --langmap=c:+.h \
 	    --links=yes \
