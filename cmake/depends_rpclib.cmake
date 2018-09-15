@@ -13,8 +13,8 @@ endif()
 
 function(depends_rpclib TARGET_NAME_PARAM)
     if(USE_SYSTEM_RPCLIB)
-        target_include_directories(${TARGET_NAME_PARAM} SYSTEM INTERFACE ${MSGPACK_INCLUDE_DIRS})
-        target_link_libraries(${TARGET_NAME_PARAM} INTERFACE ${MSGPACK_LIBRARIES})
+        target_include_directories(${TARGET_NAME_PARAM} SYSTEM INTERFACE ${RPCLIB_INCLUDE_DIRS})
+        target_link_libraries(${TARGET_NAME_PARAM} INTERFACE ${RPCLIB_LIBRARIES})
     else()
        #target_include_directories(${TARGET_NAME_PARAM} SYSTEM PUBLIC
        #    ${CMAKE_SOURCE_DIR}/lib/rpclib/include)
