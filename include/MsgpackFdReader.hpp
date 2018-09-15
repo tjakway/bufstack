@@ -23,6 +23,10 @@ public:
             std::size_t _backlogSize,
             std::chrono::milliseconds _sleepInterval);
 
+    MsgpackFdReader(
+            int _fd,
+            Callback onDecode);
+
     virtual ~MsgpackFdReader() {}
 
     virtual void startListening() override;
