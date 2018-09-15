@@ -9,6 +9,7 @@
 #include <functional>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -31,7 +32,10 @@ public:
         MsgpackReaderUnpacker::readFd(fd, callback);
     }
 
-    virtual void waitUntilDone() {}
+    virtual void startListening()
+    {
+        throw std::runtime_error("Not implemented");
+    }
 
     virtual void abstract() {}
 };
