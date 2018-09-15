@@ -14,7 +14,6 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 class MsgpackReaderUnpacker : 
-    virtual public HasClientFd,
     virtual public Loggable,
     public Interruptible
 {
@@ -40,7 +39,7 @@ public:
     //alias for interrupt
     void done();
 
-    void startListening();
+    virtual void startListening() = 0;
 
     //basically call join()
     virtual void waitUntilDone() = 0;
