@@ -15,28 +15,12 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 class MsgpackClient : 
-    public AbstractMsgpackClient,
-    //needed to initialize remote functions
-    public std::enable_shared_from_this<MsgpackClient>
+    public AbstractMsgpackClient
 {
     const std::unique_ptr<ClientConnection> clientConnection;
 
-    std::unique_ptr<RemoteFunctionInstances> remoteFunctions;
-    static const std::string subscribedEvents;
-
-
-    void onConnect();
 protected:
-    void initializeRemoteFunctions(const ApiInfo&);
-    void subscribeEvents();
-    void checkFunctions(const std::unordered_set<NvimFunction>&);
-
     virtual ClientConnection& getClientConnection() const override;
-
-    /**
-     * skipOnConnect: whether to call onConnect()
-     */
-    MsgpackClient(ConnectionInfo, bool skipOnConnect);
 
 public:
     MsgpackClient(ConnectionInfo);
