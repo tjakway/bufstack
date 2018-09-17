@@ -42,10 +42,11 @@ public:
     virtual std::string printMultiline() const;
 };
 
-std::ostream& operator <<(std::ostream& s, const PrintableObject& c) 
-{
-    s << c.printCompact();
-    return s; 
-}
+#define PRINTABLE_OBJECT_OVERLOAD_STREAM_OPERATOR(className) \
+    std::ostream& operator <<(std::ostream& s, const className& c) \
+    { \
+        s << c.printCompact();\
+        return s; \
+    }
 
 BUFSTACK_END_NAMESPACE
