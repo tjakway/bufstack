@@ -4,13 +4,15 @@
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
 #include "HasFd.hpp"
+#include "Interruptible.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class ServerConnection
     : virtual public Loggable,
     virtual public Connectible,
-    public HasFd
+    public Interruptible,
+    public HasServerFd
 {
 protected:
     ServerConnection(int serverFd)

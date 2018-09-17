@@ -6,6 +6,9 @@
 #include "Util/Strcat.hpp"
 
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <cstdlib>
 #include <cerrno>
@@ -46,9 +49,9 @@ void ServerSocketConnection::startListen()
     {
         //wait for a connection then hand it off to the callback
         sockaddr_in client;
-        memset(&client, 0 sizeof(sockaddr_in));
+        memset(&client, 0, sizeof(sockaddr_in));
         socklen_t clientLen = sizeof(sockaddr_in);
-        int clientFd = accept(server_fd, (struct sockaddr *) &client, &clientLen);
+        int clientFd = accept(getServerFd(), (struct sockaddr *) &client, &clientLen);
 
         if(clientFd < 0)
         {
