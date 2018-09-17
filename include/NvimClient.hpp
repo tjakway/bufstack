@@ -3,7 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "ClientConnection.hpp"
 #include "HasFd.hpp"
-#include "AbstractMsgpackClient.hpp"
+#include "MsgpackClient.hpp"
 #include "Loggable.hpp"
 
 #include "NvimApi/NvimFunction.hpp"
@@ -21,13 +21,10 @@ class NvimClient :
     public std::enable_shared_from_this<NvimClient>,
     virtual public Loggable
 {
-    const std::unique_ptr<ClientConnection> clientConnection;
-
     std::unique_ptr<RemoteFunctionInstances> remoteFunctions;
     static const std::string subscribedEvents;
-
-
     void onConnect();
+
 protected:
     void initializeRemoteFunctions(const ApiInfo&);
     void subscribeEvents();
