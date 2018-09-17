@@ -272,17 +272,44 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
         deprecated = make_optional(deprecatedSinceVersion);
     }
 
+    //parse parameters
     std::ostringstream ss;
     ss << function.at(Keys::Function::parameters);
     getLogger()->debug("parameters object for {}: {}", printOptional(name),
             ss.str());
 
+
+    //for some reason the parameters are wrapped twice: instead of a list of objects,
+    //it's actually a list of list of objects
+    //unwrap it
+    const std::vector<msgpack::object>& paramObjList = 
+        function.at(Keys::Function::parameters).as<std::vector<msgpack::object>>();
+
+    std::vector<std::string> parsedParams;
+
+    if(!paramObjList.empty())
+    {
+        if(paramObjList.size() != 1)
+        {
+            throw ParseFunctionException(
+                STRCATS("Expected parameter list to be either" << 
+                    "empty or size 1: " << 
+                    function.at(Keys::Function::parameters)));
+        }
+        else
+        {
+            parsedParams = 
+                tryConvert<std::vector<std::string>>(paramObjList.at(0))
+                                        .value_or(std::vector<std::string>{});
+
+        }
+    }
+
     return NvimFunction(tryConvert<bool>(function.at(Keys::Function::method)),
                 tryConvert<std::string>(function.at(Keys::Function::returnType)),
                 tryConvert<std::string>(function.at(Keys::Function::since)),
                 deprecated,
-                tryConvert<std::vector<std::string>>(function.at(Keys::Function::parameters))
-                    .value_or(std::vector<std::string>{}),
+                parsedParams,
                 name.value());
 
 }
