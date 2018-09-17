@@ -15,13 +15,13 @@ private:
     virtual void onReceiveRequestMsg(
             const MsgpackRpc::RequestMessage& msg) override 
     {
-        getLogger()->debug(STRCATS("Received RequestMessage: " << msg));
+        getLogger()->debug(STRCATS("Received RequestMessage: " << msg.printCompact()));
     }
 
     virtual void onReceiveNotificationMsg(
             const MsgpackRpc::NotificationMessage& msg) override
     {
-        getLogger()->debug(STRCATS("Received NotificationMessage: " << msg));
+        getLogger()->debug(STRCATS("Received NotificationMessage: " << msg.printCompact()));
     }
     
 public:
