@@ -1,5 +1,8 @@
 #include "NvimClient.hpp"
 
+#include "NvimApi/ApiParser.hpp"
+#include "NvimApi/RemoteFunction.hpp"
+
 namespace {
 
     class MsgpackOnConnectThread 
@@ -10,7 +13,7 @@ namespace {
 
 BUFSTACK_BEGIN_NAMESPACE
 
-const std::string MsgpackClient::subscribedEvents = 
+const std::string NvimClient::subscribedEvents = 
         "BufEnter,BufLeave,TabEnter,TabLeave,WinEnter,WinLeave";
 
 void NvimClient::onConnect()
@@ -73,9 +76,8 @@ NvimClient::NvimClient(ConnectionInfo ci, bool skipOnConnect)
 }
 
 NvimClient::NvimClient(ConnectionInfo ci)
-{
-
-}
+    : NvimClient(ci, false)
+{}
 
 NvimClient::~NvimClient()
 {
