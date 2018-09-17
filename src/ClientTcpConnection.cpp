@@ -37,7 +37,7 @@ void ClientTcpConnection::_connect()
 
     int sockFd = -1;
     try {
-        auto res = TcpSocket::newTcpSocket(getAddress(), getPort());
+        auto res = TcpSocket::newTcpSocket(getAddress(), getPort(), *this);
         sockFd = res.first;
         sockaddr_in sock = res.second;
 
