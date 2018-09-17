@@ -15,7 +15,7 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 std::pair<int,sockaddr_in> TcpSocket::newTcpSocket(
-        const std::string& addr, uint16_t port)
+    const std::string& address, uint16_t port, Loggable& l)
 {
     int sockFd = -1;
     try {
@@ -48,7 +48,7 @@ std::pair<int,sockaddr_in> TcpSocket::newTcpSocket(
     catch(...)
     {
         //close the socket on error then rethrow
-        SAFE_CLOSE_LOG_ERROR(sockFd);
+        SAFE_CLOSE_LOG_ERROR_LOGGABLE(sockFd, l);
         throw;
     }
 }

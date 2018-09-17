@@ -2,6 +2,12 @@
 
 #include "NamespaceDefines.hpp"
 #include "Util/NewExceptionType.hpp"
+#include "Loggable.hpp"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <string>
 #include <cstdint>
@@ -18,7 +24,7 @@ public:
     NEW_EXCEPTION_TYPE(BadAddressException);
 
     static std::pair<int,sockaddr_in> newTcpSocket(
-            const std::string& addr, uint16_t port);
+        const std::string& addr, uint16_t port, Loggable&);
     static void decodeAddress(const std::string&, in_addr*);
 };
 
