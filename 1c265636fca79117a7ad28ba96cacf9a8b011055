@@ -1,0 +1,1 @@
+using a macro to declare stream operators instead of just writing a stream operator for PrintableObject because otherwise the compiler complains about having multiple definitions--would need to overload the operator for a pointer to the object and use polymorphism instead (or just declare it for each subclass individually, which is the alternative I'm using)
