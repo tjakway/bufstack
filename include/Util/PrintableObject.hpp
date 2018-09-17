@@ -3,6 +3,7 @@
 #include "NamespaceDefines.hpp"
 #include "nonstd/optional.hpp"
 
+#include <iostream>
 #include <string>
 #include <map>
 
@@ -40,5 +41,12 @@ public:
     virtual std::string printCompact() const;
     virtual std::string printMultiline() const;
 };
+
+#define PRINTABLE_OBJECT_OVERLOAD_STREAM_OPERATOR(className) \
+    std::ostream& operator <<(std::ostream& s, const className& c) \
+    { \
+        s << c.printCompact();\
+        return s; \
+    }
 
 BUFSTACK_END_NAMESPACE
