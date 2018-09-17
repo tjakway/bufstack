@@ -122,6 +122,9 @@ protected:
 
         std::shared_ptr<CustomType> parseCustomType(const std::string&, const msgpack::object&);
 
+        std::vector<std::string> parseParameters(const msgpack::object&, 
+                const std::string& name);
+
         ParseFunctions()
             : Loggable("ParseFunctions")
         {}

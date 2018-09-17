@@ -272,10 +272,25 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
         deprecated = make_optional(deprecatedSinceVersion);
     }
 
+
+    const auto nameValue = name.value();
+
+    return NvimFunction(tryConvert<bool>(function.at(Keys::Function::method)),
+                tryConvert<std::string>(function.at(Keys::Function::returnType)),
+                tryConvert<std::string>(function.at(Keys::Function::since)),
+                deprecated,
+                parseParameters(function.at(Keys::Function::parameters), nameValue), 
+                nameValue);
+
+}
+
+std::vector<std::string> ApiParser::ParseFunctions::parseParameters(const msgpack::object& obj,
+        const std::string& name)
+{
     //parse parameters
     std::ostringstream ss;
-    ss << function.at(Keys::Function::parameters);
-    getLogger()->debug("parameters object for {}: {}", printOptional(name),
+    ss << obj;
+    getLogger()->debug("parameters object for {}: {}", name,
             ss.str());
 
 
@@ -283,35 +298,16 @@ NvimFunction ApiParser::ParseFunctions::parseNvimFunction(const msgpack::object&
     //it's actually a list of list of objects
     //unwrap it
     const std::vector<msgpack::object>& paramObjList = 
-        function.at(Keys::Function::parameters).as<std::vector<msgpack::object>>();
+        obj.as<std::vector<msgpack::object>>();
 
     std::vector<std::string> parsedParams;
 
-    if(!paramObjList.empty())
+    for(const msgpack::object& thisElem : paramObjList)
     {
-        if(paramObjList.size() != 1)
-        {
-            throw ParseFunctionException(
-                STRCATS("Expected parameter list to be either" << 
-                    "empty or size 1: " << 
-                    function.at(Keys::Function::parameters)));
-        }
-        else
-        {
-            parsedParams = 
-                tryConvert<std::vector<std::string>>(paramObjList.at(0))
-                                        .value_or(std::vector<std::string>{});
-
-        }
+        parsedParams.emplace_back(thisElem.as<std::vector<std::string>>().at(0));
     }
 
-    return NvimFunction(tryConvert<bool>(function.at(Keys::Function::method)),
-                tryConvert<std::string>(function.at(Keys::Function::returnType)),
-                tryConvert<std::string>(function.at(Keys::Function::since)),
-                deprecated,
-                parsedParams,
-                name.value());
-
+    return parsedParams;
 }
 
 std::unordered_set<NvimFunction> ApiParser::getFunctions()
