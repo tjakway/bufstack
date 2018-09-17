@@ -19,7 +19,7 @@ private:
     }
 
     virtual void onReceiveNotificationMsg(
-            const MsgpackRpc::NotificationMessage&) override
+            const MsgpackRpc::NotificationMessage& msg) override
     {
         getLogger()->debug(STRCATS("Received NotificationMessage: " << msg));
     }
