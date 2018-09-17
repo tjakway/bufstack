@@ -3,7 +3,10 @@
 #include "NamespaceDefines.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
+#include "Connectible.hpp"
+#include "ServerConnection.hpp"
 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -20,7 +23,7 @@ class ServerSocketConnection
 
 protected:
     ServerSocketConnection(int serverFd, sockaddr_in,
-            int backlog = Config::serverBacklog);
+            int backlog = Config::Defaults::serverBacklog);
 
     virtual void onClientConnect(int clientFd) = 0;
 
