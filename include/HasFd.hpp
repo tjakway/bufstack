@@ -12,27 +12,8 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-class HasFd : virtual public Loggable
+class HasFd
 {
-    int fd;
-
-protected:
-    int getFd() const noexcept
-    {
-        if(!Util::fd_is_valid(fd))
-        {
-            getLogger()->warn(
-                STRCATS("Util::fd_is_valid(fd) returned" <<
-                    " false for file descriptor " << fd));
-        }
-        return fd;
-    }
-
-    void setFd(int newFd) noexcept
-    {
-        fd = newFd;
-    }
-
 public:
     HasFd(int _fd)
         : fd(_fd)
@@ -42,58 +23,45 @@ public:
         : fd(-1)
     {}
 
+    virtual int getFd() const = 0;
+
     virtual ~HasFd()
-    {
-        if(Util::fd_is_valid(getFd()))
-        {
-            int res = close(getFd());
-            if(res != 0)
-            {
-                auto _errno = errno;
-                getLogger()->warn(STRCATS("close returned" <<
-                    " nonzero value when closing file descriptor " <<
-                    fd << ", error description: " << strerror(_errno)));
-            }
-        }
-        setFd(-1);
-    }
-
-    //dummy method to mark the class abstract
-    virtual void abstract() = 0;
+    {}
 };
 
-class HasClientFd : public HasFd
+class HasReadFd : public HasFd
 {
 public:
-    int getClientFd() { return getFd(); }
-    void setClientFd(int fd) { setFd(fd); }
+    int getReadFd() { return getFd(); }
+    void setReadFd(int fd) { setFd(fd); }
 
-    HasClientFd(int _fd)
+    HasReadFd(int _fd)
         : HasFd(_fd)
     {}
 
-    HasClientFd()
+    HasReadFd()
         : HasFd()
     {}
 
-    virtual ~HasClientFd() {}
+    virtual ~HasReadFd() {}
 };
 
-class HasServerFd : public HasFd
+class HasWriteFd : public HasFd
 {
 public:
-    int getServerFd() { return getFd(); }
-    void setServerFd(int fd) { setFd(fd); }
+    int getWriteFd() { return getFd(); }
+    void setWriteFd(int fd) { setFd(fd); }
 
-    HasServerFd(int _fd)
+    HasWriteFd(int _fd)
         : HasFd(_fd)
     {}
 
-    HasServerFd()
+    HasWriteFd()
         : HasFd()
     {}
 
-    virtual ~HasServerFd() {}
+    virtual ~HasWriteFd() {}
 };
+
 
 BUFSTACK_END_NAMESPACE
