@@ -78,5 +78,20 @@ public:
     std::string getPath() const noexcept { return path; }
 };
 
+class ClientEmbeddedConnection
+    : public ClientConnection
+{
+protected:
+    virtual Fields getFields() const noexcept override;
+    virtual std::string getName() const noexcept override;
+
+public:
+    ClientEmbeddedConnection(int readFd, int writeFd);
+    ClientEmbeddedConnection(const ClientEmbeddedConnection&) = delete;
+    ClientEmbeddedConnection(ClientEmbeddedConnection&&);
+
+    virtual ~ClientEmbeddedConnection();
+};
+
 
 BUFSTACK_END_NAMESPACE
