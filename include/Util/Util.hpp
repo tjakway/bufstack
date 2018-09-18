@@ -89,9 +89,11 @@ public:
     static std::string printVector(std::vector<T> vec, 
             std::string separator = ", ",
             std::string header = "vec { ",
-            std::string footer = " }")
+            std::string footer = " }",
+            std::function<void(std::ostringstream&)> setupStream = [](std::ostringstream&){})
     {
         std::ostringstream stream;
+        setupStream(stream);
         stream << header;
  
         if(vec.size() > 1)
@@ -135,7 +137,12 @@ public:
             vec.emplace_back(array[i]);
         }
 
-        return printVector(vec, separator, header, footer);
+        //print digits in hex
+        auto setupStream = [](std::ostringstream& s){
+            s << std::hex;
+        };
+
+        return printVector(vec, separator, header, footer, setupStream);
     }
 
 
