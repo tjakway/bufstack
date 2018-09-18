@@ -28,4 +28,13 @@ ConnectionInfo ConnectionInfo::unixConnection(std::string path)
     return ConnectionInfo(ConnectionType::Unix, d);
 }
 
+ConnectionInfo ConnectionInfo::embeddedConnection(int readFd, int writeFd)
+{
+    Data d;
+    d.pipeData.readFd = readFd;
+    d.pipeData.writeFd = writeFd;
+
+    return ConnectionInfo(ConnectionType::Embedded, d);
+}
+
 BUFSTACK_END_NAMESPACE

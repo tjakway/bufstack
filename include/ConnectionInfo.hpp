@@ -16,7 +16,8 @@ public:
         /**
          * unix domain sockets
          */
-        Unix = 2
+        Unix = 2,
+        Embedded = 3
     };
     const ConnectionType connectionType;
 
@@ -37,10 +38,17 @@ public:
         ~UnixData() {}
     };
 
+    struct PipeData
+    {
+        int readFd;
+        int writeFd;
+    };
+
     union Data
     {
         TcpData tcpData;
         UnixData unixData;
+        PipeData pipeData;
 
         //see https://stackoverflow.com/questions/321351/initializing-a-union-with-a-non-trivial-constructor
         Data() { memset(this, 0, sizeof(Data)); }
@@ -53,6 +61,7 @@ public:
             std::string address,
             uint16_t port);
     static ConnectionInfo unixConnection(std::string path);
+    static ConnectionInfo embeddedConnection(int readFd, int writeFd);
 
 protected:
     ConnectionInfo(ConnectionType, Data);
