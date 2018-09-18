@@ -71,6 +71,13 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
             currentBufPosition += amountWritten;
         }
     }
+
+    std::unique_ptr<char> bufCpy(new char[bufLen]);
+    memcpy(bufCpy.get(), buf, bufLen);
+
+    log.getLogger()->debug(STRCATS("Sent " << bufLen 
+        << " bytes on file descriptor " << clientFd <<
+        ": " << Util::printArray(bufCpy.get(), bufLen)));
 }
 
 void BufSender::send(int clientFd, const char* buf, std::size_t len)
