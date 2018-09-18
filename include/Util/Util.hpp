@@ -13,6 +13,7 @@
 #include <iterator>
 #include <utility>
 #include <sstream>
+#include <stdexcept>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -82,7 +83,8 @@ public:
         return fd > 0 && fcntl(fd, F_GETFD) != -1 || errno != EBADF;
     }
 
-
+    //TODO: refactor into a print function in PrintableObject that takes
+    //iterators
     template <typename T>
     static std::string printVector(std::vector<T> vec, 
             std::string separator = ", ",
@@ -111,6 +113,31 @@ public:
         stream << footer;
         return stream.str();
     }
+
+    template <typename T>
+    static std::string printArray(T* array, 
+            std::size_t len,
+            std::string separator = ", ",
+            std::string header = "[ ",
+            std::string footer = " ]")
+    {
+        if(len < 0)
+        {
+            throw std::logic_error(
+                STRCATS(__func__ << " called with array of length " << len));
+        }
+
+        //copy to a vector then pass our formatting constants
+        std::vector<T> vec;
+        vec.reserve(len);
+        for(std::size_t i = 0; i < len; i++)
+        {
+            vec.emplace_back(array[i]);
+        }
+
+        return printVector(vec, separator, header, footer);
+    }
+
 
     /**
     * return true if rhs is a subset of lhs
