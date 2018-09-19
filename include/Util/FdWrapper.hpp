@@ -7,10 +7,11 @@
 #include <string>
 #include <utility>
 
+BUFSTACK_BEGIN_NAMESPACE
+
 class FdWrapper
     : public Loggable
 {
-    static constexpr int initialValue = -1;
 
     int fd;
 
@@ -33,6 +34,8 @@ protected:
     }
 
 public:
+    static constexpr int initialValue = -1;
+
     FdWrapper(int _fd)
         : Loggable("FdWrapper"), fd(_fd)
     {}
@@ -52,7 +55,7 @@ public:
 
     virtual ~FdWrapper()
     {
-        if(Util::fd_is_valid(getFd()))
+        if(fd != initialValue && Util::fd_is_valid(getFd()))
         {
             int res = close(getFd());
             if(res != 0)
