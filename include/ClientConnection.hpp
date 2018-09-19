@@ -7,6 +7,7 @@
 #include "ConnectionInfo.hpp"
 #include "Util/NewExceptionType.hpp"
 #include "Util/PrintableObject.hpp"
+#include "Util/FdWrapper.hpp"
 
 #include <cstdint>
 #include <string>
@@ -15,7 +16,6 @@ BUFSTACK_BEGIN_NAMESPACE
 
 class ClientConnection : 
     virtual public Connectible,
-    virtual public HasClientFd,
     virtual public Loggable,
     virtual public PrintableObject
 {
@@ -34,7 +34,10 @@ public:
 
 class ClientTcpConnection 
     : public ClientConnection,
-      public HasTcpConnection
+      public HasTcpConnection,
+      public HasSingleFd,
+      virtual public Loggable,
+      virtual public PrintableObject
 {
     virtual void abstract() override {}
     void _connect();
@@ -58,7 +61,10 @@ public:
  * connection over unix domain sockets
  */
 class ClientUnixConnection
-    : public ClientConnection
+    : public ClientConnection,
+      public HasSingleFd,
+      virtual public Loggable,
+      virtual public PrintableObject
 {
     virtual void abstract() override {}
 
@@ -79,19 +85,30 @@ public:
 };
 
 class ClientEmbeddedConnection
-    : public ClientConnection
+    : public ClientConnection,
+    public HasReadFd,
+    public HasWriteFd,
+    virtual public Loggable,
+    virtual public PrintableObject
 {
+    FdWrapper readFd, writeFd;
+
 protected:
     virtual Fields getFields() const noexcept override;
     virtual std::string getName() const noexcept override;
 
 public:
-    ClientEmbeddedConnection(int readFd, int writeFd);
+    ClientEmbeddedConnection(FdWrapper&& readFd, FdWrapper&& writeFd);
     ClientEmbeddedConnection(const ClientEmbeddedConnection&) = delete;
     ClientEmbeddedConnection(ClientEmbeddedConnection&&);
 
     virtual ~ClientEmbeddedConnection();
+
+
+    virtual int getWriteFd() const override;
+    virtual int getReadFd() const override;
 };
+
 
 
 BUFSTACK_END_NAMESPACE
