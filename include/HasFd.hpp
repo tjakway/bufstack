@@ -15,53 +15,67 @@ BUFSTACK_BEGIN_NAMESPACE
 class HasFd
 {
 public:
-    HasFd(int _fd)
-        : fd(_fd)
-    {}
-
-    HasFd()
-        : fd(-1)
-    {}
-
     virtual int getFd() const = 0;
 
-    virtual ~HasFd()
-    {}
+    virtual ~HasFd() {}
 };
 
-class HasReadFd : public HasFd
+/**
+ * HasReadFd and HasWriteFd don't extend HasFd
+ * in case they are implemented by separate file descriptors
+ */
+class HasReadFd
 {
 public:
-    int getReadFd() { return getFd(); }
-    void setReadFd(int fd) { setFd(fd); }
-
-    HasReadFd(int _fd)
-        : HasFd(_fd)
-    {}
-
-    HasReadFd()
-        : HasFd()
-    {}
+    virtual int getReadFd() const = 0;
 
     virtual ~HasReadFd() {}
 };
 
-class HasWriteFd : public HasFd
+class HasWriteFd
 {
 public:
-    int getWriteFd() { return getFd(); }
-    void setWriteFd(int fd) { setFd(fd); }
-
-    HasWriteFd(int _fd)
-        : HasFd(_fd)
-    {}
-
-    HasWriteFd()
-        : HasFd()
-    {}
+    virtual int getWriteFd() const = 0;
 
     virtual ~HasWriteFd() {}
 };
 
+
+/**
+ * for classes that read/write to the same file descriptor
+ */
+class HasSingleFd :
+    public HasFd,
+    public HasReadFd,
+    public HasWriteFd
+{
+    FdWrapper fd;
+public:
+    HasSingleFd(FdWrapper&& _fd)
+        : fd(_fd),
+        HasReadFd(fd.getFd()),
+        HasWriteFd(fd.getFd())
+    {}
+
+    /**
+     * default-construct with a -1 file descriptor
+     */
+    HasSingleFd()
+        : HasSingleFd(FdWrapper())
+    {}
+
+    void setSingleFd(FdWrapper&& _fd)
+    {
+        fd = _fd;
+    }
+
+    virtual getFd() const override
+    {
+        return fd.getFd();
+    }
+
+    virtual int getWriteFd() const { return getFd(); }
+    virtual int getReadFd() const { return getFd(); }
+};
 
 BUFSTACK_END_NAMESPACE
