@@ -10,15 +10,15 @@
 #include "FindNeovim.hpp"
 
 #include "TestConfig.hpp"
-#include "HasTcpConnection.hpp"
 #include "MsgpackClient.hpp"
+#include "ClientConnection.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class NvimConnectionTest
 {
     std::unique_ptr<pid_t> nvimPid;
-    std::pair<int, int> pipeFds;
+    std::unique_ptr<ClientEmbeddedConnection> nvimConnection;
 
     static constexpr auto localhost = HasTcpConnection::localhost;
 
@@ -30,7 +30,7 @@ class NvimConnectionTest
 
     //atomically initialize the client
     void connect();
-    std::pair<FdWrapper,FdWrapper> launchNeovim(
+    void launchNeovim(
         const std::string& path);
 
 protected:

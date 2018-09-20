@@ -19,7 +19,7 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-std::pair<FdWrapper,FdWrapper> NvimConnectionTest::launchNeovim(
+void NvimConnectionTest::launchNeovim(
     const std::string& path)
 {
     //we need 2 pipes:
@@ -106,7 +106,9 @@ std::pair<FdWrapper,FdWrapper> NvimConnectionTest::launchNeovim(
     else
     {
         nvimPid = make_unique<pid_t>(pid);
-        return std::make_pair(FdWrapper(parentRead), FdWrapper(parentWrite));
+        nvimConnection = 
+            make_unique<ClientEmbeddedConnection>(
+                    FdWrapper(parentRead), FdWrapper(parentWrite));
     }
 }
 
