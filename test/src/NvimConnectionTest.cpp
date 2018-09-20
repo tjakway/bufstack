@@ -34,62 +34,10 @@ std::unique_ptr<NvimClient> NvimConnectionTest::getClientInstance()
     }
     else
     {
-        return make_unique<NvimClient>(nvimConnection);
+        return make_unique<MockNvimClient>(nvimConnection);
     }
 }
 
-
-std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
-    const std::string& address,
-    uint16_t port)
-{
-    std::shared_ptr<MsgpackClient> client = nullptr;
-    const auto start = std::chrono::steady_clock::now();
-
-    unsigned int attempts = 0;
-    std::chrono::steady_clock::time_point connectTime;
-
-    std::string lastErrorMessage;
-    while(!client && 
-        (start - std::chrono::steady_clock::now()) 
-            < TestConfig::nvimMaxStartupTime)
-    {
-        try {
-            attempts++;
-
-            client = std::make_shared<MockNvimClient>(
-                ConnectionInfo::tcpConnection(address, port));
-
-            //this will only be assigned if the connection is successful
-            connectTime = std::chrono::steady_clock::now();
-        } 
-        catch(ClientConnection::ClientConnectionException ex) 
-        {
-            lastErrorMessage = ex.what();
-
-            //wait before trying to connect again
-            std::this_thread::sleep_for(
-                    TestConfig::waitBetweenNvimConnectionAttempts);
-        }
-    }
-
-    if(!client)
-    {
-        throw CannotConnectException(
-            std::string("tryCreateClient failed, last error message was: ") + 
-            lastErrorMessage);
-    }
-    else
-    {
-        const std::chrono::milliseconds timeToConnect = 
-            std::chrono::duration_cast<std::chrono::milliseconds>(connectTime - start);
-        logger->getLogger()->debug(
-            STRCATS("nvim connection successful: took " << attempts << 
-                " attempts and " << timeToConnect.count() << " milliseconds"));
-
-        return client;
-    }
-}
 
 void NvimConnectionTest::connect()
 {
