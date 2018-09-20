@@ -28,10 +28,6 @@ class NvimConnectionTest
 
     FindNeovim findNeovim;
 
-    std::shared_ptr<MsgpackClient> tryCreateClient(
-        const std::string& _address,
-        uint16_t _port);
-
     //atomically initialize the client
     void connect();
     void launchNeovim(
