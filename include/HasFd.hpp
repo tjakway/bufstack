@@ -9,6 +9,7 @@
 #include "Loggable.hpp"
 #include "Util/Util.hpp"
 #include "Util/Strcat.hpp"
+#include "Util/FdWrapper.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
