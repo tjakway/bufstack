@@ -30,25 +30,21 @@ AsyncBufSender::AsyncBufSender(
     forceAsync(_forceAsync)
 {}
 
-void AsyncBufSender::send(int clientFd, Buffer buf)
+void AsyncBufSender::doSend(std::function<void(void)> writeF)
 {
     std::lock_guard<std::mutex> {writeMutex};
 
-    //the function object to pass to std::async
-    const auto doSendF = 
-        std::bind(&AsyncBufSender::doSend, this, 
-                std::placeholders::_1, std::placeholders::_2);
 
     std::future<void> result;
     //if forceAsync == true, force the use of a separate write thread
     if(forceAsync)
     {
-        result = std::async(doSendF, clientFd, std::move(buf), std::launch::async);
+        result = std::async(std::launch::async, writeF);
     }
     else
     {
         //otherwise use default launch flags
-        result = std::async(doSendF, clientFd, std::move(buf));
+        result = std::async(writeF);
     }
 
     //***NEED*** to keep the returned std::future, otherwise its destructor
@@ -60,16 +56,18 @@ void AsyncBufSender::send(int clientFd, Buffer buf)
 
 void AsyncBufSender::send(int clientFd, const char* buf, std::size_t len)
 {
-    std::unique_lock<std::mutex> {writeMutex};
-    BufSender::sendAll(clientFd, buf, len, *this);
+    doSend([=]() {
+        BufSender::sendAll(clientFd, buf, len, *this);
+    });
 }
 
-
-void AsyncBufSender::doSend(int clientFd, Buffer buf)
+void AsyncBufSender::send(int clientFd, Buffer buf)
 {
-    std::unique_lock<std::mutex> {writeMutex};
-
-    BufSender::sendAll(clientFd, buf.data(), buf.size(), *this);
+    auto f = [clientFd, this](Buffer mbuf) {
+        BufSender::sendAll(clientFd, mbuf.data(), mbuf.size(), *this);
+    };
+    auto g = std::bind(f, std::move(buf));
+    doSend(g);
 }
 
 BUFSTACK_END_NAMESPACE

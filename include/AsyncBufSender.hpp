@@ -39,7 +39,7 @@ private:
 
     std::mutex writeMutex;
 
-    void doSend(int, Buffer);
+    void doSend(std::function<void(void)>);
 public:
     virtual ~AsyncBufSender() {}
 };
