@@ -19,15 +19,20 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-std::pair<int,int> NvimConnectionTest::launchNeovim(
+std::pair<FdWrapper,FdWrapper> NvimConnectionTest::launchNeovim(
     const std::string& path)
 {
-    //create a pipe to communicate with the nvim child process
-    int pipeFds[2];
-    pipeFds[0] = -1;
-    pipeFds[1] = -1;
+    //we need 2 pipes:
+    //the first: parent out -> child stdin
+    //the second: child stdout -> parent read
+    const std::size_t numPipeFds = 4;
+    int pipeFds[numPipeFds];
+    memset(&pipeFds, -1, sizeof(int) * numPipeFds);
+    int* parentReadPipe = &pipeFds[0];
+    int* childReadPipe = &pipeFds[2];
 
-    if(pipe(pipeFds) != 0)
+    if(pipe(parentReadPipe) != 0 ||
+            pipe(childReadPipe) != 0)
     {
         auto _errno = errno;
         throw NvimLaunchException(
@@ -35,21 +40,39 @@ std::pair<int,int> NvimConnectionTest::launchNeovim(
                 strerror(_errno)));
     }
 
+    int childNewStdout = parentReadPipe[1],
+        childNewStdin = childReadPipe[0],
+        parentRead = parentReadPipe[0],
+        parentWrite = childReadPipe[1];
 
+    //check file descriptors
+    for(int i = 0; i < numPipeFds; i++)
+    {
+        if(!Util::fd_is_valid(pipeFds[i]))
+        {
+            throw NvimLaunchException(STRCATS(
+                "Sanity check Util::fd_is_valid failed" <<
+                " for fd " << pipeFds[i] << 
+                "(pipeFds[" << i << "])"));
+        }
+    }
+
+
+    //fork
     pid_t pid = fork();
     //child
     if(pid == 0)
     {
         //set the read end of the pipe to stdin and
         //the write end to stdout
-        if(dup2(STDIN_FILENO, pipeFds[0]) == -1)
+        if(dup2(STDIN_FILENO, childNewStdin) == -1)
         {
             throw NvimLaunchException(
                 STRCATS("Error setting the read end of the pipe (" <<
                     "file descriptor " << pipeFds[0] << ") to stdin"));
         }
         
-        if(dup2(STDOUT_FILENO, pipeFds[1]) == -1)
+        if(dup2(STDOUT_FILENO, childNewStdout) == -1)
         {
             throw NvimLaunchException(
                 STRCATS("Error setting the write end of the pipe (" <<
@@ -83,7 +106,7 @@ std::pair<int,int> NvimConnectionTest::launchNeovim(
     else
     {
         nvimPid = make_unique<pid_t>(pid);
-        return std::make_pair(pipeFds[0], pipeFds[1]);
+        return std::make_pair(FdWrapper(parentRead), FdWrapper(parentWrite));
     }
 }
 

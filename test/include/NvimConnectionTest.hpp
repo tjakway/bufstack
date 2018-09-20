@@ -18,6 +18,7 @@ BUFSTACK_BEGIN_NAMESPACE
 class NvimConnectionTest
 {
     std::unique_ptr<pid_t> nvimPid;
+    std::pair<int, int> pipeFds;
 
     static constexpr auto localhost = HasTcpConnection::localhost;
 
@@ -28,13 +29,9 @@ class NvimConnectionTest
         uint16_t _port);
 
     //atomically initialize the client
-    void connect(
-        const std::string& _address,
-        uint16_t _port);
-    void launchNeovim(
-        const std::string& path,
-        const std::string& _address,
-        uint16_t _port);
+    void connect();
+    std::pair<FdWrapper,FdWrapper> launchNeovim(
+        const std::string& path);
 
 protected:
     std::unique_ptr<Loggable> logger;
@@ -51,9 +48,7 @@ public:
             NvimConnectionTestException);
 
 
-    NvimConnectionTest(
-        const std::string& _address = TestConfig::nvimConnectionAddress,
-        uint16_t _port = TestConfig::nvimConnectionPort);
+    NvimConnectionTest();
 
     virtual ~NvimConnectionTest();
 
