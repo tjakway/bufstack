@@ -15,6 +15,7 @@ class MsgpackFdReader
 {
     const int fd;
     Callback cb;
+    std::atomic_bool listening;
 
 public:
     MsgpackFdReader(

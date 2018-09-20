@@ -10,7 +10,8 @@ MsgpackFdReader::MsgpackFdReader(
         std::chrono::milliseconds _sleepInterval)
 : Loggable("MsgpackFdReader"),
     MsgpackReaderUnpacker(_backlogSize, _sleepInterval), 
-    fd(_fd)
+    fd(_fd),
+    listening(false)
 {}
 
 MsgpackFdReader::MsgpackFdReader(
@@ -19,14 +20,23 @@ MsgpackFdReader::MsgpackFdReader(
 : Loggable("MsgpackFdReader"),
     //call with default args
     MsgpackReaderUnpacker(), 
-    fd(_fd)
+    fd(_fd),
+    listening(false)
 {}
 
 void MsgpackFdReader::startListening()
 {
-    while(!interrupted())
+    //check that we're not already reading
+    if(!listening)
     {
-        readFd(fd, cb);
+        while(!interrupted())
+        {
+            listening.store(true);
+            readFd(fd, cb);
+        }
+        
+        //done listening
+        listening.store(false);
     }
 }
 
