@@ -9,6 +9,7 @@
 #include "HasFd.hpp"
 #include "AsyncBufSender.hpp"
 #include "MsgpackReceiver.hpp"
+#include "MsgpackFdReader.hpp"
 #include "ClientConnection.hpp"
 #include <cstdlib>
 
@@ -69,6 +70,10 @@ class AbstractMsgpackClient :
         std::function<bool(MsgpackRpc::ResponseMessage)>;
 
     AtomicAccess<std::vector<BoundResponseCallback>> responseCallbacks;
+
+    std::mutex fdReaderMutex;
+    std::unique_ptr<MsgpackFdReader> fdReader;
+    void onDecodeCallback(const MsgpackReaderUnpacker::ObjectList&);
     
 protected:
     using BaseException = MsgpackReceiver::BaseException;
@@ -76,6 +81,10 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseResultConversionException, ResponseException);
     //indicates a serverside error
     NEW_EXCEPTION_TYPE_WITH_BASE(ResponseGotException, ResponseException);
+
+    NEW_EXCEPTION_TYPE_WITH_BASE(AlreadyListeningException, BaseException);
+
+    void startListening(int readFd);
 
     virtual void addResponseCallback(BoundResponseCallback&& cb);
     virtual void onReceiveResponseMsg(
@@ -213,7 +222,8 @@ public:
 
     AbstractMsgpackClient()
         : idSeq(0), responseCallbacks(
-            std::vector<BoundResponseCallback>{})
+            std::vector<BoundResponseCallback>{}),
+        fdReader()
     {}
 
     virtual ~AbstractMsgpackClient() {}
