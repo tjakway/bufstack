@@ -26,7 +26,8 @@ public:
     class Message : public PrintableObject
     {
     public:
-        enum Type
+        using EnumType = uint32_t;
+        enum Type : EnumType
         {
             Request = 0,
             Response = 1,
@@ -38,6 +39,7 @@ public:
 
         const Type type;
 
+        static EnumType getTypeValue(Type t) { return static_cast<EnumType>(t); }
         Type getType() const { return type; }
 
         std::string printMessage();
