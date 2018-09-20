@@ -39,7 +39,6 @@ class ClientTcpConnection
       virtual public Loggable,
       virtual public PrintableObject
 {
-    virtual void abstract() override {}
     void _connect();
 
 protected:
@@ -66,8 +65,6 @@ class ClientUnixConnection
       virtual public Loggable,
       virtual public PrintableObject
 {
-    virtual void abstract() override {}
-
     void _connect();
     const std::string path;
 
