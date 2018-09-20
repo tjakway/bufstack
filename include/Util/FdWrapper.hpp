@@ -10,7 +10,8 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 class FdWrapper
-    : public Loggable
+    : public Loggable,
+    public PrintableObject
 {
 
     int fd;
