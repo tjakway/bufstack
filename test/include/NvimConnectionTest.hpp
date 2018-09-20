@@ -3,6 +3,7 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <mutex>
 
 #include "NamespaceDefines.hpp"
 #include "Util/NewExceptionType.hpp"
@@ -18,7 +19,10 @@ BUFSTACK_BEGIN_NAMESPACE
 class NvimConnectionTest
 {
     std::unique_ptr<pid_t> nvimPid;
+
+    std::mutex connectionMutex;
     std::shared_ptr<ClientEmbeddedConnection> nvimConnection;
+
 
     static constexpr auto localhost = HasTcpConnection::localhost;
 
@@ -52,7 +56,7 @@ public:
 
     virtual ~NvimConnectionTest();
 
-    std::shared_ptr<MsgpackClient> getClientInstance();
+    std::unique_ptr<NvimClient> getClientInstance();
 };
 
 BUFSTACK_END_NAMESPACE

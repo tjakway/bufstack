@@ -22,24 +22,19 @@
 #include "TestConfig.hpp"
 #include "MockNvimClient.hpp"
 
-namespace {
-    static std::mutex clientPtrMutex;
-    static std::shared_ptr<bufstack::MsgpackClient> clientPtr = nullptr;
-}
-
 BUFSTACK_BEGIN_NAMESPACE
 
-std::shared_ptr<MsgpackClient> NvimConnectionTest::getClientInstance()
+std::unique_ptr<NvimClient> NvimConnectionTest::getClientInstance()
 {
-    std::lock_guard<std::mutex> {clientPtrMutex};
-    if(!clientPtr)
+    std::lock_guard<std::mutex> {connectionMutex};
+    if(!nvimConnection)
     {
         throw NvimNotInitialized("Nvim instance not initialized "
                 "(did you remember to connect()?)");
     }
     else
     {
-        return clientPtr;
+        return make_unique<NvimClient>(nvimConnection);
     }
 }
 
