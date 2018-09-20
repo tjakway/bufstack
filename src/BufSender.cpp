@@ -8,6 +8,7 @@
 
 #include <cstdlib>
 #include <cstddef>
+#include <cassert>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -26,7 +27,8 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
     }
 
     //don't write more than this at once
-    auto maxWriteCycle = sizeof(size_t) - 1;
+    auto maxWriteCycle = std::numeric_limits<size_t>::max() - 1;
+    assert(maxWriteCycle > 0);
     char* currentBufPosition = (char*)buf;
 
     std::size_t remaining = bufLen;
