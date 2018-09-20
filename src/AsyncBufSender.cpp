@@ -60,11 +60,8 @@ void AsyncBufSender::send(int clientFd, Buffer buf)
 
 void AsyncBufSender::send(int clientFd, const char* buf, std::size_t len)
 {
-    Buffer vec;
-    vec.reserve(len);
-
-    std::copy(buf, buf + len, std::back_inserter(vec));
-    AsyncBufSender::send(clientFd, std::move(vec));
+    std::unique_lock<std::mutex> {writeMutex};
+    BufSender::sendAll(clientFd, buf, len, *this);
 }
 
 
