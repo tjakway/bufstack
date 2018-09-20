@@ -18,7 +18,7 @@ BUFSTACK_BEGIN_NAMESPACE
 class NvimConnectionTest
 {
     std::unique_ptr<pid_t> nvimPid;
-    std::unique_ptr<ClientEmbeddedConnection> nvimConnection;
+    std::shared_ptr<ClientEmbeddedConnection> nvimConnection;
 
     static constexpr auto localhost = HasTcpConnection::localhost;
 

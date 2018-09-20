@@ -107,7 +107,7 @@ void NvimConnectionTest::launchNeovim(
     {
         nvimPid = make_unique<pid_t>(pid);
         nvimConnection = 
-            make_unique<ClientEmbeddedConnection>(
+            std::make_shared<ClientEmbeddedConnection>(
                     FdWrapper(parentRead), FdWrapper(parentWrite));
     }
 }
