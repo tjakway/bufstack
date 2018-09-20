@@ -28,6 +28,8 @@ public:
             int _fd,
             Callback onDecode);
 
+    int getFd() const { return fd; }
+
     virtual ~MsgpackFdReader() {}
 
     virtual void startListening() override;
