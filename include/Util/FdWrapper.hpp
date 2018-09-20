@@ -25,8 +25,8 @@ protected:
     virtual Fields getFields() const noexcept override
     {
         return Fields {
-            std::make_pair("fd", std::to_string(fd));
-        }
+            std::make_pair("fd", std::to_string(fd))
+        };
     }
 
     virtual std::string getName() const noexcept override
