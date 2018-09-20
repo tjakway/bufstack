@@ -37,6 +37,7 @@ protected:
 
 public:
     NvimClient(ConnectionInfo);
+    NvimClient(std::shared_ptr<ClientConnection>);
 
     virtual ~NvimClient();
 };

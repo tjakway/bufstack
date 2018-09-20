@@ -17,13 +17,14 @@ BUFSTACK_BEGIN_NAMESPACE
 class MsgpackClient : 
     public AbstractMsgpackClient
 {
-    const std::unique_ptr<ClientConnection> clientConnection;
+    const std::shared_ptr<ClientConnection> clientConnection;
 
 protected:
     virtual ClientConnection& getClientConnection() const override;
 
 public:
     MsgpackClient(ConnectionInfo);
+
 
     virtual ~MsgpackClient();
 };

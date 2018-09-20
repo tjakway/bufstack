@@ -8,8 +8,14 @@
 BUFSTACK_BEGIN_NAMESPACE
 
 
+MsgpackClient::MsgpackClient(std::shared_ptr<ClientConnection> conn)
+    : clientConnection(conn)
+{}
+
 MsgpackClient::MsgpackClient(ConnectionInfo ci)
-    : clientConnection(ClientConnection::newClientConnection(ci))
+    : MsgpackClient(
+            std::shared_ptr<ClientConnection>(
+                ClientConnection::newClientConnection(ci)))
 {}
 
 MsgpackClient::~MsgpackClient()

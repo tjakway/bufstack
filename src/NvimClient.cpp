@@ -18,9 +18,8 @@ const std::string NvimClient::subscribedEvents =
 
 void NvimClient::onConnect()
 {
-    /*
     std::function<void(void)> init = 
-        [this]() -> void {*/
+        [this]() -> void {
         this->getLogger()->set_level(spdlog::level::debug);
     
         msgpack::object_handle apiInfoObject = 
@@ -37,9 +36,9 @@ void NvimClient::onConnect()
 
         this->initializeRemoteFunctions(apiInfo);
         this->subscribeEvents();
-    //};
+    };
 
-    //std::async(init).wait();
+    std::async(init).wait();
 //    std::future<void> x = then<msgpack::object_handle, std::function<void(msgpack::object_handle)>>
 //        (apiInfoCall, init);
 
@@ -61,12 +60,10 @@ void NvimClient::checkFunctions(const std::unordered_set<NvimFunction>&)
 
 }
 
-/**
-    * skipOnConnect: whether to call onConnect()
-    */
-NvimClient::NvimClient(ConnectionInfo ci, bool skipOnConnect)
+
+NvimClient::NvimClient(std::shared_ptr<ClientConnection> conn, bool skipOnConnect)
     : Loggable("NvimClient"),
-    MsgpackClient(ci)
+    MsgpackClient(conn)
 {
     if(!skipOnConnect)
     {
@@ -74,6 +71,16 @@ NvimClient::NvimClient(ConnectionInfo ci, bool skipOnConnect)
         onConnect();
     }
 }
+
+
+/**
+    * skipOnConnect: whether to call onConnect()
+    */
+NvimClient::NvimClient(ConnectionInfo ci, bool skipOnConnect)
+    : NvimClient(
+            std::shared_ptr<ClientConnection>(
+                ClientConnection::newClientConnection(ci)), skipOnConnect)
+{}
 
 NvimClient::NvimClient(ConnectionInfo ci)
     : NvimClient(ci, false)
