@@ -50,7 +50,7 @@ void ClientTcpConnection::_connect()
         }
 
         //connection successful, set fields
-        setClientFd(sockFd);
+        setSingleFd(FdWrapper(sockFd));
 
         getLogger()->debug(STRCATS("TCP client connection successful on " <<
                     getAddress() << ":" << getPort()));
