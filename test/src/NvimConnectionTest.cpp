@@ -20,6 +20,7 @@
 #include "MsgpackClient.hpp"
 #include "MockMsgpackClient.hpp"
 #include "TestConfig.hpp"
+#include "MockNvimClient.hpp"
 
 namespace {
     static std::mutex clientPtrMutex;
@@ -61,7 +62,7 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
         try {
             attempts++;
 
-            client = std::make_shared<MockMsgpackClient>(
+            client = std::make_shared<MockNvimClient>(
                 ConnectionInfo::tcpConnection(address, port));
 
             //this will only be assigned if the connection is successful
@@ -95,10 +96,7 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
     }
 }
 
-void NvimConnectionTest::connect(
-        const std::string& address,
-        uint16_t port)
-
+void NvimConnectionTest::connect()
 {
     std::lock_guard<std::mutex> {clientPtrMutex};
     //only connect once
@@ -116,7 +114,7 @@ void NvimConnectionTest::connect(
     {
         const std::string nvimPath = *nvimDest;
         //launch neovim then connect the client to that address and port
-        launchNeovim(nvimPath.c_str(), address, port);
+        pipeFds = launchNeovim(nvimPath.c_str());
 
         if(nvimPid != nullptr)
         {
@@ -126,20 +124,20 @@ void NvimConnectionTest::connect(
 
         
         
-        clientPtr = tryCreateClient(address, port);
+        clientPtr = std::make_shared<MockNvimClient>(
+                ConnectionInfo::embeddedConnection(pipeFds.first, pipeFds.second));
     }
 }
 
-NvimConnectionTest::NvimConnectionTest(
-    const std::string& address,
-    uint16_t port)
-    : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr)
+NvimConnectionTest::NvimConnectionTest()
+    : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr),
+    pipeFds(-1, -1)
 {
     //set log levels before connecting
     logger->getLogger()->set_level(spdlog::level::debug);
     findNeovim.getLogger()->set_level(spdlog::level::warn);
 
-    connect(address, port);
+    connect();
 }
 
 NvimConnectionTest::~NvimConnectionTest()
