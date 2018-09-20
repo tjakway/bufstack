@@ -5,12 +5,12 @@
 #include "Loggable.hpp"
 #include "ConnectionInfo.hpp"
 #include "Util/Strcat.hpp"
-#include "MockMsgpackClient.hpp"
+#include "NvimClient.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class MockNvimClient
-    : public MockMsgpackClient
+    : public NvimClient
 {
 private:
     virtual void onReceiveRequestMsg(
@@ -27,7 +27,7 @@ private:
     
 public:
     MockNvimClient(ConnectionInfo i)
-        : Loggable("MockNvimClient"), MockMsgpackClient(i)
+        : Loggable("MockNvimClient"), NvimClient(i)
     {}
 };
 
