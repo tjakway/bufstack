@@ -65,14 +65,14 @@ void NvimConnectionTest::launchNeovim(
     {
         //set the read end of the pipe to stdin and
         //the write end to stdout
-        if(dup2(STDIN_FILENO, childRead) == -1)
+        if(dup2(childRead, STDIN_FILENO) == -1)
         {
             throw NvimLaunchException(
                 STRCATS("Error setting the read end of the pipe (" <<
                     "file descriptor " << childRead << ") to stdin"));
         }
         
-        if(dup2(STDOUT_FILENO, childWrite) == -1)
+        if(dup2(childWrite, STDOUT_FILENO) == -1)
         {
             throw NvimLaunchException(
                 STRCATS("Error setting the write end of the pipe (" <<
@@ -88,7 +88,7 @@ void NvimConnectionTest::launchNeovim(
                 "-u", "NONE", "-i", "NONE",
                 "-V20my_log",
                 NULL);
-        
+
         //only reached if there's an error in exec
         auto _errno = errno;
         throw NvimLaunchException(
