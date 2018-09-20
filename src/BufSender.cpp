@@ -6,6 +6,7 @@
 #include "Util/Strcat.hpp"
 #include "Util/Util.hpp"
 
+#include <cstdlib>
 #include <cstddef>
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -28,7 +29,7 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
     auto maxWriteCycle = sizeof(size_t) - 1;
     char* currentBufPosition = (char*)buf;
 
-    long remaining = bufLen;
+    std::size_t remaining = bufLen;
     while(remaining > 0)
     {
         //try to write at most this amount
@@ -61,6 +62,10 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
         else
         {
             remaining -= amountWritten;
+
+            log.getLogger()->debug(STRCATS("Wrote " << amountWritten << " bytes"
+                        << ", " << remaining << " bytes remaining"));
+
             if(remaining < 0)
             {
                 throw SocketException(
