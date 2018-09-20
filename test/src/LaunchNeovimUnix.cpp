@@ -40,8 +40,8 @@ void NvimConnectionTest::launchNeovim(
                 strerror(_errno)));
     }
 
-    int childNewStdout = parentReadPipe[1],
-        childNewStdin = childReadPipe[0],
+    int childWrite = parentReadPipe[1],
+        childRead = childReadPipe[0],
         parentRead = parentReadPipe[0],
         parentWrite = childReadPipe[1];
 
@@ -65,27 +65,27 @@ void NvimConnectionTest::launchNeovim(
     {
         //set the read end of the pipe to stdin and
         //the write end to stdout
-        if(dup2(STDIN_FILENO, childNewStdin) == -1)
+        if(dup2(STDIN_FILENO, childRead) == -1)
         {
             throw NvimLaunchException(
                 STRCATS("Error setting the read end of the pipe (" <<
-                    "file descriptor " << pipeFds[0] << ") to stdin"));
+                    "file descriptor " << childRead << ") to stdin"));
         }
         
-        if(dup2(STDOUT_FILENO, childNewStdout) == -1)
+        if(dup2(STDOUT_FILENO, childWrite) == -1)
         {
             throw NvimLaunchException(
                 STRCATS("Error setting the write end of the pipe (" <<
-                    "file descriptor " << pipeFds[1] << ") to stdout"));
+                    "file descriptor " << childWrite << ") to stdout"));
         }
 
         int execRet = execl(path.c_str(), 
                 //don't forget to pass the executable path as argv[0]
                 path.c_str(), 
                 "--embed",
-                //"--noplugin", 
+                "--noplugin", 
                 //no vimrc or shada
-                //"-u", "NONE", "-i", "NONE",
+                "-u", "NONE", "-i", "NONE",
                 "-V20my_log",
                 NULL);
         
