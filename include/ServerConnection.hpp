@@ -4,21 +4,28 @@
 #include "Util/NewExceptionType.hpp"
 #include "Loggable.hpp"
 #include "HasFd.hpp"
+#include "Util/FdWrapper.hpp"
 #include "Interruptible.hpp"
+
+#include <utility>
 
 BUFSTACK_BEGIN_NAMESPACE
 
 class ServerConnection
     : virtual public Loggable,
     virtual public Connectible,
-    public Interruptible,
-    public HasServerFd
+    public Interruptible
 {
+    FdWrapper serverFd;
 protected:
-    ServerConnection(int serverFd)
-        : Loggable("ServerConnection")
+    ServerConnection(FdWrapper&& _serverFd)
+        : Loggable("ServerConnection"),
+        serverFd(std::move(_serverFd))
+    {}
+
+    int getServerFd() const
     {
-        setServerFd(serverFd);
+        return serverFd.getFd();
     }
 
     virtual void onClientConnect(int clientFd) = 0;
