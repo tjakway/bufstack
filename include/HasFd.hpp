@@ -70,7 +70,7 @@ public:
         fd = _fd;
     }
 
-    virtual getFd() const override
+    virtual int getFd() const override
     {
         return fd.getFd();
     }
