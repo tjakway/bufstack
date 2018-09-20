@@ -93,30 +93,34 @@ std::shared_ptr<MsgpackClient> NvimConnectionTest::tryCreateClient(
 
 void NvimConnectionTest::connect()
 {
-    std::lock_guard<std::mutex> {clientPtrMutex};
+    std::lock_guard<std::mutex> {connectionMutex};
     //only connect once
-    if(clientPtr)
+    if(!nvimConnection)
     {
-        return;
-    }
+        auto nvimDest = findNeovim.getFirstOnPath();
+        if(nvimDest == nullptr)
+        {
+            throw CannotFindNeovimException("Could not find neovim on path");
+        }
+        else
+        {
+            const std::string nvimPath = *nvimDest;
+            //launch neovim then connect the client to that address and port
+            launchNeovim(nvimPath.c_str());
 
-    auto nvimDest = findNeovim.getFirstOnPath();
-    if(nvimDest == nullptr)
-    {
-        throw CannotFindNeovimException("Could not find neovim on path");
+            if(nvimPid != nullptr)
+            {
+                logger->getLogger()->debug("Launched nvim instance with pid " + 
+                        std::to_string(*nvimPid));
+            }
+        }
     }
     else
     {
-        const std::string nvimPath = *nvimDest;
-        //launch neovim then connect the client to that address and port
-        launchNeovim(nvimPath.c_str());
-
-        if(nvimPid != nullptr)
-        {
-            logger->getLogger()->debug("Launched nvim instance with pid " + 
-                    std::to_string(*nvimPid));
-        }
+        logger->getLogger()->debug("Already have an nvim connection, "
+                "skipping call to connect");
     }
+
 }
 
 NvimConnectionTest::NvimConnectionTest()
