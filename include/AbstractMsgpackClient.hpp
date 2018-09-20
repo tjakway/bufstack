@@ -10,6 +10,7 @@
 #include "AsyncBufSender.hpp"
 #include "MsgpackReceiver.hpp"
 #include "ClientConnection.hpp"
+#include <cstdlib>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -149,14 +150,20 @@ protected:
         const auto thisMsgId = idSeq.nextAndIncrement();
 
         auto call_obj =
-            std::make_tuple(static_cast<uint8_t>(
-                        MsgpackRpc::Message::Type::Request), 
-                    thisMsgId, name, args...);
+            std::make_tuple(
+                MsgpackRpc::Message::getTypeValue(
+                    MsgpackRpc::Message::Type::Request), 
+                static_cast<uint32_t>(thisMsgId), name, args...);
 
-        auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
-        RPCLIB_MSGPACK::pack(*buffer, call_obj);
+        std::stringstream buffer;
+        RPCLIB_MSGPACK::pack(buffer, call_obj);
 
-        send(getClientConnection().getWriteFd(), buffer->data(), buffer->size());
+        std::string str(buffer.str());
+        const char* data = str.data();
+        const auto len = str.size();
+
+        int writeFd = getClientConnection().getWriteFd();
+        send(writeFd, data, len);
 
         return thisMsgId;
     }
