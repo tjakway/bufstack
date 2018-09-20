@@ -101,7 +101,7 @@ public:
     ClientEmbeddedConnection(const ClientEmbeddedConnection&) = delete;
     ClientEmbeddedConnection(ClientEmbeddedConnection&&);
 
-    virtual ~ClientEmbeddedConnection();
+    virtual ~ClientEmbeddedConnection() {}
 
 
     virtual int getWriteFd() const override;
