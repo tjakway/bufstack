@@ -82,7 +82,7 @@ void NvimConnectionTest::launchNeovim(
         int execRet = execl(path.c_str(), 
                 //don't forget to pass the executable path as argv[0]
                 path.c_str(), 
-                "--embed"
+                "--embed",
                 //"--noplugin", 
                 //no vimrc or shada
                 //"-u", "NONE", "-i", "NONE",
@@ -105,6 +105,7 @@ void NvimConnectionTest::launchNeovim(
     //parent
     else
     {
+        std::lock_guard<std::mutex>{connectionMutex};
         nvimPid = make_unique<pid_t>(pid);
         nvimConnection = 
             std::make_shared<ClientEmbeddedConnection>(
