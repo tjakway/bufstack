@@ -121,9 +121,6 @@ void NvimConnectionTest::connect()
             logger->getLogger()->debug("Launched nvim instance with pid " + 
                     std::to_string(*nvimPid));
         }
-
-        clientPtr = std::make_shared<MockNvimClient>(
-                ConnectionInfo::embeddedConnection(pipeFds.first, pipeFds.second));
     }
 }
 
