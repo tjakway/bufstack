@@ -4,6 +4,7 @@
 
 #include <utility>
 #include <algorithm>
+#include <iterator>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -59,11 +60,11 @@ void AsyncBufSender::send(int clientFd, Buffer buf)
 
 void AsyncBufSender::send(int clientFd, const char* buf, std::size_t len)
 {
-    Buffer ptr = Buffer(
-            new Buffer::element_type(
-                std::make_pair(new char[len], len)));
-    memcpy(ptr->first, buf, len);
-    AsyncBufSender::send(clientFd, std::move(ptr));
+    Buffer vec;
+    vec.reserve(len);
+
+    std::copy(buf, buf + len, std::back_inserter(vec));
+    AsyncBufSender::send(clientFd, std::move(vec));
 }
 
 
@@ -71,7 +72,7 @@ void AsyncBufSender::doSend(int clientFd, Buffer buf)
 {
     std::unique_lock<std::mutex> {writeMutex};
 
-    BufSender::sendAll(clientFd, buf->first, buf->second, *this);
+    BufSender::sendAll(clientFd, buf.data(), buf.size(), *this);
 }
 
 BUFSTACK_END_NAMESPACE
