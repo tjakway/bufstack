@@ -114,7 +114,7 @@ void NvimConnectionTest::connect()
     {
         const std::string nvimPath = *nvimDest;
         //launch neovim then connect the client to that address and port
-        pipeFds = launchNeovim(nvimPath.c_str());
+        launchNeovim(nvimPath.c_str());
 
         if(nvimPid != nullptr)
         {
@@ -122,16 +122,13 @@ void NvimConnectionTest::connect()
                     std::to_string(*nvimPid));
         }
 
-        
-        
         clientPtr = std::make_shared<MockNvimClient>(
                 ConnectionInfo::embeddedConnection(pipeFds.first, pipeFds.second));
     }
 }
 
 NvimConnectionTest::NvimConnectionTest()
-    : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr),
-    pipeFds(-1, -1)
+    : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr)
 {
     //set log levels before connecting
     logger->getLogger()->set_level(spdlog::level::debug);
