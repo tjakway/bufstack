@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <chrono>
+#include <memory>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -16,6 +17,9 @@ class MsgpackFdReader
     const int fd;
     Callback cb;
     std::atomic_bool listening;
+    static const std::chrono::milliseconds spinInterval;
+
+    std::unique_ptr<std::thread> listenThread;
 
 public:
     MsgpackFdReader(
@@ -33,6 +37,7 @@ public:
     virtual ~MsgpackFdReader() {}
 
     virtual void startListening() override;
+    virtual void asyncStartListening();
 };
 
 BUFSTACK_END_NAMESPACE

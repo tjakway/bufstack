@@ -3,6 +3,10 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
+
+const std::chrono::milliseconds MsgpackFdReader::spinInterval =
+    std::chrono::milliseconds(10);
+
 MsgpackFdReader::MsgpackFdReader(
         int _fd,
         Callback onDecode,
@@ -37,6 +41,40 @@ void MsgpackFdReader::startListening()
         
         //done listening
         listening.store(false);
+    }
+}
+
+void MsgpackFdReader::asyncStartListening()
+{
+    //check that we're not already reading
+    if(!listening)
+    {
+        std::atomic_bool threadInitialized{false};
+
+        std::function<void(void)> threadCb = 
+            [this, &threadInitialized]() {
+
+                //set the flag that indicates we've
+                //begun execution
+                threadInitialized.store(true);
+
+                while(!this->interrupted())
+                {
+                    listening.store(true);
+                    this->readFd(this->fd, this->cb);
+                }
+
+                //done listening
+                listening.store(false);
+            };
+
+        listenThread = make_unique<std::thread>(threadCb);
+
+        //wait until the thread is running before returning
+        while(!threadInitialized.load())
+        {
+            std::this_thread::sleep_for(spinInterval);
+        }
     }
 }
 
