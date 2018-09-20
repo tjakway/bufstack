@@ -26,7 +26,7 @@ public:
     class Message : public PrintableObject
     {
     public:
-        using EnumType = uint32_t;
+        using EnumType = uint8_t;
         enum Type : EnumType
         {
             Request = 0,
