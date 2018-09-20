@@ -31,7 +31,7 @@ public:
     T nextAndIncrement()
     {
         std::lock_guard<std::mutex> lock(mut);
-        (*seqPtr)++;
+        (*seqPtr) += 1;
         return *seqPtr;
     }
 };
