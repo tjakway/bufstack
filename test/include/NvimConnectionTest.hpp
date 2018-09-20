@@ -12,6 +12,7 @@
 
 #include "TestConfig.hpp"
 #include "MsgpackClient.hpp"
+#include "NvimClient.hpp"
 #include "ClientConnection.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
