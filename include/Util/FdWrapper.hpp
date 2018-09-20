@@ -40,6 +40,10 @@ public:
     FdWrapper(int _fd)
         : Loggable("FdWrapper"), fd(_fd)
     {}
+
+    FdWrapper()
+        : FdWrapper(initialValue)
+    {}
     
     FdWrapper(const FdWrapper&) = delete;
 
@@ -68,6 +72,12 @@ public:
             }
         }
         setFd(-1);
+    }
+
+    void operator=(FdWrapper&& other)
+    {
+        fd = other.fd;
+        other.fd = initialValue;
     }
 };
 

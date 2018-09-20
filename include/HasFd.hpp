@@ -47,27 +47,25 @@ public:
  */
 class HasSingleFd :
     public HasFd,
-    public HasReadFd,
-    public HasWriteFd
+    virtual public HasReadFd,
+    virtual public HasWriteFd
 {
     FdWrapper fd;
 public:
     HasSingleFd(FdWrapper&& _fd)
-        : fd(_fd),
-        HasReadFd(fd.getFd()),
-        HasWriteFd(fd.getFd())
+        : fd(std::move(_fd))
     {}
 
     /**
      * default-construct with a -1 file descriptor
      */
     HasSingleFd()
-        : HasSingleFd(FdWrapper())
+        : HasSingleFd(std::move(FdWrapper()))
     {}
 
     void setSingleFd(FdWrapper&& _fd)
     {
-        fd = _fd;
+        fd = std::move(_fd);
     }
 
     virtual int getFd() const override

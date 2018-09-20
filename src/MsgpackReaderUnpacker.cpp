@@ -117,6 +117,9 @@ void MsgpackReaderUnpacker::readFd(int fd,
             throw SocketException(STRCAT("Error in ", __func__, ": ", strerror(errno)));
         }
 
+        getLogger()->set_level(spdlog::level::debug);
+        getLogger()->debug(STRCATS("data: " << Util::printVector(data)));
+
         //try and decode this message, recording how much we found
         char* unconsumedBuffer;
         std::size_t amountNotConsumed = -1;

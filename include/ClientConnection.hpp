@@ -17,7 +17,9 @@ BUFSTACK_BEGIN_NAMESPACE
 class ClientConnection : 
     virtual public Connectible,
     virtual public Loggable,
-    virtual public PrintableObject
+    virtual public PrintableObject,
+    virtual public HasWriteFd,
+    virtual public HasReadFd
 {
 protected:
     ClientConnection() {}

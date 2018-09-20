@@ -21,6 +21,7 @@ class MsgpackClient :
 
 protected:
     virtual ClientConnection& getClientConnection() const override;
+    MsgpackClient(std::shared_ptr<ClientConnection>);
 
 public:
     MsgpackClient(ConnectionInfo);

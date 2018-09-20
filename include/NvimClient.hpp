@@ -34,10 +34,10 @@ protected:
      * skipOnConnect: whether to call onConnect()
      */
     NvimClient(ConnectionInfo, bool skipOnConnect);
+    NvimClient(std::shared_ptr<ClientConnection>, bool);
 
 public:
     NvimClient(ConnectionInfo);
-    NvimClient(std::shared_ptr<ClientConnection>);
 
     virtual ~NvimClient();
 };

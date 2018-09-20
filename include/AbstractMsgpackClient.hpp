@@ -156,7 +156,7 @@ protected:
         auto buffer = std::make_shared<RPCLIB_MSGPACK::sbuffer>();
         RPCLIB_MSGPACK::pack(*buffer, call_obj);
 
-        send(getClientConnection().getClientFd(), buffer->data(), buffer->size());
+        send(getClientConnection().getWriteFd(), buffer->data(), buffer->size());
 
         return thisMsgId;
     }
