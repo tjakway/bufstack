@@ -75,9 +75,23 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
     std::unique_ptr<char> bufCpy(new char[bufLen]);
     memcpy(bufCpy.get(), buf, bufLen);
 
+    std::ostringstream ss;
+    ss << std::hex;
+
+    ss << "[ ";
+    for(int i = 0; i < bufLen; i++)
+    {
+        ss << (int)bufCpy.get()[i];
+        if(i != (bufLen - 1))
+        {
+            ss << ", ";
+        }
+    }
+    ss  << " ]";
+
     log.getLogger()->debug(STRCATS("Sent " << bufLen 
         << " bytes on file descriptor " << clientFd <<
-        ": " << Util::printArray(bufCpy.get(), bufLen)));
+        ": " << ss.str()));
 }
 
 void BufSender::send(int clientFd, const char* buf, std::size_t len)
