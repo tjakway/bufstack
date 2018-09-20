@@ -130,7 +130,7 @@ NvimConnectionTest::NvimConnectionTest()
     logger->getLogger()->set_level(spdlog::level::debug);
     findNeovim.getLogger()->set_level(spdlog::level::warn);
 
-    connect();
+    this->connect();
 }
 
 NvimConnectionTest::~NvimConnectionTest()
