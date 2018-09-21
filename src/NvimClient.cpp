@@ -18,6 +18,8 @@ const std::string NvimClient::subscribedEvents =
 
 void NvimClient::onConnect()
 {
+    asyncStartListening(getClientConnection().getReadFd());
+
     std::function<void(void)> init = 
         [this]() -> void {
         this->getLogger()->set_level(spdlog::level::debug);
