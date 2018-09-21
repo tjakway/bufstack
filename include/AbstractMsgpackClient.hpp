@@ -11,7 +11,9 @@
 #include "MsgpackReceiver.hpp"
 #include "MsgpackFdReader.hpp"
 #include "ClientConnection.hpp"
+
 #include <cstdlib>
+#include <tuple>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -166,7 +168,8 @@ protected:
             std::make_tuple(
                 MsgpackRpc::Message::getTypeValue(
                     MsgpackRpc::Message::Type::Request), 
-                static_cast<uint32_t>(thisMsgId), name, args...);
+                static_cast<uint32_t>(thisMsgId), name, 
+                std::forward_as_tuple(args...));
 
         std::stringstream buffer;
         RPCLIB_MSGPACK::pack(buffer, call_obj);
