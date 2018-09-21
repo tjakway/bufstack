@@ -43,7 +43,7 @@ void MsgpackReceiver::handleResponseMessage(
     uint32_t msgId;
     msgObj.at(1).convert(msgId);
     
-    const bool errorOccurred = msgObj.at(2).is_nil();
+    const bool errorOccurred = !msgObj.at(2).is_nil();
 
     optional<std::string> errorField;
     optional<std::reference_wrapper<msgpack::object>> resultField;
