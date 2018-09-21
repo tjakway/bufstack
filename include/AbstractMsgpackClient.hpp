@@ -84,7 +84,10 @@ protected:
 
     NEW_EXCEPTION_TYPE_WITH_BASE(AlreadyListeningException, BaseException);
 
+
+    void startListening(int readFd, std::function<void(MsgpackFdReader&)>);
     void startListening(int readFd);
+    void asyncStartListening(int readFd);
 
     virtual void addResponseCallback(BoundResponseCallback&& cb);
     virtual void onReceiveResponseMsg(

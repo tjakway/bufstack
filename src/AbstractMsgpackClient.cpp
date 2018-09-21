@@ -17,7 +17,8 @@ void AbstractMsgpackClient::onDecodeCallback(
 }
 
 
-void AbstractMsgpackClient::startListening(int readFd)
+void AbstractMsgpackClient::startListening(int readFd, 
+        std::function<void(MsgpackFdReader&)> f)
 {
     std::lock_guard<std::mutex> {fdReaderMutex};
     if(!fdReader)
@@ -29,7 +30,7 @@ void AbstractMsgpackClient::startListening(int readFd)
         fdReader = make_unique<MsgpackFdReader>(readFd, cb);
 
         getLogger()->debug(STRCATS("Listening on " << readFd));
-        fdReader->startListening();
+        f(*fdReader);
     }
     else
     {
@@ -37,6 +38,16 @@ void AbstractMsgpackClient::startListening(int readFd)
                     readFd << "; already listening on fd " << 
                     fdReader->getFd()));
     }
+}
+
+void AbstractMsgpackClient::startListening(int readFd)
+{
+    startListening(readFd, [](MsgpackFdReader& r) { r.startListening(); });
+}
+
+void AbstractMsgpackClient::asyncStartListening(int readFd)
+{
+    startListening(readFd, [](MsgpackFdReader& r) { r.asyncStartListening(); });
 }
 
 void AbstractMsgpackClient::addResponseCallback(BoundResponseCallback&& cb)
