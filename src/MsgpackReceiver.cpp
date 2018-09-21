@@ -57,7 +57,7 @@ void MsgpackReceiver::handleResponseMessage(
                     "nil in a message of type " <<
                     MsgpackRpc::Message::printType(
                         MsgpackRpc::Message::Response) << 
-                    " but result == " << msgObj.at(3)));
+                    " if an error occurred but result == " << msgObj.at(3)));
         }
 
         errorField = make_optional(STRCAT(msgObj.at(2)));
