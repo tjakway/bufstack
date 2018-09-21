@@ -74,6 +74,8 @@ class AbstractMsgpackClient :
     std::mutex fdReaderMutex;
     std::unique_ptr<MsgpackFdReader> fdReader;
     void onDecodeCallback(const MsgpackReaderUnpacker::ObjectList&);
+
+    void startListening(int readFd, std::function<void(MsgpackFdReader&)>);
     
 protected:
     using BaseException = MsgpackReceiver::BaseException;
@@ -85,7 +87,6 @@ protected:
     NEW_EXCEPTION_TYPE_WITH_BASE(AlreadyListeningException, BaseException);
 
 
-    void startListening(int readFd, std::function<void(MsgpackFdReader&)>);
     void startListening(int readFd);
     void asyncStartListening(int readFd);
 
