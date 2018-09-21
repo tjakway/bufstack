@@ -66,7 +66,8 @@ class AbstractMsgpackClient :
     template <typename T>
     using UnboundResponseCallback = std::function<bool(MsgId, 
             std::shared_ptr<std::promise<T>>,
-            const MsgpackRpc::ResponseMessage&)>;
+            const MsgpackRpc::ResponseMessage&,
+            MtLoggable&)>;
 
     using BoundResponseCallback = 
         std::function<bool(MsgpackRpc::ResponseMessage)>;
@@ -112,7 +113,8 @@ protected:
     template <typename T>
     static bool setResponseValue(MsgId thisCallId,
             std::shared_ptr<std::promise<T>> promise,
-            const MsgpackRpc::ResponseMessage& responseMsg)
+            const MsgpackRpc::ResponseMessage& responseMsg,
+            MtLoggable& logger)
     {
         //check if this is the response we're waiting for
         if(responseMsg.msgId == thisCallId)
@@ -148,8 +150,11 @@ protected:
                             " >.  Object received: " << objectReceived));
                 }
             }
-            catch(...)
+            catch(std::exception& e)
             {
+                logger.getLogger()->warn(
+                    STRCATS("Caught exception in " << __func__ <<
+                        ": " << e.what()));
                 promise->set_exception(std::current_exception());
             }
         }
@@ -201,11 +206,13 @@ public:
 
 
         BoundResponseCallback cb = 
-            [thisMsgId, thisPromise](const MsgpackRpc::ResponseMessage& m)
+            [this, thisMsgId, thisPromise](const MsgpackRpc::ResponseMessage& m)
             -> bool
         {
             return AbstractMsgpackClient::setResponseValue(
-                    thisMsgId, thisPromise, m);
+                    thisMsgId, thisPromise, m, 
+                    //pass *this as the instance of Loggable
+                    *this);
         };
 
         addResponseCallback(std::move(cb));
