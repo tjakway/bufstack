@@ -134,6 +134,8 @@ protected:
 public:
     ApiParser(const msgpack::object&);
 
+    void suppressLogging(bool);
+
     std::unordered_set<NvimFunction> getFunctions();
     CustomTypeSet getCustomTypes();
 

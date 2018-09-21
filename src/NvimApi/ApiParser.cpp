@@ -331,4 +331,16 @@ ApiParser::ApiParser(const msgpack::object& o)
     parseApiInfo(o);
 }
 
+void ApiParser::suppressLogging(bool flag)
+{
+    if(flag)
+    {
+        getLogger()->set_level(spdlog::level::warn);
+    }
+    else
+    {
+        getLogger()->set_level(spdlog::level::info);
+    }
+}
+
 BUFSTACK_END_NAMESPACE

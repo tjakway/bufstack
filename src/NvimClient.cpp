@@ -16,19 +16,24 @@ BUFSTACK_BEGIN_NAMESPACE
 const std::string NvimClient::subscribedEvents = 
         "BufEnter,BufLeave,TabEnter,TabLeave,WinEnter,WinLeave";
 
-void NvimClient::onConnect()
+void NvimClient::onConnect(bool suppressLogging)
 {
     asyncStartListening(getClientConnection().getReadFd());
 
     std::function<void(void)> init = 
-        [this]() -> void {
+        [this, suppressLogging]() -> void {
     
         msgpack::object_handle apiInfoObject = 
             this->call<msgpack::object_handle>("nvim_get_api_info");
 
-        this->getLogger()->debug("Received api info object");
+        if(!suppressLogging)
+        {
+            this->getLogger()->debug("Received api info object");
+        }
 
         ApiParser parser(apiInfoObject.get());
+        parser.suppressLogging(suppressLogging);
+
         ApiInfo apiInfo = parser.getApiInfo();
 
         //make sure function signatures match what we expect
@@ -62,14 +67,15 @@ void NvimClient::checkFunctions(const std::unordered_set<NvimFunction>&)
 }
 
 
-NvimClient::NvimClient(std::shared_ptr<ClientConnection> conn, bool skipOnConnect)
+NvimClient::NvimClient(std::shared_ptr<ClientConnection> conn, 
+        bool skipOnConnect, bool suppressLogging)
     : Loggable("NvimClient"),
     MsgpackClient(conn)
 {
     if(!skipOnConnect)
     {
         //since the client connection is constructed, we've already connected
-        onConnect();
+        onConnect(suppressLogging);
     }
 }
 
@@ -77,7 +83,7 @@ NvimClient::NvimClient(std::shared_ptr<ClientConnection> conn, bool skipOnConnec
 /**
     * skipOnConnect: whether to call onConnect()
     */
-NvimClient::NvimClient(ConnectionInfo ci, bool skipOnConnect)
+NvimClient::NvimClient(ConnectionInfo ci, bool skipOnConnect, bool suppressLogging)
     : NvimClient(
             std::shared_ptr<ClientConnection>(
                 ClientConnection::newClientConnection(ci)), skipOnConnect)

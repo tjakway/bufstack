@@ -27,7 +27,7 @@ private:
     
 public:
     MockNvimClient(std::shared_ptr<ClientConnection> c)
-        : Loggable("MockNvimClient"), NvimClient(c, false)
+        : Loggable("MockNvimClient"), NvimClient(c, false, true)
     {}
 
     MockNvimClient(ConnectionInfo i)
