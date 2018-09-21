@@ -91,6 +91,9 @@ BUFSTACK_BEGIN_NAMESPACE
 void MsgpackReaderUnpacker::readFd(int fd, 
         std::function<void(const ObjectList&)> callback)
 {
+    assert(fd >= 0);
+    assert(callback);
+
     std::unique_ptr<char[]> buf 
         = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
 
