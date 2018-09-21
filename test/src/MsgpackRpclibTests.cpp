@@ -64,7 +64,7 @@ const uint16_t MsgpackRpclibTests::port = TestConfig::rpclibTestPort;
 /**
  * use rpclib for both the server and client
  */
-TEST_F(MsgpackRpclibTests, TestRpclibOnly)
+/*TEST_F(MsgpackRpclibTests, TestRpclibOnly)
 {
     SetFlagTest flagTest;
     auto server = mkServer();
@@ -79,7 +79,7 @@ TEST_F(MsgpackRpclibTests, TestRpclibOnly)
     client->call(flagTest.fName).get();
 
     ASSERT_TRUE(flagTest.passes());
-}
+}*/
 
 TEST_F(MsgpackRpclibTests, TestCallVoidReturn)
 {
