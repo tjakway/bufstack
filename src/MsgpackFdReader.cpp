@@ -15,6 +15,7 @@ MsgpackFdReader::MsgpackFdReader(
 : Loggable("MsgpackFdReader"),
     MsgpackReaderUnpacker(_backlogSize, _sleepInterval), 
     fd(_fd),
+    cb(onDecode),
     listening(false)
 {}
 
@@ -25,6 +26,7 @@ MsgpackFdReader::MsgpackFdReader(
     //call with default args
     MsgpackReaderUnpacker(), 
     fd(_fd),
+    cb(onDecode),
     listening(false)
 {}
 
