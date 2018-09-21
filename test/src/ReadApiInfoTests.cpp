@@ -124,9 +124,7 @@ public:
 
     static ApiParser::ParseFunctions getParseFunctionsInstance()
     {
-        //set the log level before returning
         ApiParser::ParseFunctions parseFunctions;
-        parseFunctions.getLogger()->set_level(spdlog::level::critical);
         return parseFunctions;
     }
 
@@ -304,7 +302,6 @@ TEST_F(ReadApiInfoTests, TestParseCustomTypes)
 
             if(!Util::setsEqual(customTypes, expectedTypes))
             {
-                this->getLogger()->set_level(spdlog::level::debug);
                 this->getLogger()->debug("custom types: \n{}\nexpected types: \n{}",
                     customTypesSS.str(), expectedTypesSS.str());
                 return false;

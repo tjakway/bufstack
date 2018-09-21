@@ -22,7 +22,6 @@ void NvimClient::onConnect()
 
     std::function<void(void)> init = 
         [this]() -> void {
-        this->getLogger()->set_level(spdlog::level::debug);
     
         msgpack::object_handle apiInfoObject = 
             this->call<msgpack::object_handle>("nvim_get_api_info");

@@ -71,7 +71,6 @@ TEST_F(PipeWriteTests, TestWriteHelloWorld)
             const ObjectList& vecH)
     {
         vecSize = vecH.size();
-        this->getLogger()->set_level(spdlog::level::debug);
         this->getLogger()->debug("vecH: {}", Util::printVector(vecH));
         //can't compare object_handles for equality, need to compare
         //the references to the underlying objects

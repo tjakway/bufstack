@@ -30,8 +30,6 @@ std::string ClientTcpConnection::getName() const noexcept
 
 void ClientTcpConnection::_connect()
 {
-    getLogger()->set_level(spdlog::level::debug);
-
     //don't forget to call this!
     onConnect();
 

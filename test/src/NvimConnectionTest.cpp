@@ -75,7 +75,7 @@ NvimConnectionTest::NvimConnectionTest()
     : logger(make_unique<Loggable>("NvimConnectionTest")), nvimPid(nullptr)
 {
     //set log levels before connecting
-    logger->getLogger()->set_level(spdlog::level::debug);
+    logger->getLogger()->set_level(spdlog::level::warn);
     findNeovim.getLogger()->set_level(spdlog::level::warn);
 
     this->connect();
