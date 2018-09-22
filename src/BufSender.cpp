@@ -79,7 +79,7 @@ void BufSender::sendAll(int clientFd, const char* buf, std::size_t bufLen, Logga
         }
     }
 
-    std::unique_ptr<char> bufCpy(new char[bufLen]);
+    std::unique_ptr<char[]> bufCpy(new char[bufLen]);
     memcpy(bufCpy.get(), buf, bufLen);
 
     std::ostringstream ss;
