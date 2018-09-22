@@ -38,7 +38,7 @@ GTEST_ARGS='--gtest_filter=$(GTEST_FILTER)'
 #if we're passing gtest args, format them properly for
 #the debugger
 #note: need to cd to the test dir before calling the debugger
-DEBUGGER_ARGS=-- $(GTEST_ARGS) './$(TEST_EXE_NAME)'
+DEBUGGER_ARGS=-- './$(TEST_EXE_NAME)' $(GTEST_ARGS) 
 
 .PHONY: all
 all: $(BIN_DIR)/Makefile $(BIN_DIR)/compile_commands.json build
