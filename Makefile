@@ -30,21 +30,15 @@ TESTS=BufstackTests
 
 #the snippet `printf '%s' "$$x" | grep -v -q '^\s*$$'`
 #tests if a variable is whitespace
-GTEST_FILTER=
+GTEST_FILTER?=*
 #if the variable GTEST_FILTER is set, construct the appropriate
 #argument
-GTEST_ARGS=$(shell printf '%%s' "$(GTEST_FILTER)" | \
-	   grep -q '^\s*$$' \
-	   && printf '' \
-	   || printf -- --gtest_filter='$(GTEST_FILTER)' )
+GTEST_ARGS='--gtest_filter=$(GTEST_FILTER)'
 
 #if we're passing gtest args, format them properly for
 #the debugger
 #note: need to cd to the test dir before calling the debugger
-DEBUGGER_ARGS=$(shell printf '%%s' '$(GTEST_ARGS)' | \
-	   grep -q '^\s*$$' \
-	   && printf './$(TEST_EXE_NAME)' \
-	   || printf -- '-- %%s %%s' '$(GTEST_ARGS)' './$(TEST_EXE_NAME)' )
+DEBUGGER_ARGS=-- $(GTEST_ARGS) './$(TEST_EXE_NAME)'
 
 .PHONY: all
 all: $(BIN_DIR)/Makefile $(BIN_DIR)/compile_commands.json build
@@ -98,7 +92,3 @@ check: build
 .PHONY: debug
 debug: build
 	cd $(BIN_DIR)/test/src && $(DEBUGGER) $(DEBUGGER_ARGS)
-
-.PHONY: print-gtest
-print-gtest:
-	echo "$(GTEST_ARGS)"
