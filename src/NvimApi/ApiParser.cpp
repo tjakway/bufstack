@@ -110,6 +110,11 @@ void ApiParser::parseApiInfo(const msgpack::object& o)
         throw ParseApiInfoException(STRCAT("Caught msgpack::type_error in ", 
                     __func__, ": ", e.what()));
     }
+    catch(std::bad_cast e)
+    {
+        throw ParseApiInfoException(STRCAT("Caught std::bad_cast in ", 
+                    __func__, ": ", e.what()));
+    }
 }
 
 bool ApiParser::ParseFunctions::keysAreApiInfo(const std::set<std::string>& keys)
