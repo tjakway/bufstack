@@ -11,7 +11,7 @@
 #include <functional>
 
 #include <cstring> //strerror(int)
-#include <cstdlib> //exit(int)
+#include <cstdlib>
 #include <cstdio>
 
 #include <errno.h>
