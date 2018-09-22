@@ -46,6 +46,20 @@ void MsgpackFdReader::startListening()
     }
 }
 
+MsgpackFdReader::~MsgpackFdReader()
+{
+    if(listenThread)
+    {
+        //signal to the thread to stop
+        //and wait for it to finish
+        interrupt();
+        if(listenThread->joinable())
+        {
+            listenThread->join();
+        }
+    }
+}
+
 void MsgpackFdReader::asyncStartListening()
 {
     //check that we're not already reading
