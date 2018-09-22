@@ -56,13 +56,28 @@ void AsyncBufSender::doSend(std::function<void(void)> writeF)
 
 void AsyncBufSender::send(int clientFd, const char* buf, std::size_t len)
 {
-    doSend([=]() {
-        BufSender::sendAll(clientFd, buf, len, *this);
-    });
+    //copy the data before sending so we know it won't be free'd before we're done
+    std::vector<char> vec;
+    vec.reserve(len);
+    std::copy(buf, buf + len, std::back_inserter(vec));
+
+    assert(memcmp(buf, vec.data(), len) == 0);
+
+    auto sendF = [clientFd](std::vector<char> v, MtLoggable& log) {
+        BufSender::sendAll(clientFd, v.data(), v.size(), log);
+    };
+    MtLoggable& ref = *this;
+    std::function<void(void)> writeF = 
+        std::bind(std::move(sendF), std::move(vec), ref);
+
+    //bind *this for Loggable
+    doSend(std::move(writeF));
 }
 
 void AsyncBufSender::send(int clientFd, Buffer buf)
 {
+    //move the buffer to the write function so we 
+    //have ownership of the data when we write it
     auto f = [clientFd, this](Buffer mbuf) {
         BufSender::sendAll(clientFd, mbuf.data(), mbuf.size(), *this);
     };
