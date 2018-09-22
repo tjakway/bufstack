@@ -34,7 +34,7 @@ public:
 
     int getFd() const { return fd; }
 
-    virtual ~MsgpackFdReader() {}
+    virtual ~MsgpackFdReader();
 
     virtual void startListening() override;
     virtual void asyncStartListening();
