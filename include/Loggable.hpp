@@ -41,4 +41,7 @@ public:
 
 };
 
+//Loggable is thread-safe but this may change in the future
+using MtLoggable = Loggable;
+
 BUFSTACK_END_NAMESPACE
