@@ -85,9 +85,10 @@ $(BIN_DIR)/compile_commands.json: cmake_gen
 build: cmake_gen
 	cmake --build $(BIN_DIR)
 
+#you can pass arguments to google test via environment variables
 .PHONY: check
 check: build
-	cmake --build $(BIN_DIR) --target check
+	GTEST_FILTER=$(GTEST_FILTER) cmake --build $(BIN_DIR) --target check
 
 .PHONY: debug
 debug: build
