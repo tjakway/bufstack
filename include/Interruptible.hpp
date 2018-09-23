@@ -26,7 +26,7 @@ protected:
 
 public:
     bool interrupted() const noexcept { return interruptedFlag.load(); }
-    void interrupt() 
+    virtual void interrupt() 
     { 
         if(logInterruptCalls)
         {

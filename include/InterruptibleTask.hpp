@@ -48,6 +48,9 @@ public:
     virtual void run();
     bool isDone() const;
 
+    //warn if we were interrupted after completion
+    virtual void interrupt() override;
+
 protected:
     Operations operations;
 

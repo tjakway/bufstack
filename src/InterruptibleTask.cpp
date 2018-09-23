@@ -81,5 +81,14 @@ bool InterruptibleTask::isDone() const
     return done.load();
 }
 
+void InterruptibleTask::interrupt()
+{
+    if(isDone())
+    {
+        getLogger()->warn("interrupt() called after completion");
+        Interruptible::interrupt();
+    }
+}
+
 
 BUFSTACK_END_NAMESPACE
