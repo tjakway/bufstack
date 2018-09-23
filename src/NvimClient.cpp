@@ -121,9 +121,13 @@ NvimClient::NvimClient(ConnectionInfo ci)
 
 NvimClient::~NvimClient()
 {
-    if(onConnectFuture)
+    if(onConnectFuture && onConnectTask)
     {
-
+        if(!onConnectTask->interrupted()
+                && !onConnectTask->isDone())
+        {
+            onConnectTask->interrupt();
+        }
     }
 }
 
