@@ -5,6 +5,7 @@
 #include "Loggable.hpp"
 
 #include <vector>
+#include <initializer_list>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -12,18 +13,20 @@ class InterruptibleTask
     : virtual public Loggable,
     public Interruptible
 {
-    bool logProgress;
+protected:
+    NEW_EXCEPTION_TYPE_WITH_BASE(InterruptibleTaskException, InterruptibleException);
+
+    const bool logProgressFlag;
+    static constexpr bool defaultLogProgress = false;
 
     using Operations = std::vector<std::function<void(void)>>;
     Operations operations;
 
-protected:
-    static constexpr bool defaultLogProgress;
 
     //master constructor
     InterruptibleTask(
         bool logInterruptCalls,
-        bool logProgress,
+        bool logProgressFlag,
         Operations operations);
 
     //pass as a list
@@ -32,7 +35,7 @@ protected:
 
     //initializer list version
     InterruptibleTask(
-        std::initialize_list<Operations::value_type> operations);
+        std::initializer_list<Operations::value_type> operations);
 
     /**
      * intended to be overridden if better/more detailed logging is desired
@@ -40,8 +43,10 @@ protected:
      */
     virtual void logProgress(Operations::iterator);
 
+    virtual void runElement(Operations::iterator);
+
 public:
-    void run();
+    virtual void run();
 };
 
 BUFSTACK_END_NAMESPACE

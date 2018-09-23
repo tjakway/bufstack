@@ -1,18 +1,20 @@
 #include "InterruptibleTask.hpp"
 
+#include "Util/Strcat.hpp"
+
 #include <algorithm>
+#include <string>
 
 BUFSTACK_BEGIN_NAMESPACE
-
-constexpr bool InterruptibleTask::defaultLogProgress = false;
 
 //master constructor
 InterruptibleTask::InterruptibleTask(
     bool logInterruptCalls,
     bool _logProgress,
     Operations _operations)
-    : Interruptible(logInterruptCalls),
-    logProgress(_logProgress),
+    : Loggable("InterruptibleTask"),
+    Interruptible(logInterruptCalls),
+    logProgressFlag(_logProgress),
     operations(_operations)
 {}
 
@@ -20,13 +22,13 @@ InterruptibleTask::InterruptibleTask(
 InterruptibleTask::InterruptibleTask(
     Operations _operations)
     : InterruptibleTask(defaultLogInterruptCalls,
-        _logProgress,
+        defaultLogProgress,
         _operations)
 {}
 
 //initializer list version
 InterruptibleTask::InterruptibleTask(
-    std::initialize_list<Operations::value_type> operations)
+    std::initializer_list<Operations::value_type> operations)
     : InterruptibleTask(defaultLogInterruptCalls,
             defaultLogProgress,
             Operations(operations))
@@ -36,11 +38,22 @@ void InterruptibleTask::logProgress(Operations::iterator it)
 {
     getLogger()->debug(
         STRCATS("About to process element " << 
-            std::distance(it - operations.begin())));
+            std::to_string(std::distance(operations.begin(), it))));
+}
+
+
+void InterruptibleTask::runElement(Operations::iterator it)
+{
+    (*it)();
 }
 
 void InterruptibleTask::run()
 {
+    if(interrupted())
+    {
+        throw InterruptibleTaskException("run() called but have already been interrupted");
+    }
+
     for(auto it = operations.begin();
             it != operations.end();
             ++it)
@@ -48,11 +61,11 @@ void InterruptibleTask::run()
         if(!interrupted())
         {
             //log each element then run it
-            if(logProgress)
+            if(logProgressFlag)
             {
                 logProgress(it);
             }
-            (*it)();
+            runElement(it);
         }
     }
 }
