@@ -5,6 +5,7 @@
 #include "HasFd.hpp"
 #include "MsgpackClient.hpp"
 #include "Loggable.hpp"
+#include "InterruptibleTask.hpp"
 
 #include "NvimApi/NvimFunction.hpp"
 #include "NvimApi/RemoteFunction_decl.hpp"
@@ -25,6 +26,7 @@ class NvimClient :
     static const std::string subscribedEvents;
 
     std::unique_ptr<std::future<void>> onConnectFuture;
+    std::unique_ptr<InterruptibleTask> onConnectTask;
 
     std::future<void>& asyncOnConnect(bool suppressLogging);
     void syncOnConnect(bool suppressLogging);
