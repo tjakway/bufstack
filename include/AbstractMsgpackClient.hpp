@@ -240,7 +240,7 @@ public:
         fdReader()
     {}
 
-    virtual ~AbstractMsgpackClient() {}
+    virtual ~AbstractMsgpackClient();
 };
 
 BUFSTACK_END_NAMESPACE
