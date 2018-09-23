@@ -21,42 +21,63 @@ std::future<void>& NvimClient::asyncOnConnect(bool suppressLogging)
     if(!onConnectFuture)
     {
 
-        //lamda variables
-        msgpack::object_handle apiInfoObject;
-        std::unique_ptr<ApiParser> parser;
-        std::unique_ptr<ApiInfo> apiInfo;
-        std::unordered_set<NvimFunction> functions;
+        //we need to subclass InterruptibleTask because just declaring
+        //the lambda variables here means they go out of scope before
+        //the lambdas finish running
+        //alternatively we might be able to use shared_ptrs that are captured by value
+        class InterruptibleTaskClosure
+            : public InterruptibleTask,
+            virtual public Loggable
+        {
+            //lamda variables
+            msgpack::object_handle apiInfoObject;
+            std::unique_ptr<ApiParser> parser;
+            std::unique_ptr<ApiInfo> apiInfo;
+            std::unordered_set<NvimFunction> functions;
 
-        //TODO: consider adding timeouts to any long-running tasks here
-        //and checking the interrupt flag before restarting
-        onConnectTask = make_unique<InterruptibleTask>(!suppressLogging, 
-                !suppressLogging, InterruptibleTask::Operations {
-            [this, &apiInfoObject, suppressLogging](){
-                apiInfoObject = this->call<msgpack::object_handle>("nvim_get_api_info");
-                if(!suppressLogging)
-                {
-                    this->getLogger()->debug("Received api info object");
-                }
-            },
-            [this, &apiInfo, &apiInfoObject, &parser, suppressLogging](){
-                parser = make_unique<ApiParser>(apiInfoObject.get());
-                parser->suppressLogging(suppressLogging);
+        public:
+            InterruptibleTaskClosure(NvimClient* client, bool suppressLogging)
+                : Loggable("InterruptibleTaskClosure"),
+                apiInfoObject(),
+                parser(),
+                apiInfo(),
+                functions(),
+                InterruptibleTask(!suppressLogging, 
+                    !suppressLogging, InterruptibleTask::Operations {
+                    
+                    //TODO: consider adding timeouts to any long-running tasks
+                    //and checking the interrupt flag before restarting
 
-                apiInfo = make_unique<ApiInfo>(parser->getApiInfo());
-            },
-            [this, &functions, &parser](){
-                functions = parser->getFunctions();
-            },
-            [this, &functions](){
-                this->checkFunctions(functions);
-            },
-            [this, &apiInfo](){
-                this->initializeRemoteFunctions(*apiInfo);
-            },
-            [this](){
-                this->subscribeEvents();
-            }
-        });
+                    [this, client, suppressLogging](){
+                        this->apiInfoObject = client->call<msgpack::object_handle>("nvim_get_api_info");
+                        if(!suppressLogging)
+                        {
+                            client->getLogger()->debug("Received api info object");
+                        }
+                    },
+                    [this, client, suppressLogging](){
+                        this->parser = make_unique<ApiParser>(this->apiInfoObject.get());
+                        this->parser->suppressLogging(suppressLogging);
+
+                        this->apiInfo = make_unique<ApiInfo>(this->parser->getApiInfo());
+                    },
+                    [this, client](){
+                        this->functions = this->parser->getFunctions();
+                    },
+                    [this, client](){
+                        client->checkFunctions(this->functions);
+                    },
+                    [this, client](){
+                        client->initializeRemoteFunctions(*this->apiInfo);
+                    },
+                    [this, client](){
+                        client->subscribeEvents();
+                    }
+                })
+            {}
+        };
+
+        onConnectTask = make_unique<InterruptibleTaskClosure>(this, suppressLogging);
 
         //run the onConnect interruptible task
         onConnectFuture = make_unique<std::future<void>>(
