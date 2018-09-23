@@ -116,7 +116,7 @@ public:
 
     virtual ~ReadDecoder() {}
 
-    int read(int fd, BUFSTACK_NS::MsgpackReaderUnpacker::Callback& cb)
+    int doRead(int fd, BUFSTACK_NS::MsgpackReaderUnpacker::Callback& cb)
     {
         assert(buf);
 
@@ -194,7 +194,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
     assert(callback);
 
     int amtRead = -1;
-    ReadDecoder<SleepIntervalType> reader;
+    ReadDecoder<SleepIntervalType> reader(sleepInterval);
 
     //read returns 0 to indicate end of file
     //stop reading if that happens
@@ -219,13 +219,13 @@ void MsgpackReaderUnpacker::readFd(int fd,
         const int nfd = fd + 1;
 
         //set our sleep interval
-        chronoToTimeval<SleepIntervalType>(sleepInterval, tv);
+        chronoToTimeval<SleepIntervalType>(sleepInterval, &tv);
 
         const int numSelectFds = 1;
 
         FD_ZERO(&selectFds);
         FD_SET(fd, &selectFds);
-        int selectRes = select(nfd, selectFds, nullptr, nullptr, &tv);
+        int selectRes = select(nfd, &selectFds, nullptr, nullptr, &tv);
         if(selectRes == -1)
         {
             auto _errno = errno;
@@ -242,7 +242,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
             //check if we can read
             if(FD_ISSET(fd, &selectFds))
             {
-                amtRead = reader.read(fd, callback)
+                amtRead = reader.doRead(fd, callback);
             }
         }
     }

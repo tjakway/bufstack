@@ -18,7 +18,8 @@ class MsgpackReaderUnpacker :
     public Interruptible
 {
     const std::size_t backlogSize;
-    const std::chrono::milliseconds sleepInterval;
+    using SleepIntervalType = std::chrono::milliseconds;
+    const SleepIntervalType sleepInterval;
 public:
     using ObjectList = std::vector<std::reference_wrapper<const msgpack::object>>;
     using Callback = std::function<void(const ObjectList&)>;
@@ -28,6 +29,10 @@ protected:
 
 
 public:
+    NEW_EXCEPTION_TYPE(MsgpackReaderUnpackerException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(SelectException, MsgpackReaderUnpackerException);
+    NEW_EXCEPTION_TYPE_WITH_BASE(ReadException, MsgpackReaderUnpackerException);
+
     MsgpackReaderUnpacker();
 
     MsgpackReaderUnpacker(
