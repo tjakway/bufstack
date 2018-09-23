@@ -16,38 +16,54 @@ BUFSTACK_BEGIN_NAMESPACE
 const std::string NvimClient::subscribedEvents = 
         "BufEnter,BufLeave,TabEnter,TabLeave,WinEnter,WinLeave";
 
-void NvimClient::onConnect(bool suppressLogging)
+std::future<void> NvimClient::asyncOnConnect(bool suppressLogging)
 {
     asyncStartListening(getClientConnection().getReadFd());
 
-    std::function<void(void)> init = 
-        [this, suppressLogging]() -> void {
-    
-        msgpack::object_handle apiInfoObject = 
-            this->call<msgpack::object_handle>("nvim_get_api_info");
+    //make sure that calling this method multiple times
+    //will only generate one actual request to the server
+    if(!onConnectFuture)
+    {
+        std::function<void(void)> init = 
+            [this, suppressLogging]() -> void {
+        
+            msgpack::object_handle apiInfoObject = 
+                this->call<msgpack::object_handle>("nvim_get_api_info");
 
-        if(!suppressLogging)
-        {
-            this->getLogger()->debug("Received api info object");
-        }
+            if(!suppressLogging)
+            {
+                this->getLogger()->debug("Received api info object");
+            }
 
-        ApiParser parser(apiInfoObject.get());
-        parser.suppressLogging(suppressLogging);
+            ApiParser parser(apiInfoObject.get());
+            parser.suppressLogging(suppressLogging);
 
-        ApiInfo apiInfo = parser.getApiInfo();
+            ApiInfo apiInfo = parser.getApiInfo();
 
-        //make sure function signatures match what we expect
-        std::unordered_set<NvimFunction> functions = parser.getFunctions();
-        this->checkFunctions(functions);
+            //make sure function signatures match what we expect
+            std::unordered_set<NvimFunction> functions = parser.getFunctions();
+            this->checkFunctions(functions);
 
-        this->initializeRemoteFunctions(apiInfo);
-        this->subscribeEvents();
-    };
+            this->initializeRemoteFunctions(apiInfo);
+            this->subscribeEvents();
+        };
 
-    std::async(init).wait();
-//    std::future<void> x = then<msgpack::object_handle, std::function<void(msgpack::object_handle)>>
-//        (apiInfoCall, init);
+        onConnectFuture = make_unique(std::move(std::async(init)));
+        return *onConnectFuture;
+    }
+    //if we've already connected then return a reference to the future
+    //we still have
+    else
+    {
+        getLogger()->warn("onConnectFuture != nullptr: "
+                "asyncOnConnect has already been called");
+        return *onConnectFuture;
+    }
+}
 
+void NvimClient::syncOnConnect(bool suppressLogging)
+{
+    asyncOnConnect(suppressLogging).wait();
 }
 
 void NvimClient::initializeRemoteFunctions(const ApiInfo& apiInfo)

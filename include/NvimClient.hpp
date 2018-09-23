@@ -23,7 +23,11 @@ class NvimClient :
 {
     std::unique_ptr<RemoteFunctionInstances> remoteFunctions;
     static const std::string subscribedEvents;
-    void onConnect(bool suppressLogging);
+
+    std::unique_ptr<std::future<void>> onConnectFuture;
+
+    std::future<void>& asyncOnConnect(bool suppressLogging);
+    void syncOnConnect(bool suppressLogging);
 
 protected:
     void initializeRemoteFunctions(const ApiInfo&);
