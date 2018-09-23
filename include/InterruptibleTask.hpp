@@ -19,9 +19,8 @@ protected:
     const bool logProgressFlag;
     static constexpr bool defaultLogProgress = false;
 
+public:
     using Operations = std::vector<std::function<void(void)>>;
-    Operations operations;
-
 
     //master constructor
     InterruptibleTask(
@@ -37,6 +36,11 @@ protected:
     InterruptibleTask(
         std::initializer_list<Operations::value_type> operations);
 
+    virtual void run();
+
+protected:
+    Operations operations;
+
     /**
      * intended to be overridden if better/more detailed logging is desired
      * called BEFORE processing that 
@@ -44,9 +48,6 @@ protected:
     virtual void logProgress(Operations::iterator);
 
     virtual void runElement(Operations::iterator);
-
-public:
-    virtual void run();
 };
 
 BUFSTACK_END_NAMESPACE
