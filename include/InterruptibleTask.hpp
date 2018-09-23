@@ -9,6 +9,12 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
+/**
+ * allows you to implement a task as a list of functions,
+ * each of which represents an "atom" of work
+ * the task can be interrupted before or after any atom has
+ * run but once started each will finish before execution stops
+ */
 class InterruptibleTask
     : virtual public Loggable,
     public Interruptible
