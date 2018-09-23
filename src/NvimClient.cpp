@@ -75,6 +75,8 @@ std::future<void>& NvimClient::asyncOnConnect(bool suppressLogging)
                     }
                 })
             {}
+
+            virtual ~InterruptibleTaskClosure() {}
         };
 
         onConnectTask = make_unique<InterruptibleTaskClosure>(this, suppressLogging);
