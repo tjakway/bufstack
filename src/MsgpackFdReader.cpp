@@ -76,12 +76,12 @@ void MsgpackFdReader::asyncStartListening()
 
                 while(!this->interrupted())
                 {
-                    listening.store(true);
+                    this->listening.store(true);
                     this->readFd(this->fd, this->cb);
                 }
 
                 //done listening
-                listening.store(false);
+                this->listening.store(false);
             };
 
         listenThread = make_unique<std::thread>(threadCb);
@@ -89,6 +89,9 @@ void MsgpackFdReader::asyncStartListening()
         //wait until the thread is running before returning
         while(!threadInitialized.load())
         {
+            getLogger()->debug(STRCATS(
+                "Async listener thread not up yet, sleeping for " << 
+                spinInterval.count() << " milliseconds"));
             std::this_thread::sleep_for(spinInterval);
         }
     }
