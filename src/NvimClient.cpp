@@ -56,6 +56,7 @@ std::future<void>& NvimClient::asyncOnConnect(bool suppressLogging)
             }
         });
 
+        //run the onConnect interruptible task
         onConnectFuture = make_unique<std::future<void>>(
                 std::async(std::bind(&InterruptibleTask::run, onConnectTask.get())));
         return *onConnectFuture;
