@@ -79,4 +79,11 @@ void AbstractMsgpackClient::onReceiveResponseMsg(
         });
 }
 
+AbstractMsgpackClient::~AbstractMsgpackClient()
+{
+    fdReader->done();
+}
+
+
+
 BUFSTACK_END_NAMESPACE
