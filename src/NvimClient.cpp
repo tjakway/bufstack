@@ -79,7 +79,7 @@ void NvimClient::subscribeEvents()
 
 void NvimClient::checkFunctions(const std::unordered_set<NvimFunction>&)
 {
-
+    //TODO
 }
 
 
