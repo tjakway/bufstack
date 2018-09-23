@@ -27,6 +27,8 @@ std::future<void>& NvimClient::asyncOnConnect(bool suppressLogging)
         std::unique_ptr<ApiInfo> apiInfo;
         std::unordered_set<NvimFunction> functions;
 
+        //TODO: consider adding timeouts to any long-running tasks here
+        //and checking the interrupt flag before restarting
         onConnectTask = make_unique<InterruptibleTask>(!suppressLogging, 
                 !suppressLogging, InterruptibleTask::Operations {
             [this, &apiInfoObject, suppressLogging](){
