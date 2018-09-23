@@ -81,7 +81,7 @@ void AbstractMsgpackClient::onReceiveResponseMsg(
 
 AbstractMsgpackClient::~AbstractMsgpackClient()
 {
-    fdReader->done();
+    fdReader->join();
 }
 
 

@@ -38,6 +38,18 @@ public:
 
     virtual void startListening() override;
     virtual void asyncStartListening();
+
+    void join()
+    {
+        done();
+        if(listenThread)
+        {
+            if(listenThread->joinable())
+            {
+                listenThread->join();
+            }
+        }
+    }
 };
 
 BUFSTACK_END_NAMESPACE
