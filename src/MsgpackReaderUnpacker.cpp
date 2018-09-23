@@ -23,7 +23,12 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cassert>
-#include <ctime> //for ctime()
+#include <ctime>
+#include <cerrno>
+
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 //how much to read at once
 #define BUFFER_READ_SIZE 65536
@@ -83,27 +88,39 @@ std::vector<msgpack::object_handle> decode(
     *amountNotConsumed = unpacker.nonparsed_size();
     return handles;
 }
+
+template <typename T>
+void chronoToTimeval(T t, struct timeval* tv)
+{
+    assert(tv != nullptr);
+    std::chrono::nanoseconds ns = 
+        std::chrono::duration_cast<std::chrono::nanoseconds>(t);
+    tv->tv_sec = 0;
+    tv->tv_usec = ns.count();
 }
 
-BUFSTACK_BEGIN_NAMESPACE
-
-
-void MsgpackReaderUnpacker::readFd(int fd, 
-        std::function<void(const ObjectList&)> callback)
+template <typename T>
+class ReadDecoder : public BUFSTACK_NS::Loggable
 {
-    assert(fd >= 0);
-    assert(callback);
-
-    std::unique_ptr<char[]> buf 
-        = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
-
     std::vector<char> data;
+    const T sleepInterval;
+    std::unique_ptr<char[]> buf;
 
-    int amtRead = -1;
-
-    while(amtRead != 0 && !interrupted())
+public:
+    ReadDecoder(T _sleepInterval)
+        : Loggable("ReadDecoder"),
+        sleepInterval(_sleepInterval)
     {
-        amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
+        buf = std::unique_ptr<char[]>(new char[BUFFER_READ_SIZE]);
+    }
+
+    virtual ~ReadDecoder() {}
+
+    int read(int fd, BUFSTACK_NS::MsgpackReaderUnpacker::Callback& cb)
+    {
+        assert(buf);
+
+        int amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
         if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
         {
             std::this_thread::sleep_for(sleepInterval);
@@ -113,42 +130,120 @@ void MsgpackReaderUnpacker::readFd(int fd,
         {
             data.reserve(data.size() + amtRead);
             std::copy_n(buf.get(), amtRead, std::back_inserter(data));
-
         }
-        else if(amtRead != 0)
+        else if(amtRead < 0)
         {
-            throw SocketException(STRCAT("Error in ", __func__, ": ", strerror(errno)));
+            throw BUFSTACK_NS::MsgpackReaderUnpacker::ReadException(
+                    STRCAT("Error in ", __func__, ": ", strerror(errno)));
+        }
+        //read returns 0 for end of file
+        else
+        {
+            getLogger()->debug("end of file");
         }
 
-        getLogger()->debug(STRCATS("data: " << Util::printVector(data)));
-
-        //try and decode this message, recording how much we found
-        char* unconsumedBuffer;
-        std::size_t amountNotConsumed = -1;
-        const std::vector<msgpack::object_handle> handles = 
-            decode(data.data(), data.size(),
-                    &unconsumedBuffer, &amountNotConsumed, *this);
-
-        //invoke the callback if we decoded anything
-        if(!handles.empty())
+        //don't bother decoding empty messages
+        if(amtRead > 0)
         {
-            std::vector<std::reference_wrapper<const msgpack::object>> vs;
-            vs.reserve(handles.size());
-            
-            for(auto& h : handles)
+            getLogger()->debug(STRCATS("read data: " << 
+                        Util::printVector(data)));
+
+            //try and decode this message, recording how much we found
+            char* unconsumedBuffer;
+            std::size_t amountNotConsumed = -1;
+            const std::vector<msgpack::object_handle> handles = 
+                decode(data.data(), data.size(),
+                        &unconsumedBuffer, &amountNotConsumed, *this);
+
+            //invoke the callback if we decoded anything
+            if(!handles.empty())
             {
-                vs.emplace_back(std::ref(h.get()));
+                std::vector<std::reference_wrapper<const msgpack::object>> vs;
+                vs.reserve(handles.size());
+                
+                for(auto& h : handles)
+                {
+                    vs.emplace_back(std::ref(h.get()));
+                }
+
+                cb(vs);
             }
 
-            callback(vs);
+            //if there was any data left over make sure we append any subsequent messages
+            //to it
+            if(amountNotConsumed > 0)
+            {
+                data = std::vector<char>(unconsumedBuffer, 
+                        unconsumedBuffer + amountNotConsumed);
+            }
         }
 
-        //if there was any data left over make sure we prepend any subsequent messages
-        //to it
-        if(amountNotConsumed > 0)
+        return amtRead;
+    }
+};
+
+}
+
+BUFSTACK_BEGIN_NAMESPACE
+
+
+void MsgpackReaderUnpacker::readFd(int fd, 
+        Callback callback)
+{
+    assert(fd >= 0);
+    assert(callback);
+
+    int amtRead = -1;
+    ReadDecoder<SleepIntervalType> reader;
+
+    //read returns 0 to indicate end of file
+    //stop reading if that happens
+    while(amtRead != 0 && !interrupted())
+    {
+        //NOTE: **DO NOT** move fd_set initialization code out of the loop
+        //from select(2):
+        //   On  exit,  each  of the file descriptor sets is modified in place to indicate which file descriptors actually changed status.
+        //   (Thus, if using select() within a loop, the sets must be reinitialized before each call.)
+        fd_set selectFds;
+        struct timeval tv;
+
+
+        //nfd is ***NOT*** number of file descriptors
+        //from select(2) again:
+        //
+        //   nfds  should be set to the highest-numbered file descriptor in any of the three sets, plus 1.  The indicated file descriptors
+        //   in each set are checked, up to this limit (but see BUGS).
+        //
+        //see https://unix.stackexchange.com/questions/7742/whats-the-purpose-of-the-first-argument-to-select-system-call
+        //for why this is so
+        const int nfd = fd + 1;
+
+        //set our sleep interval
+        chronoToTimeval<SleepIntervalType>(sleepInterval, tv);
+
+        const int numSelectFds = 1;
+
+        FD_ZERO(&selectFds);
+        FD_SET(fd, &selectFds);
+        int selectRes = select(nfd, selectFds, nullptr, nullptr, &tv);
+        if(selectRes == -1)
         {
-            data = std::vector<char>(unconsumedBuffer, 
-                    unconsumedBuffer + amountNotConsumed);
+            auto _errno = errno;
+            throw SelectException(
+                    STRCAT("Error in select(2): " << strerror(_errno)));
+        }
+        else
+        {
+            //since select returns the number of changed file descriptors
+            //it should never be greater than the number of file descriptors 
+            //we passed in the first place
+            assert(selectRes <= numSelectFds);
+
+            //check if we can read
+            if(FD_ISSET(fd, &selectFds))
+            {
+                amtRead = reader.read(fd, callback)
+            }
         }
     }
 
