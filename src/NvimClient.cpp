@@ -83,7 +83,8 @@ std::future<void>& NvimClient::asyncOnConnect(bool suppressLogging)
 
         //run the onConnect interruptible task
         onConnectFuture = make_unique<std::future<void>>(
-                std::async(std::bind(&InterruptibleTask::run, onConnectTask.get())));
+                std::async(std::launch::async,
+                    std::bind(&InterruptibleTask::run, onConnectTask.get())));
         return *onConnectFuture;
     }
     //if we've already connected then return a reference to the future
@@ -152,6 +153,8 @@ NvimClient::~NvimClient()
                 && !onConnectTask->isDone())
         {
             onConnectTask->interrupt();
+            //wait for the thread to clean up before proceeding
+            onConnectFuture->wait();
         }
     }
 }
