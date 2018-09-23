@@ -91,7 +91,7 @@ NvimClient::NvimClient(std::shared_ptr<ClientConnection> conn,
     if(!skipOnConnect)
     {
         //since the client connection is constructed, we've already connected
-        onConnect(suppressLogging);
+        asyncOnConnect(suppressLogging);
     }
 }
 
@@ -111,7 +111,10 @@ NvimClient::NvimClient(ConnectionInfo ci)
 
 NvimClient::~NvimClient()
 {
+    if(onConnectFuture)
+    {
 
+    }
 }
 
 BUFSTACK_END_NAMESPACE
