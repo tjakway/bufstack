@@ -15,7 +15,8 @@ InterruptibleTask::InterruptibleTask(
     : Loggable("InterruptibleTask"),
     Interruptible(logInterruptCalls),
     logProgressFlag(_logProgress),
-    operations(_operations)
+    operations(_operations),
+    done(false)
 {}
 
 //pass as list
@@ -68,6 +69,16 @@ void InterruptibleTask::run()
             runElement(it);
         }
     }
+
+    if(!interrupted())
+    {
+        done.store(true);
+    }
+}
+
+bool InterruptibleTask::isDone() const
+{
+    return done.load();
 }
 
 

@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <initializer_list>
+#include <atomic>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -25,6 +26,8 @@ protected:
     const bool logProgressFlag;
     static constexpr bool defaultLogProgress = false;
 
+    std::atomic_bool done;
+
 public:
     using Operations = std::vector<std::function<void(void)>>;
 
@@ -43,6 +46,7 @@ public:
         std::initializer_list<Operations::value_type> operations);
 
     virtual void run();
+    bool isDone() const;
 
 protected:
     Operations operations;
