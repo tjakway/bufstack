@@ -2,6 +2,7 @@
 
 #include "NamespaceDefines.hpp"
 #include "InterruptibleTask.hpp"
+#include "Resumable.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -11,6 +12,9 @@ class ResumableTask
     public InterruptibleTask
 {
     Operations::iterator lastRunElement;
+
+    virtual void onResume() override;
+
 public:
     //master constructor
     ResumableTask(
@@ -24,11 +28,9 @@ public:
 
     //initializer list version
     ResumableTask(
-        std::initialize_list<Operations::value_type> operations);
+        std::initializer_list<Operations::value_type> operations);
 
     virtual void runElement(Operations::iterator it) override;
-
-    void resume();
 };
 
 BUFSTACK_END_NAMESPACE

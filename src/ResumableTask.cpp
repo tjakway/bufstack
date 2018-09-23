@@ -2,9 +2,38 @@
 
 BUFSTACK_BEGIN_NAMESPACE
 
-void ResumableTask::resume()
+
+ResumableTask::ResumableTask(
+    bool logInterruptCalls,
+    bool logProgress,
+    Operations operations)
+    : Loggable("ResumableTask"),
+        InterruptibleTask(logInterruptCalls,
+            logProgress, operations)
+{}
+
+//pass as a list
+ResumableTask::ResumableTask(
+    Operations operations)
+    : ResumableTask(
+            Interruptible::defaultLogInterruptCalls,
+            InterruptibleTask::defaultLogProgress,
+            operations)
+{}
+
+//initializer list version
+ResumableTask::ResumableTask(
+    std::initializer_list<Operations::value_type> operations)
+    : ResumableTask(Operations(operations))
+{}
+
+void ResumableTask::onResume()
 {
-    for(Operations it = lastRunElement; 
+    if(logProgressFlag)
+    {
+        getLogger()->debug("onResume() called");
+    }
+    for(Operations::iterator it = lastRunElement; 
             it != operations.end();
             ++it)
     {

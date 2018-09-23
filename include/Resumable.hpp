@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Interruptible.hpp"
+#include "Loggable.hpp"
 #include "NamespaceDefines.hpp"
 
 BUFSTACK_BEGIN_NAMESPACE
@@ -13,7 +14,7 @@ class Resumable
       virtual public Loggable
 {
 protected:
-    void onResume() = 0;
+    virtual void onResume() = 0;
 
 public:
     Resumable()
@@ -21,7 +22,7 @@ public:
     {}
 
     Resumable(bool logInterruptCalls)
-        : Interrruptible(logInterruptCalls)
+        : Interruptible(logInterruptCalls)
     {}
 
     void resume()
