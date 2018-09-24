@@ -12,7 +12,8 @@
 namespace {
 
     void setFdNonblocking(int fd,
-        std::function<void(const std::string&)> onError)
+        std::function<void(const std::string&)> onError,
+        BUFSTACK_NS::Loggable& log)
     {
         //save current flags, OR with O_NONBLOCK
         int flags = fcntl(fd, F_GETFL, 0);
@@ -24,13 +25,24 @@ namespace {
                         strerror(_errno)));
         }
 
-        flags |= O_NONBLOCK;
-        if(fcntl(fd, F_SETFL, flags) == -1)
+        if((flags & O_NONBLOCK) == 0)
         {
-            auto _errno = errno;
-            onError(STRCAT("fcntl returned -1 for F_SETFL in " <<
-                        __func__ << ": " <<
-                        strerror(_errno)));
+            flags |= O_NONBLOCK;
+            if(fcntl(fd, F_SETFL, flags) == -1)
+            {
+                auto _errno = errno;
+                onError(STRCAT("fcntl returned -1 for F_SETFL in " <<
+                            __func__ << ": " <<
+                            strerror(_errno)));
+            }
+
+            log.getLogger()->debug(STRCATS("set fd " << fd <<
+                        " to nonblocking"));
+        }
+        else
+        {
+            log.getLogger()->debug(STRCATS("fd " << fd <<
+                        " is already nonblocking"));
         }
     }
 }
@@ -99,7 +111,7 @@ void MsgpackFdReader::asyncStartListening()
 {
     setFdNonblocking(fd, [](const std::string& msg) {
         throw SetFdNonblockingException(msg);
-    });
+    }, *this);
 
     //check that we're not already reading
     if(!listening)
