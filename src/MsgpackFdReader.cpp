@@ -97,6 +97,10 @@ MsgpackFdReader::~MsgpackFdReader()
 
 void MsgpackFdReader::asyncStartListening()
 {
+    setFdNonblocking(fd, [](const std::string& msg) {
+        throw SetFdNonblockingException(msg);
+    });
+
     //check that we're not already reading
     if(!listening)
     {
