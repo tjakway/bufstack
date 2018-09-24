@@ -107,6 +107,8 @@ class ReadDecoder : public BUFSTACK_NS::Loggable
     std::unique_ptr<char[]> buf;
 
 public:
+    NEW_EXCEPTION_TYPE(AlreadyInterruptedException);
+
     ReadDecoder(T _sleepInterval)
         : Loggable("ReadDecoder"),
         sleepInterval(_sleepInterval)
@@ -116,34 +118,64 @@ public:
 
     virtual ~ReadDecoder() {}
 
-    int doRead(int fd, BUFSTACK_NS::MsgpackReaderUnpacker::Callback& cb)
+    long doRead(int fd, 
+            BUFSTACK_NS::MsgpackReaderUnpacker::Callback& cb,
+            BUFSTACK_NS::Interruptible& interruptible)
     {
         assert(buf);
-
-        int amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
-        if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
+        if(interruptible.interrupted())
         {
-            std::this_thread::sleep_for(sleepInterval);
-        }
-        //if we read data copy into the result buffer
-        else if(amtRead > 0)
-        {
-            data.reserve(data.size() + amtRead);
-            std::copy_n(buf.get(), amtRead, std::back_inserter(data));
-        }
-        else if(amtRead < 0)
-        {
-            throw BUFSTACK_NS::MsgpackReaderUnpacker::ReadException(
-                    STRCAT("Error in ", __func__, ": ", strerror(errno)));
-        }
-        //read returns 0 for end of file
-        else
-        {
-            getLogger()->debug("end of file");
+            throw AlreadyInterruptedException(
+                "We were interrupted before we started reading");
         }
 
+        long accumulatedAmountRead = 0;
+        int amtRead = -1;
+        //0 is the default (non-error) value of errno
+        //see https://stackoverflow.com/questions/21025631/default-value-of-errno-variable
+        int _errno = 0;
+
+        std::function<bool(void)> loopContinue = 
+            [&](){
+                return amtRead > 0 &&
+                    (_errno != EAGAIN ||
+                     _errno != EWOULDBLOCK) &&
+                    !interruptible.interrupted();
+            };
+
+        //read as much as we can without blocking
+        do {
+            amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
+            if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
+            {
+                std::this_thread::sleep_for(sleepInterval);
+            }
+            //if we read data copy into the result buffer
+            else if(amtRead > 0)
+            {
+                data.reserve(data.size() + amtRead);
+                std::copy_n(buf.get(), 
+                        sizeof(char) * amtRead, std::back_inserter(data));
+
+                accumulatedAmountRead += amtRead;
+            }
+            else if(amtRead < 0)
+            {
+                throw BUFSTACK_NS::MsgpackReaderUnpacker::ReadException(
+                        STRCAT("Error in ", __func__, ": ", strerror(errno)));
+            }
+            //read returns 0 for end of file
+            else
+            {
+                getLogger()->debug("end of file");
+            }
+
+        } while(loopContinue());
+
+        //handle the data we read
+        
         //don't bother decoding empty messages
-        if(amtRead > 0)
+        if(accumulatedAmountRead > 0 && !interruptible.interrupted())
         {
             getLogger()->debug(STRCATS("read data: " << 
                         Util::printVector(data)));
@@ -178,7 +210,7 @@ public:
             }
         }
 
-        return amtRead;
+        return accumulatedAmountRead;
     }
 };
 
@@ -193,7 +225,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
     assert(fd >= 0);
     assert(callback);
 
-    int amtRead = -1;
+    long amtRead = -1;
     ReadDecoder<SleepIntervalType> reader(sleepInterval);
 
     //read returns 0 to indicate end of file
@@ -242,7 +274,7 @@ void MsgpackReaderUnpacker::readFd(int fd,
             //check if we can read
             if(FD_ISSET(fd, &selectFds))
             {
-                amtRead = reader.doRead(fd, callback);
+                amtRead = reader.doRead(fd, callback, *this);
             }
         }
     }
