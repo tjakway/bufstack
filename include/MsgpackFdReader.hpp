@@ -32,6 +32,8 @@ public:
             int _fd,
             Callback onDecode);
 
+    NEW_EXCEPTION_TYPE(SetFdNonblockingException);
+
     int getFd() const { return fd; }
 
     virtual ~MsgpackFdReader();
