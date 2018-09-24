@@ -40,6 +40,8 @@ GTEST_ARGS='--gtest_filter=$(GTEST_FILTER)'
 #note: need to cd to the test dir before calling the debugger
 DEBUGGER_ARGS=-- './$(TEST_EXE_NAME)' $(GTEST_ARGS) 
 
+VALGRIND_ARGS=
+
 .PHONY: all
 all: $(BIN_DIR)/Makefile $(BIN_DIR)/compile_commands.json build
 
@@ -92,7 +94,11 @@ check: build
 
 .PHONY: valgrind
 valgrind: build
-	cd $(BIN_DIR)/test/src && valgrind './$(TEST_EXE_NAME)' $(GTEST_ARGS) 
+	cd $(BIN_DIR)/test/src && valgrind $(VALGRIND_ARGS) './$(TEST_EXE_NAME)' $(GTEST_ARGS) 
+
+.PHONY: helgrind
+helgrind: VALGRIND_ARGS=--tool=helgrind
+helgrind: valgrind
 
 
 .PHONY: debug
