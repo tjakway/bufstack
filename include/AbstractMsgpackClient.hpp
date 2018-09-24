@@ -14,6 +14,7 @@
 
 #include <cstdlib>
 #include <tuple>
+#include <mutex>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -89,6 +90,8 @@ protected:
 
     NEW_EXCEPTION_TYPE_WITH_BASE(AlreadyListeningException, BaseException);
 
+
+    std::recursive_mutex callMutex;
 
     void startListening(int readFd);
     void asyncStartListening(int readFd);
@@ -167,6 +170,7 @@ protected:
     template <typename... Args>
     MsgId sendCall(const std::string& name, Args... args)
     {
+        std::lock_guard<decltype(callMutex)> {callMutex};
         const auto thisMsgId = idSeq.nextAndIncrement();
 
         auto call_obj =
@@ -199,6 +203,8 @@ public:
     template <typename T, typename... Args>
     std::future<T> asyncCall(const std::string& name, Args... args)
     {
+        std::lock_guard<std::recursive_mutex> {callMutex};
+
         MsgId thisMsgId = sendCall<Args...>(name, args...);
 
         std::shared_ptr<std::promise<T>> thisPromise = 

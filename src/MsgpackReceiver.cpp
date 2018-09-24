@@ -100,6 +100,7 @@ void MsgpackReceiver::handleNotificationMessage(
 
 void MsgpackReceiver::onRecvMsg(const msgpack::object& o)
 {
+    std::lock_guard<decltype(onRecvMsgMutex)> {onRecvMsgMutex};
     std::vector<msgpack::object> msgObj;
 
     getLogger()->info("Received msgpack object: {}", toString(o));

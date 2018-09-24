@@ -125,8 +125,9 @@ public:
         assert(buf);
         if(interruptible.interrupted())
         {
-            throw AlreadyInterruptedException(
+            getLogger()->debug(
                 "We were interrupted before we started reading");
+            return 0;
         }
 
         long accumulatedAmountRead = 0;

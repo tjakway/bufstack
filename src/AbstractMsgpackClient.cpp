@@ -52,6 +52,8 @@ void AbstractMsgpackClient::asyncStartListening(int readFd)
 
 void AbstractMsgpackClient::addResponseCallback(BoundResponseCallback&& cb)
 {
+    std::lock_guard<decltype(callMutex)> {callMutex};
+
     std::function<void(std::vector<BoundResponseCallback>&, 
             BoundResponseCallback&&)> f = 
         [](std::vector<BoundResponseCallback>& v, 
@@ -70,6 +72,8 @@ void AbstractMsgpackClient::addResponseCallback(BoundResponseCallback&& cb)
 void AbstractMsgpackClient::onReceiveResponseMsg(
         const MsgpackRpc::ResponseMessage& msg)
 {
+    std::lock_guard<decltype(callMutex)> {callMutex};
+
     responseCallbacks.access<void>(
         [&msg](std::vector<BoundResponseCallback>& callbacks){
             std::remove_if(callbacks.begin(), callbacks.end(),

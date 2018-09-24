@@ -8,6 +8,7 @@
 
 #include <msgpack.hpp>
 #include <vector>
+#include <mutex>
 
 BUFSTACK_BEGIN_NAMESPACE
 
@@ -44,6 +45,7 @@ protected:
     virtual void onReceiveNotificationMsg(const MsgpackRpc::NotificationMessage&) = 0;
 
     virtual void onRecvMsg(const msgpack::object&);
+    std::mutex onRecvMsgMutex;
 
 public:
     virtual ~MsgpackReceiver() {}
