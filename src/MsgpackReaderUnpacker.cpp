@@ -149,7 +149,7 @@ public:
             _errno = errno;
             if(_errno == EAGAIN || _errno == EWOULDBLOCK)
             {
-                std::this_thread::sleep_for(sleepInterval);
+                getLogger()->debug("Call to read would block, stopping loop");
             }
             //if we read data copy into the result buffer
             else if(amtRead > 0)
