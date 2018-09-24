@@ -4,6 +4,9 @@
 #include <string>
 #include <cerrno>
 
+#include <unistd.h>
+#include <fcntl.h>
+
 #include "Util/Strcat.hpp"
 
 namespace {
