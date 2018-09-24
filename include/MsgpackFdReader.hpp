@@ -39,6 +39,11 @@ public:
     virtual void startListening() override;
     virtual void asyncStartListening();
 
+    bool isListening() const
+    {
+        return listening.load();
+    }
+
     void join()
     {
         done();
