@@ -90,6 +90,11 @@ build: cmake_gen
 check: build
 	GTEST_FILTER=$(GTEST_FILTER) cmake --build $(BIN_DIR) --target check
 
+.PHONY: valgrind
+valgrind: build
+	cd $(BIN_DIR)/test/src && valgrind './$(TEST_EXE_NAME)' $(GTEST_ARGS) 
+
+
 .PHONY: debug
 debug: build
 	cd $(BIN_DIR)/test/src && $(DEBUGGER) $(DEBUGGER_ARGS)
