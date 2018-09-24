@@ -1,5 +1,37 @@
 #include "MsgpackFdReader.hpp"
 
+#include <functional>
+#include <string>
+#include <cerrno>
+
+#include "Util/Strcat.hpp"
+
+namespace {
+
+    void setFdNonblocking(int fd,
+        std::function<void(const std::string&)> onError)
+    {
+        //save current flags, OR with O_NONBLOCK
+        int flags = fcntl(fd, F_GETFL, 0);
+        if (flags == -1)
+        {
+            auto _errno = errno;
+            onError(STRCAT("fcntl returned -1 for F_SETFL in " <<
+                        __func__ << ": " <<
+                        strerror(_errno)));
+        }
+
+        flags |= O_NONBLOCK;
+        if(fcntl(fd, F_SETFL, flags) == -1)
+        {
+            auto _errno = errno;
+            onError(STRCAT("fcntl returned -1 for F_SETFL in " <<
+                        __func__ << ": " <<
+                        strerror(_errno)));
+        }
+    }
+}
+
 
 BUFSTACK_BEGIN_NAMESPACE
 
