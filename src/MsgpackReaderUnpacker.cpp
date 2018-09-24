@@ -146,7 +146,8 @@ public:
         //read as much as we can without blocking
         do {
             amtRead = read(fd, buf.get(), BUFFER_READ_SIZE);
-            if(amtRead == EAGAIN || amtRead == EWOULDBLOCK)
+            _errno = errno;
+            if(_errno == EAGAIN || _errno == EWOULDBLOCK)
             {
                 std::this_thread::sleep_for(sleepInterval);
             }
@@ -162,7 +163,7 @@ public:
             else if(amtRead < 0)
             {
                 throw BUFSTACK_NS::MsgpackReaderUnpacker::ReadException(
-                        STRCAT("Error in ", __func__, ": ", strerror(errno)));
+                        STRCAT("Error in ", __func__, ": ", strerror(_errno)));
             }
             //read returns 0 for end of file
             else
