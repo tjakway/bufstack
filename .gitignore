@@ -2,3 +2,5 @@
 *.pyc
 tags
 .tags
+.stack-work
+.cabal-sandbox
