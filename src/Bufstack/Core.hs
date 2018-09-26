@@ -1,15 +1,35 @@
 module Bufstack.Core where
 
 import Control.Concurrent.STM
-import Neovim.API.String
+import qualified Neovim as Nvim
+import qualified Neovim.API.String as Nvim
+import Control.Monad (filterM)
 
-data Config = Config
+data Config = 
+    Config {
+        --to indicate their position on the stack
+        renameBuffers :: Bool
+    }
+
+
+defaultConfig :: Config
+defaultConfig = Config False
 
 data Bufstack =
     Bufstack {
         config :: Config,
-        buffers :: TVar [Buffer]
+        buffers :: TVar [Nvim.Buffer]
         }
+
+modifyBuffers :: Bufstack -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> STM ()
+modifyBuffers Bufstack {buffers= bufs} = modifyTVar' bufs
 
 initBufstack :: Config -> STM Bufstack
 initBufstack c = Bufstack c <$> newTVar []
+
+discardBadBuffers :: Bufstack -> Nvim.Neovim env ()
+discardBadBuffers Bufstack {buffers= bufs} = 
+        (Nvim.liftIO . readTVarIO $ bufs) >>= 
+        filterM (Nvim.buffer_is_valid') >>=
+        (Nvim.liftIO . atomically . writeTVar bufs)
+
