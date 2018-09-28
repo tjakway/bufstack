@@ -27,7 +27,7 @@ Library
                         -fwarn-unused-do-bind -fwarn-incomplete-uni-patterns
   build-depends:       base, containers, nvim-hs, stm
   
-  exposed-modules: Bufstack.Core, Bufstack.Util
+  exposed-modules: Bufstack.Core, Bufstack.Util, Bufstack.BufferOperations
 
   if flag(test)
     CPP-Options: -DTESTING

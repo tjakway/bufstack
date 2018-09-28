@@ -23,9 +23,6 @@ data Bufstack =
 
 type BufstackM a = Nvim.Neovim Bufstack a
 
-modifyBuffers :: Bufstack -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> STM ()
-modifyBuffers Bufstack {buffers= bufs} = modifyTVar' bufs
-
 initBufstack :: Config -> STM Bufstack
 initBufstack c = Bufstack c <$> newTVar []
 
