@@ -21,15 +21,18 @@ data Bufstack =
         buffers :: TVar [Nvim.Buffer]
         }
 
+type BufstackM a = Nvim.Neovim Bufstack a
+
 modifyBuffers :: Bufstack -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> STM ()
 modifyBuffers Bufstack {buffers= bufs} = modifyTVar' bufs
 
 initBufstack :: Config -> STM Bufstack
 initBufstack c = Bufstack c <$> newTVar []
 
-discardBadBuffers :: Bufstack -> Nvim.Neovim env ()
-discardBadBuffers Bufstack {buffers= bufs} = 
-        (Nvim.liftIO . readTVarIO $ bufs) >>= 
-        filterM (Nvim.buffer_is_valid') >>=
-        (Nvim.liftIO . atomically . writeTVar bufs)
+discardBadBuffers :: BufstackM ()
+discardBadBuffers = 
+        Nvim.ask >>= (\Bufstack {buffers= bufs} ->
+            (Nvim.liftIO . readTVarIO $ bufs) >>= 
+            filterM (Nvim.buffer_is_valid') >>=
+            (Nvim.liftIO . atomically . writeTVar bufs))
 
