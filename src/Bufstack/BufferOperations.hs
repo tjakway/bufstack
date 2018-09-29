@@ -6,6 +6,4 @@ import Bufstack.Core
 import Bufstack.Util
 
 pushBuffer :: Nvim.Buffer -> BufstackM ()
-pushBuffer buf = modifyBuffersM (buf :)
-
-
+pushBuffer buf = modifyBuffersM_ (buf :)
