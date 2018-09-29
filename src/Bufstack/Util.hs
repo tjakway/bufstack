@@ -23,16 +23,15 @@ modifyBuffers_ Bufstack {buffers= bufs} = STM.modifyTVar' bufs
 modifyBuffers :: Bufstack -> 
                 ([Nvim.Buffer] -> [Nvim.Buffer]) -> 
                 STM.STM [Nvim.Buffer]
-modifyBuffers Bufstack {buffers= bufs} f = 
-        modifyBuffers_ bufs f >> readTVar bufs
+modifyBuffers b@Bufstack {buffers= bufs} f = 
+        modifyBuffers_ b f >> STM.readTVar bufs
 
 
 modifyBuffersMImpl :: (Bufstack -> 
                     ([Nvim.Buffer] -> [Nvim.Buffer]) -> 
                     STM.STM a) -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM a
-modifyBuffersMImpl g f = 
-        let m x = atomically $ g x f
-            in Nvim.ask >>= m
+modifyBuffersMImpl g f = let m x = atomically $ g x f
+                            in Nvim.ask >>= m
 
 modifyBuffersM_ :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM ()
 modifyBuffersM_ = modifyBuffersMImpl modifyBuffersM_
@@ -40,3 +39,21 @@ modifyBuffersM_ = modifyBuffersMImpl modifyBuffersM_
 
 modifyBuffersM :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM [Nvim.Buffer]
 modifyBuffersM = modifyBuffersMImpl modifyBuffersM
+
+modifyBuffersMs :: ([Nvim.Buffer] -> (a, [Nvim.Buffer])) -> BufstackM a
+modifyBuffersMs f = let x (Bufstack {buffers = bufs}) = stateTVar bufs f
+                        in atomically $ Nvim.ask >>= x
+
+
+-- verbatim from http://hackage.haskell.org/package/stm-2.5.0.0/docs/src/Control.Concurrent.STM.TVar.html#stateTVar
+-- | Like 'modifyTVar'' but the function is a simple state transition that can
+-- return a side value which is passed on as the result of the 'STM'.
+--
+-- @since 2.5.0
+stateTVar :: STM.TVar s -> (s -> (a, s)) -> STM.STM a
+stateTVar var f = do
+   s <- STM.readTVar var
+   let (a, s') = f s -- since we destructure this, we are strict in f
+   STM.writeTVar var s'
+   return a
+{-# INLINE stateTVar #-}
