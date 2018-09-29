@@ -34,15 +34,15 @@ modifyBuffersMImpl g f = let m x = atomically $ g x f
                             in Nvim.ask >>= m
 
 modifyBuffersM_ :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM ()
-modifyBuffersM_ = modifyBuffersMImpl modifyBuffersM_
+modifyBuffersM_ = modifyBuffersMImpl modifyBuffers_
 
 
 modifyBuffersM :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM [Nvim.Buffer]
-modifyBuffersM = modifyBuffersMImpl modifyBuffersM
+modifyBuffersM = modifyBuffersMImpl modifyBuffers
 
 modifyBuffersMs :: ([Nvim.Buffer] -> (a, [Nvim.Buffer])) -> BufstackM a
-modifyBuffersMs f = let x (Bufstack {buffers = bufs}) = stateTVar bufs f
-                        in atomically $ Nvim.ask >>= x
+modifyBuffersMs f = let x (Bufstack {buffers = bufs}) = atomically $ stateTVar bufs f
+                        in Nvim.ask >>= x
 
 
 -- verbatim from http://hackage.haskell.org/package/stm-2.5.0.0/docs/src/Control.Concurrent.STM.TVar.html#stateTVar
