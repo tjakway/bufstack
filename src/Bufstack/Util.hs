@@ -1,4 +1,10 @@
-module Bufstack.Util where
+module Bufstack.Util (
+    atomically,
+    modifyBuffers_,
+    modifyBuffers,
+    modifyBuffersM,
+    modifyBuffersM_
+) where
 
 import qualified Control.Concurrent.STM as STM
 import qualified Neovim as Nvim
@@ -23,18 +29,14 @@ modifyBuffers Bufstack {buffers= bufs} f =
 
 modifyBuffersMImpl :: (Bufstack -> 
                     ([Nvim.Buffer] -> [Nvim.Buffer]) -> 
-                    STM.STM a) -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM ()
+                    STM.STM a) -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM a
 modifyBuffersMImpl g f = 
         let m x = atomically $ g x f
             in Nvim.ask >>= m
 
 modifyBuffersM_ :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM ()
-modifyBuffersM_ f = 
-        let m x = atomically $ modifyBuffers_ x f
-            in Nvim.ask >>= m
+modifyBuffersM_ = modifyBuffersMImpl modifyBuffersM_
 
 
 modifyBuffersM :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM [Nvim.Buffer]
-modifyBuffersM f = 
-        let m x = atomically $ modifyBuffers x f
-            in Nvim.ask >>= m
+modifyBuffersM = modifyBuffersMImpl modifyBuffersM
