@@ -3,7 +3,8 @@ module Bufstack.Util (
     modifyBuffers_,
     modifyBuffers,
     modifyBuffersM,
-    modifyBuffersM_
+    modifyBuffersM_,
+    modifyBuffersMs
 ) where
 
 import qualified Control.Concurrent.STM as STM
