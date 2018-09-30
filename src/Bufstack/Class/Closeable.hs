@@ -5,24 +5,24 @@ import Neovim.API.String
 import Bufstack.Close.HasNumber
 import Control.Monad (foldM, mapM_)
 
-class NvimCloseable a where
+class Closeable a where
         close :: a -> Neovim env (Either NeovimException ())
         close' :: a -> Neovim env ()
 
-instance NvimCloseable Buffer where
+instance Closeable Buffer where
         close b = vim_command (":bd " ++ show . getNumber b)
         close' b = vim_command' (":bd " ++ show . getNumber b)
 
-instance NvimCloseable Window where
+instance Closeable Window where
         close b = vim_command (":" ++ show . getNumber b ++ "quit")
         close' b = vim_command' (":" ++ show . getNumber b ++ "quit")
 
 
-instance NvimCloseable Tabpage where
+instance Closeable Tabpage where
         close b = vim_command (":tabclose " ++ show . getNumber b)
         close' b = vim_command' (":tabclose " ++ show . getNumber b)
 
-closeAll :: NvimCloseable a => [a] -> Neovim env (Either [NeovimException] ())
+closeAll :: Closeable a => [a] -> Neovim env (Either [NeovimException] ())
 closeAll = g . foldM f (Right ())
     where f (Right ()) thisElem = case close thisElem of Left r -> [r]
                                                          Right _ -> Right ()
@@ -32,7 +32,7 @@ closeAll = g . foldM f (Right ())
           rev (Right ()) = Right ()
           rev (Left errs) = Left (reverse errs)
 
-closeAll' :: NvimCloseable a => [a] -> Neovim env ()
+closeAll' :: Closeable a => [a] -> Neovim env ()
 closeAll' = h . closeAll
     where h (Right ()) = ()
           h (Left errs) = mapM_ errOnInvalidResult errs
