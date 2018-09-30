@@ -1,4 +1,4 @@
-module IsValid where
+module Bufstack.Class.IsValid where
 
 import Neovim
 import Neovim.API.String

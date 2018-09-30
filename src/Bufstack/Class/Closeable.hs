@@ -2,7 +2,7 @@ module Bufstack.Class.Closeable where
 
 import Neovim
 import Neovim.API.String
-import Bufstack.Close.HasNumber
+import Bufstack.Class.HasNumber
 import Control.Monad (foldM, mapM_)
 
 class Closeable a where
