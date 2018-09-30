@@ -4,7 +4,8 @@ module Bufstack.Util (
     modifyBuffers,
     modifyBuffersM,
     modifyBuffersM_,
-    modifyBuffersMs
+    modifyBuffersMs,
+    wrapNvimEither
 ) where
 
 import qualified Control.Concurrent.STM as STM
@@ -45,6 +46,9 @@ modifyBuffersMs :: ([Nvim.Buffer] -> (a, [Nvim.Buffer])) -> BufstackM a
 modifyBuffersMs f = let x (Bufstack {buffers = bufs}) = atomically $ stateTVar bufs f
                         in Nvim.ask >>= x
 
+wrapNvimEither :: Either Nvim.NeovimException (Nvim.Neovim env a) -> Nvim.Neovim env (Either Nvim.NeovimException a)
+wrapNvimEither (Left x) = return . Left $ x
+wrapNvimEither (Right x) = x >>= (\a -> return . Right $ a)
 
 -- verbatim from http://hackage.haskell.org/package/stm-2.5.0.0/docs/src/Control.Concurrent.STM.TVar.html#stateTVar
 -- | Like 'modifyTVar'' but the function is a simple state transition that can

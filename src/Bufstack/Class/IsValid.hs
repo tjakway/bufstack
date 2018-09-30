@@ -4,8 +4,8 @@ import Neovim
 import Neovim.API.String
 
 class IsValid a where
-        isValid :: a -> Neovim env Bool
-        isValid' :: a -> Neovim env (Either NeovimException Bool)
+        isValid :: a -> Neovim env (Either NeovimException Bool)
+        isValid' :: a -> Neovim env Bool
 
 instance IsValid Buffer where
         isValid = nvim_buf_is_valid

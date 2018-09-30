@@ -3,7 +3,7 @@ module Bufstack.Class.Closeable where
 
 import Neovim
 import Neovim.API.String
-import Control.Monad (foldM, mapM_)
+import Control.Monad (foldM, mapM_, sequence_)
 
 import Bufstack.Class.HasNumber
 import Bufstack.Util
@@ -50,7 +50,8 @@ closeAll = fmap rev . foldM f startFold
           rev (Left errs) = Left (reverse errs)
 
 closeAll' :: Closeable a => [a] -> Neovim env ()
-closeAll' = h . closeAll
-    where h (Right ()) = ()
-          h (Left errs) = mapM_ errOnInvalidResult errs
+closeAll' xs = closeAll xs >>= h
+    where h :: Either [NeovimException] () -> Neovim env ()
+          h (Right ()) = return ()
+          h (Left errs) = sequence_ $ mapM_ errOnInvalidResult errs
 
