@@ -12,3 +12,18 @@ popBuffer :: BufstackM (Maybe Nvim.Buffer)
 popBuffer = modifyBuffersMs tailMaybeS 
     where tailMaybeS [] = (Nothing, [])
           tailMaybeS (x:xs) = (Just x, xs)
+
+removeBuffer :: Nvim.Buffer -> BufstackM ()
+removeBuffer b = modifyBuffersM_ $ filter (/= b)
+
+-- | look at the top buffer without removing any
+peekBuffer :: BufstackM (Maybe Nvim.Buffer)
+peekBuffer = getBuffers >>= return . headMaybe
+    where headMaybe [] = Nothing
+          headMaybe (x:xs) = Just x
+
+replaceBufstack :: [Nvim.Buffer] -> BufstackM ()
+replaceBufstack newBuffers = modifyBuffersM_ (const newBuffers)
+
+reverseBufstack :: BufstackM ()
+reverseBufstack = modifyBuffersM_ reverse
