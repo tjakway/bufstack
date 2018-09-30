@@ -49,9 +49,8 @@ closeAll = fmap rev . foldM f startFold
           rev (Right ()) = Right ()
           rev (Left errs) = Left (reverse errs)
 
-closeAll' :: Closeable a => [a] -> Neovim env ()
-closeAll' xs = closeAll xs >>= h
-    where h :: Either [NeovimException] () -> Neovim env ()
-          h (Right ()) = return ()
-          h (Left errs) = sequence_ $ mapM_ errOnInvalidResult errs
+closeAll' :: Closeable a => ([NeovimException] -> Neovim env ()) -> [a] -> Neovim env ()
+closeAll' onError xs = closeAll xs >>= h
+    where h (Right ()) = return ()
+          h (Left errs) = onError errs
 
