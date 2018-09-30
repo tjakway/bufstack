@@ -20,7 +20,7 @@ removeBuffer b = modifyBuffersM_ $ filter (/= b)
 peekBuffer :: BufstackM (Maybe Nvim.Buffer)
 peekBuffer = getBuffers >>= return . headMaybe
     where headMaybe [] = Nothing
-          headMaybe (x:xs) = Just x
+          headMaybe (x:_) = Just x
 
 replaceBufstack :: [Nvim.Buffer] -> BufstackM ()
 replaceBufstack newBuffers = modifyBuffersM_ (const newBuffers)
