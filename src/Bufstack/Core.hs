@@ -33,3 +33,6 @@ discardBadBuffers =
             filterM (Nvim.buffer_is_valid') >>=
             (Nvim.liftIO . atomically . writeTVar bufs))
 
+getBuffers :: BufstackM [Nvim.Buffer]
+getBuffers = Nvim.ask >>= (\(Bufstack{buffers = buf}) -> 
+                Nvim.liftIO . readTVarIO $ buf)
