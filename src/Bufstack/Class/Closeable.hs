@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Bufstack.Class.Closeable where
 
 import Neovim
@@ -7,20 +8,26 @@ import Control.Monad (foldM, mapM_)
 
 class Closeable a where
         close :: a -> Neovim env (Either NeovimException ())
+
         close' :: a -> Neovim env ()
+        close' x = let f (Right _) = Right ObjectNil
+                       f (Left y) = Left y
+
+                       closeNil :: Neovim env (Either NeovimException Object)
+                       closeNil = (close x) >>= return . f
+
+                        in errOnInvalidResult closeNil 
 
 instance Closeable Buffer where
-        close b = vim_command (":bd " ++ show . getNumber b)
-        close' b = vim_command' (":bd " ++ show . getNumber b)
+        close b = getNumber b >>= (>>= (\n -> vim_command $ ":bd " ++ show n))
 
 instance Closeable Window where
-        close b = vim_command (":" ++ show . getNumber b ++ "quit")
-        close' b = vim_command' (":" ++ show . getNumber b ++ "quit")
+        close b = getNumber b >>= (>>= (\n -> vim_command $ ": " ++ show n ++ "quit"))
 
 
 instance Closeable Tabpage where
-        close b = vim_command (":tabclose " ++ show . getNumber b)
-        close' b = vim_command' (":tabclose " ++ show . getNumber b)
+        close b = vim_command (":tabclose " ++ (show . getNumber) b)
+        close' b = vim_command' (":tabclose " ++ (show . getNumber) b)
 
 closeAll :: Closeable a => [a] -> Neovim env (Either [NeovimException] ())
 closeAll = g . foldM f (Right ())
