@@ -29,7 +29,7 @@ Library
   
   exposed-modules: Bufstack.Core, Bufstack.Util, Bufstack.BufferOperations,
                     Bufstack.Class.IsValid, Bufstack.Class.HasNumber,
-                    Bufstack.Class.Closeable
+                    Bufstack.Class.Closeable, Bufstack.Vim.Exports
 
   if flag(test)
     CPP-Options: -DTESTING
@@ -44,7 +44,7 @@ Test-Suite test-bufstack
   hs-source-dirs:
     test
 
-  other-modules: TruthTable.Tests.LogicTests, TruthTable.Tests.ParserTests
+  other-modules: Bufstack.Vim.Autocmds
   default-language:    Haskell2010
 
   build-depends:       base, bufstack, 
