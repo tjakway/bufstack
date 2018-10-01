@@ -3,7 +3,6 @@ module Bufstack.Vim.Autocmds (
     addAutocmds
 ) where
 
-import Control.Concurrent.STM
 import Neovim
 import Neovim.API.String
 import Control.Monad.Trans.Resource
@@ -30,6 +29,6 @@ addAutocmds =
                         acmdNested = False,
                         acmdGroup = Nothing
                         }
-            in addAutocmd "BufNext" options bufEnterAutocmd >>= 
+            in addAutocmd "BufEnter" options bufEnterAutocmd >>= 
                 checkAutocmdRegister
 
