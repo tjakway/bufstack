@@ -4,6 +4,7 @@ import Control.Concurrent.STM
 import qualified Neovim as Nvim
 import qualified Neovim.API.String as Nvim
 import Control.Monad (filterM)
+import Control.Monad.Trans.Resource
 
 data Config = 
     Config {
@@ -18,13 +19,15 @@ defaultConfig = Config False
 data Bufstack =
     Bufstack {
         config :: Config,
-        buffers :: TVar [Nvim.Buffer]
+        buffers :: TVar [Nvim.Buffer],
+        -- registered autocmds (addAutocmd returns a ReleaseKey)
+        autocmds :: TVar [ReleaseKey]
         }
 
 type BufstackM a = Nvim.Neovim Bufstack a
 
 initBufstack :: Config -> STM Bufstack
-initBufstack c = Bufstack c <$> newTVar []
+initBufstack c = Bufstack c <$> newTVar [] <*> newTVar []
 
 discardBadBuffers :: BufstackM ()
 discardBadBuffers = 
