@@ -5,7 +5,8 @@ module Bufstack.Util (
     modifyBuffersM,
     modifyBuffersM_,
     modifyBuffersMs,
-    wrapNvimEither
+    wrapNvimEither,
+    addReleaseKey
 ) where
 
 import qualified Control.Concurrent.STM as STM
@@ -49,6 +50,11 @@ modifyBuffersMs f = let x (Bufstack {buffers = bufs}) = atomically $ stateTVar b
 wrapNvimEither :: Either Nvim.NeovimException (Nvim.Neovim env a) -> Nvim.Neovim env (Either Nvim.NeovimException a)
 wrapNvimEither (Left x) = return . Left $ x
 wrapNvimEither (Right x) = x >>= (\a -> return . Right $ a)
+
+-- prepend this key to the list of release keys
+addReleaseKey :: ReleaseKey -> BufstackM ()
+addReleaseKey k = Nvim.ask >>= (\(Bufstack{autocmds = releaseKeys}) -> 
+                        atomically $ STM.modifyTVar' releaseKeys (k :))
 
 -- verbatim from http://hackage.haskell.org/package/stm-2.5.0.0/docs/src/Control.Concurrent.STM.TVar.html#stateTVar
 -- | Like 'modifyTVar'' but the function is a simple state transition that can
