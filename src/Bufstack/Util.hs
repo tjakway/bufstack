@@ -15,6 +15,8 @@ import qualified Neovim.API.String as Nvim
 import Control.Monad (filterM)
 import Bufstack.Core
 
+import Control.Monad.Trans.Resource
+
 atomically :: STM.STM a -> Nvim.Neovim env a
 atomically = Nvim.liftIO . STM.atomically
 
