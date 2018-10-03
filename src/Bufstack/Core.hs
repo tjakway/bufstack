@@ -29,6 +29,9 @@ type BufstackM a = Nvim.Neovim Bufstack a
 initBufstack :: Config -> STM Bufstack
 initBufstack c = Bufstack c <$> newTVar [] <*> newTVar []
 
+initBufstackIO :: Config -> IO Bufstack
+initBufstackIO = atomically . initBufstack
+
 discardBadBuffers :: BufstackM ()
 discardBadBuffers = 
         Nvim.ask >>= (\Bufstack {buffers= bufs} ->
