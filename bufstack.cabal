@@ -45,7 +45,7 @@ Test-Suite test-bufstack
                         containers, parsec, array, 
                         HUnit, test-framework, test-framework-hunit 
 
-  other-modules: Bufstack.Test.Vim.Framework
+  other-modules: Bufstack.Test.Vim.Framework, Bufstack.Test.BasicTests
 
 executable bufstack-exe
   main-is:             Main.hs
