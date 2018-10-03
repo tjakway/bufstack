@@ -65,7 +65,9 @@ setup = do
         closeAll' . filter (/= thisWindow) $ allWindows
         closeAll' . filter (/= thisBuffer) $ allBuffers
 
-       -- assertEqual "Closed other tabpages" [thisTabpage]
+        vim_get_tabpages' >>= assertEqual "Closed other tabpages" [thisTabpage]
+        vim_get_windows' >>= assertEqual "Closed other windows" [thisWindow]
+        vim_get_buffers' >>= assertEqual "Closed other buffers" [thisBuffer]
 
     where newTabpage :: BufstackM (Tabpage, Buffer)
           newTabpage = do
