@@ -1,5 +1,6 @@
 module Bufstack.Util (
     atomically,
+    bindNvimEither,
     modifyBuffers_,
     modifyBuffers,
     modifyBuffersM,
@@ -21,9 +22,9 @@ atomically :: STM.STM a -> Nvim.Neovim env a
 atomically = Nvim.liftIO . STM.atomically
 
 -- | bind twice
-bindNvimEither :: Neovim env (Either NeovimException a) -> 
-                    (a -> Neovim env (Either NeovimException b)) -> 
-                    Neovim env (Either NeovimException b)
+bindNvimEither :: Nvim.Neovim env (Either Nvim.NeovimException a) -> 
+                    (a -> Nvim.Neovim env (Either Nvim.NeovimException b)) -> 
+                    Nvim.Neovim env (Either Nvim.NeovimException b)
 bindNvimEither x y = let f (Right r) = y r
                          f (Left l) = return . Left $ l
                            in x >>= f
