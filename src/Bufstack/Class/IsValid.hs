@@ -36,6 +36,6 @@ whenIsValid a f = isValid a `bindNvimEither` (\x -> if x then f else return (Rig
 
 -- | like whenIsValid when the first argument also needs to be unwrapped
 whenIsValidM :: IsValid a => Neovim env (Either NeovimException a) -> 
-                                Neovim env (Either NeovimException a) ->
-                                Neovim env (Either NeovimException a)
-whenIsValidM a = a `bindNvimEither` whenIsValid
+                                Neovim env (Either NeovimException ()) ->
+                                Neovim env (Either NeovimException ())
+whenIsValidM a b = a `bindNvimEither` (\x -> whenIsValid x b)

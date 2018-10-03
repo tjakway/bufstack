@@ -6,6 +6,7 @@ import Neovim.API.String
 import Control.Monad (foldM, mapM_, sequence_)
 
 import Bufstack.Class.HasNumber
+import Bufstack.Class.IsValid
 import Bufstack.Util
 
 class Closeable a where
@@ -21,14 +22,14 @@ class Closeable a where
                         in errOnInvalidResult closeNil 
 
 instance Closeable Buffer where
-        close b = getNumber b `bindNvimEither` (\n -> vim_command $ ":bd " ++ show n)
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ":bd " ++ show n)
 
 instance Closeable Window where
-        close b = getNumber b `bindNvimEither` (\n -> vim_command $ ": " ++ show n ++ "quit")
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ": " ++ show n ++ "close")
 
 
 instance Closeable Tabpage where
-        close b = getNumber b `bindNvimEither` (\n -> vim_command $ ":tabclose " ++ show n)
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ":tabclose " ++ show n)
 
 closeAll :: Closeable a => [a] -> Neovim env (Either [NeovimException] ())
 closeAll = fmap rev . foldM f startFold
