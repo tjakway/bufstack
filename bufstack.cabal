@@ -15,10 +15,6 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
-Flag Test
-  description: Whether testing is enabled.
-  default: True
-
 Library 
 
   hs-source-dirs:      src
@@ -32,9 +28,6 @@ Library
                     Bufstack.Class.Closeable, Bufstack.Vim.Exports
 
   other-modules: Bufstack.Vim.Autocmds
-
-  if flag(test)
-    CPP-Options: -DTESTING
 
 Test-Suite test-bufstack
   type:
