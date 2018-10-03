@@ -4,6 +4,8 @@ module Bufstack.Class.IsValid where
 import Neovim
 import Neovim.API.String
 
+import Bufstack.Util
+
 class IsValid a where
         isValid :: a -> Neovim env (Either NeovimException Bool)
         isValid' :: a -> Neovim env Bool
@@ -28,3 +30,12 @@ instance IsValid IsValidInst where
         isValid (IsValidInst a) = isValid a
         isValid' (IsValidInst a) = isValid' a
 
+
+whenIsValid :: IsValid a => a -> Neovim env (Either NeovimException ()) -> Neovim env (Either NeovimException ())
+whenIsValid a f = isValid a `bindNvimEither` (\x -> if x then f else return (Right ()))
+
+-- | like whenIsValid when the first argument also needs to be unwrapped
+whenIsValidM :: IsValid a => Neovim env (Either NeovimException a) -> 
+                                Neovim env (Either NeovimException a) ->
+                                Neovim env (Either NeovimException a)
+whenIsValidM a = a `bindNvimEither` whenIsValid
