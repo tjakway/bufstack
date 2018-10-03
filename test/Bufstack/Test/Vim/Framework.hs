@@ -52,7 +52,8 @@ checkTestEnvironment = checkLengths
               checkLengths = objects >>= mapM_ (\(num, obj) -> 
                                     assertEqual (errMsg obj num) 1 num)
 
-setup :: BufstackM ()
+-- | return the open tabpage, window, and buffer
+setup :: Neovim env (Tabpage, Window, Buffer)
 setup = do
         (thisTabpage, thisBuffer) <- newTabpage
         thisWindow <- tabpage_get_window' thisTabpage
@@ -79,7 +80,9 @@ setup = do
 
         mapM_ (\x -> isValid' x >>= assertTrue "Our objects are still valid") objects
 
-    where newTabpage :: BufstackM (Tabpage, Buffer)
+        return (thisTabpage, thisWindow, thisBuffer)
+
+    where newTabpage :: Neovim env (Tabpage, Buffer)
           newTabpage = do
               vim_command' ":tabnew"
               newTp <- vim_get_current_tabpage'
