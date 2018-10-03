@@ -20,6 +20,13 @@ import Control.Monad.Trans.Resource
 atomically :: STM.STM a -> Nvim.Neovim env a
 atomically = Nvim.liftIO . STM.atomically
 
+-- | bind twice
+bindNvimEither :: Neovim env (Either NeovimException a) -> 
+                    (a -> Neovim env (Either NeovimException b)) -> 
+                    Neovim env (Either NeovimException b)
+bindNvimEither x y = let f (Right r) = y r
+                         f (Left l) = return . Left $ l
+                           in x >>= f
 
 modifyBuffers_ :: Bufstack -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> STM.STM ()
 modifyBuffers_ Bufstack {buffers= bufs} = STM.modifyTVar' bufs
