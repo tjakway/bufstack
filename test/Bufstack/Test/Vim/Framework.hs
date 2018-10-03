@@ -11,10 +11,12 @@ import Neovim
 import Neovim.API.String
 import Control.Concurrent.STM
 import Control.Monad.Trans.Resource
+import Data.List (nub)
 
 import Bufstack.Core
 import qualified Bufstack.Class.Closeable as Closeable
 import Bufstack.Class.IsValid
+import Bufstack.Class.HasNumber
 
 import Bufstack.Test.Vim.Utils
 
@@ -37,6 +39,9 @@ cleanup Bufstack{buffers = b, autocmds = a} = do
 
 cleanupM :: BufstackM ()
 cleanupM = ask >>= liftIO . cleanup
+
+exitNeovim :: Neovim env ()
+exitNeovim = vim_command' ":qa!"
 
 checkTestEnvironment :: Neovim env ()
 checkTestEnvironment = checkLengths
@@ -65,9 +70,9 @@ setup = do
         (thisTabpage, thisBuffer) <- newTabpage
         thisWindow <- tabpage_get_window' thisTabpage
 
-        allTabpages <- vim_get_tabpages'
-        allWindows <- vim_get_windows'
-        allBuffers <- vim_get_buffers'
+        allTabpages <- nub <$> vim_get_tabpages'
+        allWindows <- nub <$> vim_get_windows'
+        allBuffers <- nub <$> vim_get_buffers'
 
         -- close other windows and tabpages
         closeAll' . filter (/= thisTabpage) $ allTabpages

@@ -22,7 +22,7 @@ class Closeable a where
                         in errOnInvalidResult closeNil 
 
 instance Closeable Buffer where
-        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ":bd " ++ show n)
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ":bwipeout " ++ show n)
 
 instance Closeable Window where
         close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ": " ++ show n ++ "close")

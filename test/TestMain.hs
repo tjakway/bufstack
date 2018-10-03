@@ -5,6 +5,7 @@ import Test.Framework
 import Test.Framework.Providers.HUnit
 import Data.Monoid
 
+import qualified Neovim
 import Neovim.Test
 
 import Bufstack.Core
@@ -19,7 +20,7 @@ testConfig = defaultConfig
 
 main :: IO ()
 main =     -- create a new context for each test
-       let testFunctionWithCleanup f = \input -> f input >> cleanupM
+       let testFunctionWithCleanup f = \input -> f input >> cleanupM >> (Neovim.liftIO $ putStrLn "cleanup done from main") >> exitNeovim >> (Neovim.liftIO $ putStrLn "Done")
            wrapTest testF = initBufstackIO testConfig >>= (\env -> 
                                 testWithEmbeddedNeovim 
                                     Nothing 

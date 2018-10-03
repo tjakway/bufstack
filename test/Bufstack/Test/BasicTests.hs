@@ -7,4 +7,4 @@ import Test.Framework.Providers.HUnit
 import Bufstack.Test.Vim.Framework
 
 tests :: [BufstackTestCase]
-tests = []
+tests = [(\_ -> return (), "Empty test")]
