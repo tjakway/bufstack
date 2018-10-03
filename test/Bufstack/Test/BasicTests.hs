@@ -6,5 +6,5 @@ import Test.Framework.Providers.HUnit
 
 import Bufstack.Test.Vim.Framework
 
-tests :: TF.Test
-tests = TF.testGroup "BufstackTests" []
+tests :: [BufstackTestCase]
+tests = []

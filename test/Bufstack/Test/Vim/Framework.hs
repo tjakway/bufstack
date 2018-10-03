@@ -18,6 +18,10 @@ import Bufstack.Class.IsValid
 
 import Bufstack.Test.Vim.Utils
 
+type BufstackTest = (Tabpage, Window, Buffer) -> BufstackM ()
+-- BufstackTest plus a name/description
+type BufstackTestCase = (BufstackTest, String)
+
 cleanup :: Bufstack -> IO ()
 cleanup Bufstack{buffers = b, autocmds = a} = do
         -- atomically clear bufstack fields
@@ -30,6 +34,9 @@ cleanup Bufstack{buffers = b, autocmds = a} = do
 
         -- release autocmd resource handles
         mapM_ release cmds
+
+cleanupM :: BufstackM ()
+cleanupM = ask >>= liftIO . cleanup
 
 checkTestEnvironment :: Neovim env ()
 checkTestEnvironment = checkLengths
@@ -80,6 +87,7 @@ setup = do
 
         mapM_ (\x -> isValid' x >>= assertTrue "Our objects are still valid") objects
 
+        checkTestEnvironment
         return (thisTabpage, thisWindow, thisBuffer)
 
     where newTabpage :: Neovim env (Tabpage, Buffer)
