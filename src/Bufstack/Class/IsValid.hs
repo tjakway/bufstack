@@ -1,3 +1,4 @@
+{-# Language ExistentialQuantification #-}
 module Bufstack.Class.IsValid where
 
 import Neovim
@@ -18,3 +19,12 @@ instance IsValid Window where
 instance IsValid Tabpage where
         isValid = tabpage_is_valid
         isValid' = tabpage_is_valid'
+
+-- | existentially qualified instance wrapper
+data IsValidInst = forall a. IsValid a => IsValidInst a
+
+-- obviously
+instance IsValid IsValidInst where
+        isValid (IsValidInst a) = isValid a
+        isValid' (IsValidInst a) = isValid' a
+
