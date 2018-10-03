@@ -13,6 +13,7 @@ import Control.Concurrent.STM
 import Control.Monad.Trans.Resource
 
 import Bufstack.Core
+import qualified Bufstack.Class.Closeable as Closeable
 
 import Bufstack.Test.Vim.Utils
 
@@ -50,3 +51,31 @@ checkTestEnvironment = checkLengths
               checkLengths = objects >>= mapM_ (\(num, obj) -> 
                                     assertEqual (errMsg obj num) 1 num)
 
+setup :: BufstackM ()
+setup = do
+        (thisTabpage, thisBuffer) <- newTabpage
+        thisWindow <- tabpage_get_window' thisTabpage
+
+        allTabpages <- vim_get_tabpages'
+        allWindows <- vim_get_windows'
+        allBuffers <- vim_get_buffers'
+
+        -- close other windows and tabpages
+        closeAll' . filter (/= thisTabpage) $ allTabpages
+        closeAll' . filter (/= thisWindow) $ allWindows
+        closeAll' . filter (/= thisBuffer) $ allBuffers
+
+       -- assertEqual "Closed other tabpages" [thisTabpage]
+
+    where newTabpage :: BufstackM (Tabpage, Buffer)
+          newTabpage = do
+              vim_command' ":tabnew"
+              newTp <- vim_get_current_tabpage'
+              newBuffer <- vim_get_current_buffer'
+              tabpage_is_valid' newTp >>= assertTrue "new tab page is valid"
+              buffer_is_valid' newBuffer >>= assertTrue "new buffer is valid"
+              return (newTp, newBuffer)
+
+          closeAll' :: Closeable.Closeable a => [a] -> Neovim env ()
+          closeAll' = Closeable.closeAll' (\e -> 
+                            assertFailure $ "closeAll' failed: " ++ show e)
