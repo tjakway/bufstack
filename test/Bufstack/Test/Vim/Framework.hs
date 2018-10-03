@@ -31,7 +31,7 @@ cleanup Bufstack{buffers = b, autocmds = a} = do
         -- release autocmd resource handles
         mapM_ release cmds
 
-checkTestEnvironment :: BufstackM ()
+checkTestEnvironment :: Neovim env ()
 checkTestEnvironment = checkLengths
         where errMsg :: String -> Int -> String
               errMsg obj num = "Expected 1 " ++ obj ++ " but got: " ++ show num
