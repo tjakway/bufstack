@@ -1,7 +1,7 @@
 {-|
 - Contains setup/teardown code for running tests in neovim
 -}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, ExistentialQuantification #-}
 module Bufstack.Test.Vim.Framework where
 
 import Test.Framework
@@ -14,6 +14,7 @@ import Control.Monad.Trans.Resource
 
 import Bufstack.Core
 import qualified Bufstack.Class.Closeable as Closeable
+import Bufstack.Class.IsValid
 
 import Bufstack.Test.Vim.Utils
 
@@ -65,9 +66,18 @@ setup = do
         closeAll' . filter (/= thisWindow) $ allWindows
         closeAll' . filter (/= thisBuffer) $ allBuffers
 
+        -- make sure ours are the only ones open
         vim_get_tabpages' >>= assertEqual "Closed other tabpages" [thisTabpage]
         vim_get_windows' >>= assertEqual "Closed other windows" [thisWindow]
         vim_get_buffers' >>= assertEqual "Closed other buffers" [thisBuffer]
+
+        -- make sure everything is still valid
+        let objects = [IsValidInst thisTabpage, 
+                      IsValidInst thisWindow,
+                      IsValidInst thisBuffer]
+            
+
+        mapM_ (\x -> isValid' x >>= assertTrue "Our objects are still valid") objects
 
     where newTabpage :: BufstackM (Tabpage, Buffer)
           newTabpage = do
