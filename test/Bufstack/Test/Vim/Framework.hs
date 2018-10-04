@@ -13,6 +13,9 @@ import Control.Concurrent.STM
 import Control.Monad.Trans.Resource
 import Data.List (nub)
 
+import System.IO
+import System.Process
+
 import Bufstack.Core
 import qualified Bufstack.Class.Closeable as Closeable
 import Bufstack.Class.IsValid
@@ -40,29 +43,33 @@ cleanup Bufstack{buffers = b, autocmds = a} = do
 cleanupM :: BufstackM ()
 cleanupM = ask >>= liftIO . cleanup
 
-exitNeovim :: Neovim env ()
-exitNeovim = vim_command' "qa!"
+exitNeovim :: (Handle, Handle, ProcessHandle) -> Neovim env ()
+exitNeovim (hin, hout, ph) = liftIO $ do
+        hClose hin 
+        hClose hout
+        terminateProcess $ ph
+        void . waitForProcess $ ph
 
 checkTestEnvironment :: Neovim env ()
 checkTestEnvironment = checkLengths
-        where errMsg :: String -> Int -> String
-              errMsg obj num = "Expected 1 " ++ obj ++ " but got: " ++ show num
+    where   errMsg :: String -> Int -> String
+            errMsg obj num = "Expected 1 " ++ obj ++ " but got: " ++ show num
 
-              objects :: Neovim env [(Int, String)]
-              objects =
-                  (length <$> vim_get_buffers') >>= 
-                    \numBuffers -> 
-                    (length <$> vim_get_windows') >>=
-                    \numWindows ->
-                    (length <$> vim_get_tabpages') >>=
-                    \numTabpages ->
-                        return [(numBuffers, "buffer"),
-                                (numWindows, "window"),
-                                (numTabpages, "tabpage")]
+            objects :: Neovim env [(Int, String)]
+            objects =
+                (length <$> vim_get_buffers') >>= 
+                \numBuffers -> 
+                (length <$> vim_get_windows') >>=
+                \numWindows ->
+                (length <$> vim_get_tabpages') >>=
+                \numTabpages ->
+                    return [(numBuffers, "buffer"),
+                            (numWindows, "window"),
+                            (numTabpages, "tabpage")]
 
-              checkLengths :: Neovim env ()
-              checkLengths = objects >>= mapM_ (\(num, obj) -> 
-                                    assertEqual (errMsg obj num) 1 num)
+            checkLengths :: Neovim env ()
+            checkLengths = objects >>= mapM_ (\(num, obj) -> 
+                                assertEqual (errMsg obj num) 1 num)
 
 -- | return the open tabpage, window, and buffer
 setup :: Neovim env (Tabpage, Window, Buffer)
