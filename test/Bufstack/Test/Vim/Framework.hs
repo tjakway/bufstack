@@ -47,8 +47,14 @@ exitNeovim :: (Handle, Handle, ProcessHandle) -> Neovim env ()
 exitNeovim (hin, hout, ph) = liftIO $ do
         hClose hin 
         hClose hout
-        terminateProcess $ ph
-        void . waitForProcess $ ph
+        -- neovim has a bug where it often hangs instead of quitting
+        -- (see https://github.com/neovim/neovim/issues/7376)
+        -- it doesn't look like these lines are needed to make it quit
+        -- (just closing stdin seems to do it) but I'm leaving them here
+        -- just in case
+        --
+        --terminateProcess $ ph
+        --void . waitForProcess $ ph
 
 checkTestEnvironment :: Neovim env ()
 checkTestEnvironment = checkLengths
