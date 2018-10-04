@@ -25,7 +25,7 @@ data Bufstack =
         }
 
 type BufstackM a = Nvim.Neovim Bufstack a
-type BufstackME a = Nvim.Neovim Bufstack (Either Nvim.NeovimException a)
+type BufstackMEither a = Nvim.Neovim Bufstack (Either Nvim.NeovimException a)
 
 initBufstack :: Config -> STM Bufstack
 initBufstack c = Bufstack c <$> newTVar [] <*> newTVar []
