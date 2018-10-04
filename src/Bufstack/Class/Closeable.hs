@@ -22,14 +22,14 @@ class Closeable a where
                         in errOnInvalidResult closeNil 
 
 instance Closeable Buffer where
-        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ":bwipeout " ++ show n)
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ "bwipeout " ++ show n)
 
 instance Closeable Window where
-        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ": " ++ show n ++ "close")
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ show n ++ "close")
 
 
 instance Closeable Tabpage where
-        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ ":tabclose " ++ show n)
+        close b = whenIsValid b $ getNumber b `bindNvimEither` (\n -> vim_command $ "tabclose " ++ show n)
 
 closeAll :: Closeable a => [a] -> Neovim env (Either [NeovimException] ())
 closeAll = fmap rev . foldM f startFold

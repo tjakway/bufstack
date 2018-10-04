@@ -41,7 +41,7 @@ cleanupM :: BufstackM ()
 cleanupM = ask >>= liftIO . cleanup
 
 exitNeovim :: Neovim env ()
-exitNeovim = vim_command' ":qa!"
+exitNeovim = vim_command' "qa!"
 
 checkTestEnvironment :: Neovim env ()
 checkTestEnvironment = checkLengths
@@ -97,7 +97,7 @@ setup = do
 
     where newTabpage :: Neovim env (Tabpage, Buffer)
           newTabpage = do
-              vim_command' ":tabnew"
+              vim_command' "tabnew"
               newTp <- vim_get_current_tabpage'
               newBuffer <- vim_get_current_buffer'
               tabpage_is_valid' newTp >>= assertTrue "new tab page is valid"
