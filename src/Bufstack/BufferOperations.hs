@@ -27,3 +27,13 @@ replaceBufstack newBuffers = modifyBuffersM_ (const newBuffers)
 
 reverseBufstack :: BufstackM ()
 reverseBufstack = modifyBuffersM_ reverse
+
+nextBufFunction :: BufstackM ()
+nextBufFunction = undefined  -- TODO
+
+-- | TODO: use the previous buffer (numerically) if the stack is empty
+-- (i.e. if popBuffer returns Nothing)
+previousBufFunction :: BufstackM ()
+previousBufFunction = popBuffer >>= f
+    where f (Just buf) = Nvim.nvim_set_current_buf' buf
+          f _ = return ()
