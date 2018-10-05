@@ -1,6 +1,7 @@
 module Bufstack.Util (
     atomically,
     bindNvimEither,
+    fmapNvimEither,
     modifyBuffers_,
     modifyBuffers,
     modifyBuffersM,
@@ -28,6 +29,12 @@ bindNvimEither :: Nvim.Neovim env (Either Nvim.NeovimException a) ->
 bindNvimEither x y = let f (Right r) = y r
                          f (Left l) = return . Left $ l
                            in x >>= f
+
+-- | fmap twice
+fmapNvimEither :: (a -> b) -> 
+                    Nvim.Neovim env (Either Nvim.NeovimException a) -> 
+                    Nvim.Neovim env (Either Nvim.NeovimException b)
+fmapNvimEither x y = (fmap (fmap x)) y
 
 modifyBuffers_ :: Bufstack -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> STM.STM ()
 modifyBuffers_ Bufstack {buffers= bufs} = STM.modifyTVar' bufs
