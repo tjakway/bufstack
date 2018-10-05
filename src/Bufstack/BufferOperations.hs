@@ -49,7 +49,14 @@ nextBufFunction = do
             mapLeft f (Left x) = Left (f x)
             mapLeft _ (Right y) = Right y
 
-        (numberedBufs :: Either NeovimException [(Buffer, Int64)]) <- nvim_list_bufs >>= (fmap (mapLeft joinErrors) . foldM accEithers (Right [])  . (mapM (\x -> (,) x <$> getNumber x) . nub))
+        (numberedBufs 
+            :: Either NeovimException [(Buffer, Int64)]) 
+            <- nvim_list_bufs `bindNvimEither` 
+                            (fmap (mapLeft joinErrors) . 
+                             foldM accEithers (Right []) . 
+                             map (\x -> (x, getNumber x)) . 
+                             nub)
+
         currentBuf <- nvim_get_current_buf
         currentBufNum <- getNumber currentBuf
 
