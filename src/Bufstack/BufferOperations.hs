@@ -36,7 +36,6 @@ reverseBufstack = modifyBuffersM_ reverse
 
 nextBufFunction :: BufstackMEither ()
 nextBufFunction = do
-        -- 
         let accEithers acc (buf, getNumF) = do
                         x <- getNumF
                         return $ case (acc, x) of (Left errs, Left e) -> Left (e : errs)
@@ -45,7 +44,7 @@ nextBufFunction = do
                                                   (_, Left e) -> Left [e]
 
             joinErrors x = let e = pretty "Accumulated errors from getNumber applied to results from nvim_list_bufs: "
-                               in ErrorMessage (e <> (pretty . reverse $ x))
+                               in ErrorMessage (e <> (pretty . show . reverse $ x))
             mapLeft f (Left x) = Left (f x)
             mapLeft _ (Right y) = Right y
 
@@ -58,7 +57,7 @@ nextBufFunction = do
                              nub)
 
         currentBuf <- nvim_get_current_buf
-        currentBufNum <- getNumber currentBuf
+        currentBufNum <- currentBuf `bindNvimEither` getNumber
 
         let headMaybe [] = Nothing
             headMaybe (x:_) = Just x
@@ -67,13 +66,14 @@ nextBufFunction = do
                     | (length xs) > (i + 1) = Nothing
                     | otherwise = Just (xs !! i)
 
+            f :: Either NeovimException (Maybe Buffer)
             f = do -- Either monad
-               sortedNumberedBufs <- sortBy (compare `on` fst) <$> numberedBufs
+               sortedNumberedBufs <- sortBy (compare `on` snd) <$> numberedBufs
                currentBuf' <- currentBuf
                currentBufNum' <- currentBufNum
 
-               currentBufIndex <- maybe (ErrorMessage "Could not find current buf index") return .
-                                       findIndex (== currentBufNum') $ sortedNumberedBufs
+               currentBufIndex <- maybe (Left . ErrorMessage . pretty $ "Could not find current buf index") return .
+                                       findIndex ((== currentBufNum') . snd) $ sortedNumberedBufs
 
                let nextBufIndex = currentBufIndex + 1
 
@@ -87,11 +87,11 @@ nextBufFunction = do
                     if nextBufIndex >= (length sortedNumberedBufs)
                         -- should never return Nothing, but just in case
                         then headMaybe sortedNumberedBufs 
-                        else atMaybe nextBufIndex sortedNumberedBufs
+                        else atMaybe sortedNumberedBufs nextBufIndex 
 
         case f of Right (Nothing) -> return . return $ () -- there's only 1 buffer, do nothing
-                  Right (Just nextBuf) -> pushBuffer nextBuf >> nvim_set_current_buf' nextBuf
-                  Left x -> return . return $ x
+                  Right (Just nextBuf) -> pushBuffer nextBuf >> nvim_set_current_buf nextBuf
+                  Left x -> return . Left $ x
 
 
 -- | TODO: use the previous buffer (numerically) if the stack is empty
