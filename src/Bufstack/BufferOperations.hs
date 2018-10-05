@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Bufstack.BufferOperations where
 
 import Neovim
@@ -6,6 +7,7 @@ import Bufstack.Core
 import Bufstack.Util
 import Bufstack.Class.HasNumber
 
+import Control.Monad (mapM, foldM)
 import Data.List (nub, sortBy, findIndex)
 import Data.Function (on)
 
@@ -34,7 +36,20 @@ reverseBufstack = modifyBuffersM_ reverse
 
 nextBufFunction :: BufstackMEither ()
 nextBufFunction = do
-        numberedBufs <- fmapNvimEither (map (\x -> (,) x <$> getNumber x) . nub) nvim_list_bufs
+        -- 
+        let accEithers acc (buf, getNumF) = do
+                        x <- getNumF
+                        return $ case (acc, x) of (Left errs, Left e) -> Left (e : errs)
+                                                  (Left errs, _) -> Left errs
+                                                  (Right ys, Right y) -> Right ((buf, y) : ys)
+                                                  (_, Left e) -> Left [e]
+
+            joinErrors x = let e = pretty "Accumulated errors from getNumber applied to results from nvim_list_bufs: "
+                               in ErrorMessage (e <> (pretty . reverse $ x))
+            mapLeft f (Left x) = Left (f x)
+            mapLeft _ (Right y) = Right y
+
+        (numberedBufs :: Either NeovimException [(Buffer, Int64)]) <- nvim_list_bufs >>= (fmap (mapLeft joinErrors) . foldM accEithers (Right [])  . (mapM (\x -> (,) x <$> getNumber x) . nub))
         currentBuf <- nvim_get_current_buf
         currentBufNum <- getNumber currentBuf
 
