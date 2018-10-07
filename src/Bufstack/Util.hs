@@ -8,7 +8,9 @@ module Bufstack.Util (
     modifyBuffersM_,
     modifyBuffersMs,
     wrapNvimEither,
-    addReleaseKey
+    addReleaseKey,
+    newBuffer,
+    newBuffer'
 ) where
 
 import qualified Control.Concurrent.STM as STM
