@@ -14,3 +14,8 @@ assertTrue a = liftIO . HUnit.assertBool a
 
 assertFailure :: String -> Neovim env ()
 assertFailure = liftIO . HUnit.assertFailure
+
+assertCurrentBufEquals :: Buffer -> Neovim env ()
+assertCurrentBufEquals expected = do
+        currentBuf <- vim_get_current_buffer'
+        assertEqual "Assert current buf equals" expected currentBuf
