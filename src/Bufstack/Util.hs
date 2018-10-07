@@ -81,12 +81,15 @@ addReleaseKey k = Nvim.ask >>= (\(Bufstack{autocmds = releaseKeys}) ->
                         atomically $ STM.modifyTVar' releaseKeys (k :))
 
 newBuffer :: Nvim.Neovim env (Either Nvim.NeovimException Nvim.Buffer)
-newBuffer = Nvim.vim_command "new" `bindNvimEither` 
-                    (\_ -> Nvim.vim_get_current_buffer)
+newBuffer = Nvim.vim_command "new" `bindNvimEither_` 
+                    Nvim.vim_get_current_buffer
 
 
 newBuffer' :: Nvim.Neovim env Nvim.Buffer
-newBuffer' = Nvim.errOnInvalidResult (Nvim.fromObject <$> newBuffer)
+newBuffer' = newBuffer >>= \x -> 
+                case x of Left y -> Nvim.errOnInvalidResult (fmapNvimEither Nvim.toObject newBuffer)
+                          Right y -> return y
+
 
 -- verbatim from http://hackage.haskell.org/package/stm-2.5.0.0/docs/src/Control.Concurrent.STM.TVar.html#stateTVar
 -- | Like 'modifyTVar'' but the function is a simple state transition that can
