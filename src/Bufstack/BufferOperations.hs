@@ -83,7 +83,7 @@ nextBufFunction = nextBufE >>= handleErrorE
 
 -- | TODO: use the previous buffer (numerically) if the stack is empty
 -- (i.e. if popBuffer returns Nothing)
-previousBufFunction :: BufstackM ()
-previousBufFunction = popBuffer >>= f
+prevBufFunction :: BufstackM ()
+prevBufFunction = popBuffer >>= f
     where f (Just buf) = nvim_set_current_buf' buf
           f _ = return ()
