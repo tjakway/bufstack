@@ -7,19 +7,7 @@ import qualified Neovim.API.String as Nvim
 import Control.Monad (filterM)
 import Control.Monad.Trans.Resource
 
--- | datatype to hold instances of the Doc typeclass
-data DocData = forall a. Nvim.Doc a => DocData a
-
-data Config env = 
-    Config {
-        --to indicate their position on the stack
-        renameBuffers :: Bool,
-        onErrorF :: DocData -> Nvim.Neovim env ()
-    }
-
-
-defaultConfig :: Config
-defaultConfig = Config False
+import Bufstack.Config.Type
 
 data Bufstack =
     Bufstack {
@@ -48,8 +36,3 @@ discardBadBuffers =
 getBuffers :: BufstackM [Nvim.Buffer]
 getBuffers = Nvim.ask >>= (\(Bufstack{buffers = buf}) -> 
                 Nvim.liftIO . readTVarIO $ buf)
-
-onError :: Nvim.Doc a => Bufstack -> a -> Nvim.Neovim env ()
-onError = errF
-        where errF = f . onErrorF . config
-              f (DocData a) = a
