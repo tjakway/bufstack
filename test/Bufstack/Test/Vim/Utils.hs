@@ -32,8 +32,8 @@ assertPeekBufstack expected = do
                     Nothing -> assertFail msg
 
 -- | check that the underlying bufstack is equal to expected
-assertBufstack :: [Buffer] -> BufstackM ()
-assertBufstack expected = 
+assertBufstackEquals :: [Buffer] -> BufstackM ()
+assertBufstackEquals expected = 
         let msg = "Check bufstack is equal to expected"
             in getBuffers >>= assertEqual msg expected
 
