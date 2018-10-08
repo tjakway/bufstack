@@ -1,13 +1,13 @@
-module Bufstack.Test.Vim.Utils where
+module Bufstack.Test.Vim.Util where
 
 import qualified Test.HUnit as HUnit
 
 import Neovim
 
--- lifted hunit assertions
+import Bufstack.Core
+import Bufstack.BufferOperations
 
-assertFail :: String -> Neovim env ()
-assertFail = liftIO . Hunit.assertFail
+-- lifted hunit assertions
 
 assertEqual :: (Eq a, Show a) => String -> a -> a -> Neovim env ()
 assertEqual a b = liftIO . HUnit.assertEqual a b
@@ -29,7 +29,7 @@ assertPeekBufstack expected = do
         let msg = "Assert top of bufstack == " ++ show expected
         top <- peekBuffer
         case top of Just x -> assertEqual msg expected x
-                    Nothing -> assertFail msg
+                    Nothing -> assertFailure msg
 
 -- | check that the underlying bufstack is equal to expected
 assertBufstackEquals :: [Buffer] -> BufstackM ()
@@ -37,4 +37,18 @@ assertBufstackEquals expected =
         let msg = "Check bufstack is equal to expected"
             in getBuffers >>= assertEqual msg expected
 
+numBuffers :: Neovim env Int
+numBuffers = length <$> vim_get_buffers'
 
+mkBuffers :: Int -> Neovim env ()
+mkBuffers howMany = do
+        startingBuf <- vim_get_current_buffer'
+        numBuffers' <- numBuffers
+
+        mapM_ (const $ vim_command' "new") [1..howMany]
+        nvim_set_current_buf' startingBuf
+
+        let msg = "Check we created the correct number of buffers"
+            expectedNumBuffers = numBuffers' + howMany
+
+        numBuffers >>= assertEqual msg expectedNumBuffers

@@ -21,7 +21,7 @@ import qualified Bufstack.Class.Closeable as Closeable
 import Bufstack.Class.IsValid
 import Bufstack.Class.HasNumber
 
-import Bufstack.Test.Vim.Utils
+import Bufstack.Test.Vim.Util
 
 type BufstackTest = (Tabpage, Window, Buffer) -> BufstackM ()
 -- BufstackTest plus a name/description
