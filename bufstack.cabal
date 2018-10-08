@@ -24,7 +24,8 @@ Library
   build-depends:       base, containers, nvim-hs, stm, resourcet, process
                         
   
-  exposed-modules: Bufstack.Core, Bufstack.Util, Bufstack.BufferOperations,
+  exposed-modules: Bufstack.Core, Bufstack.Error,
+                    Bufstack.Util, Bufstack.BufferOperations,
                     Bufstack.Config.Type, Bufstack.Config.Default,
                     Bufstack.Class.IsValid, Bufstack.Class.HasNumber,
                     Bufstack.Class.Closeable, Bufstack.Vim.Exports

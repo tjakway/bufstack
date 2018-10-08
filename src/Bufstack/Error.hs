@@ -29,6 +29,5 @@ printAndThrow :: NeovimException -> IO ()
 printAndThrow e =  printStderrOnError e >> throw e
 
 
-
 defaultOnError :: NeovimException -> IO ()
 defaultOnError = printAndThrow

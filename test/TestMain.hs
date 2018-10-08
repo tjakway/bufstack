@@ -8,6 +8,8 @@ import Data.Monoid
 import qualified Neovim
 
 import Bufstack.Core
+import Bufstack.Config.Type
+import Bufstack.Config.Default
 import Bufstack.Test.Vim.Framework
 import qualified Bufstack.Test.BasicTests as BasicTests
 import qualified Bufstack.Test.Vim.EmbeddedTest as EmbeddedTest
