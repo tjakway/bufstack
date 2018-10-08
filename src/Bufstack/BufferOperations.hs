@@ -8,6 +8,7 @@ import Bufstack.Util
 import Bufstack.Error
 import Bufstack.Class.HasNumber
 
+import Bufstack.Util
 import Control.Monad (mapM, foldM)
 import Data.List (nub, sortBy, findIndex)
 import Data.Function (on)
@@ -37,26 +38,10 @@ reverseBufstack = modifyBuffersM_ reverse
 
 nextBufE :: BufstackMEither ()
 nextBufE = do
-        let accEithers acc (buf, getNumF) = do
-                        x <- getNumF
-                        return $ case (acc, x) of (Left errs, Left e) -> Left (e : errs)
-                                                  (Left errs, _) -> Left errs
-                                                  (Right ys, Right y) -> Right ((buf, y) : ys)
-                                                  (_, Left e) -> Left [e]
-
-            joinErrors x = let e = pretty "Accumulated errors from getNumber applied to results from nvim_list_bufs: "
-                               in ErrorMessage (e <> (pretty . show . reverse $ x))
-            mapLeft f (Left x) = Left (f x)
-            mapLeft _ (Right y) = Right y
-
-        numberedBufs <- nvim_list_bufs `bindNvimEither` 
-                            (fmap (mapLeft joinErrors) . 
-                             foldM accEithers (Right []) . 
-                             map (\x -> (x, getNumber x)) . 
-                             nub)
-
         currentBuf <- nvim_get_current_buf
         currentBufNum <-   (return currentBuf) `bindNvimEither` getNumber
+
+        sortedNumberedBufs' <- getNumberedBuffers
 
         let headMaybe [] = Nothing
             headMaybe (x:_) = Just x
@@ -67,7 +52,7 @@ nextBufE = do
 
             f :: Either NeovimException (Maybe Buffer)
             f = do -- Either monad
-               sortedNumberedBufs <- sortBy (compare `on` snd) <$> numberedBufs
+               sortedNumberedBufs <- sortedNumberedBufs'
                currentBuf' <- currentBuf
                currentBufNum' <- currentBufNum
 
@@ -94,7 +79,7 @@ nextBufE = do
 
 
 nextBufFunction :: BufstackM ()
-nextBufFunction = nextBufE >>= handleError
+nextBufFunction = nextBufE >>= handleErrorE
 
 -- | TODO: use the previous buffer (numerically) if the stack is empty
 -- (i.e. if popBuffer returns Nothing)

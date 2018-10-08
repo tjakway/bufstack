@@ -10,16 +10,22 @@ module Bufstack.Util (
     wrapNvimEither,
     addReleaseKey,
     newBuffer,
-    newBuffer'
+    newBuffer',
+    getNumberedBuffers
 ) where
 
 import qualified Control.Concurrent.STM as STM
 import Neovim
 import Neovim.API.String
-import Control.Monad (filterM)
-import Bufstack.Core
+
+import Control.Monad
+import Data.List (sortBy, nub)
+import Data.Function (on)
 
 import Control.Monad.Trans.Resource
+
+import Bufstack.Core
+import Bufstack.Class.HasNumber
 
 atomically :: STM.STM a -> Neovim env a
 atomically = liftIO . STM.atomically
@@ -105,3 +111,26 @@ stateTVar var f = do
    STM.writeTVar var s'
    return a
 {-# INLINE stateTVar #-}
+
+getNumberedBuffers :: BufstackMEither [(Buffer, NvimNumber)]
+getNumberedBuffers =
+        let accEithers acc (buf, getNumF) = do
+                        x <- getNumF
+                        return $ case (acc, x) of (Left errs, Left e) -> Left (e : errs)
+                                                  (Left errs, _) -> Left errs
+                                                  (Right ys, Right y) -> Right ((buf, y) : ys)
+                                                  (_, Left e) -> Left [e]
+
+            joinErrors x = let e = pretty "Accumulated errors from getNumber applied to results from nvim_list_bufs: "
+                               in ErrorMessage (e <> (pretty . show . reverse $ x))
+            mapLeft f (Left x) = Left (f x)
+            mapLeft _ (Right y) = Right y
+
+            doSort (Right xs) = Right . sortBy (compare `on` snd) $ xs
+            doSort (Left xs) = Left xs
+
+            in nvim_list_bufs `bindNvimEither` 
+                    (fmap (doSort . mapLeft joinErrors) . 
+                        foldM accEithers (Right []) . 
+                        map (\x -> (x, getNumber x)) . 
+                        nub)
