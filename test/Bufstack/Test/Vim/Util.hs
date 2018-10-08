@@ -45,7 +45,10 @@ mkBuffers howMany = do
         startingBuf <- vim_get_current_buffer'
         numBuffers' <- numBuffers
 
-        mapM_ (const $ vim_command' "new") [1..howMany]
+        -- see https://forum.upcase.com/t/vimrc-winminwidth-e36-not-enough-room-error/4334
+        -- regarding silencing out-of-width errors (which we don't care
+        -- about because we're headless)
+        mapM_ (const $ vim_command' "silent! new") [1..howMany]
         nvim_set_current_buf' startingBuf
 
         let msg = "Check we created the correct number of buffers"

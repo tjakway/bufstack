@@ -63,10 +63,7 @@ doTestWraparound = do
 -- | test that if we're currently at the highest numbered buffer that we'll
 -- wraparound to the lowest numbered buffer
 bufTestWraparound :: BufstackTest
-bufTestWraparound (_, _, buf) = do
-        secondBuf <- newBuffer'
-        assertCurrentBufEquals secondBuf
-
+bufTestWraparound (_, _, _) = do
         mkBuffers 10
         doTestWraparound
 
@@ -74,4 +71,4 @@ bufTestWraparound (_, _, buf) = do
 
 
 tests :: [BufstackTestCase]
-tests = [(bufPrevTest, "bufPrevTest")]
+tests = [(bufPrevTest, "bufPrevTest"), (bufTestWraparound, "bufTestWraparound")]
