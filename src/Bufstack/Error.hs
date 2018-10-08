@@ -25,6 +25,11 @@ handleErrorE (Left e) = handleError e
 handleErrorME :: BufstackM (Either NeovimException a) -> BufstackM ()
 handleErrorME e = e >>= handleErrorE
 
+handleErrorWithDefault :: a -> BufstackM (Either NeovimException a) -> BufstackM a
+handleErrorWithDefault defaultValue m = m >>= f
+        where f (Right x) = return x
+              f (Left y) = handleError y >> return defaultValue
+
 printAndThrow :: NeovimException -> IO ()
 printAndThrow e =  printStderrOnError e >> throw e
 
