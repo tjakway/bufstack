@@ -32,7 +32,7 @@ bufPrevTest (_, _, buf) = do
 
         -- replace the bufstack with the first buffer we had
         replaceBufstack [buf]
-        previousBufFunction
+        prevBufFunction
 
         currentBuf <- vim_get_current_buffer'
         assertTrue "Buffer should have changed" (openBuf /= currentBuf)
