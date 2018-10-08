@@ -50,7 +50,10 @@ Test-Suite test-bufstack
                         unliftio, transformers, mtl, directory, text, prettyprinter,
                         prettyprinter-ansi-terminal
 
-  other-modules: Bufstack.Test.Vim.Framework, Bufstack.Test.BasicTests
+  other-modules: Bufstack.Test.Vim.Framework, 
+                    Bufstack.Test.Vim.EmbeddedTest,
+                    Bufstack.Test.Vim.Util,
+                    Bufstack.Test.BasicTests
 
 executable bufstack-exe
   main-is:             Main.hs
