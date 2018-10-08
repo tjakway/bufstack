@@ -14,82 +14,82 @@ module Bufstack.Util (
 ) where
 
 import qualified Control.Concurrent.STM as STM
-import qualified Neovim as Nvim
-import qualified Neovim.API.String as Nvim
+import Neovim
+import Neovim.API.String
 import Control.Monad (filterM)
 import Bufstack.Core
 
 import Control.Monad.Trans.Resource
 
-atomically :: STM.STM a -> Nvim.Neovim env a
-atomically = Nvim.liftIO . STM.atomically
+atomically :: STM.STM a -> Neovim env a
+atomically = liftIO . STM.atomically
 
 -- | bind twice
-bindNvimEither :: Nvim.Neovim env (Either Nvim.NeovimException a) -> 
-                    (a -> Nvim.Neovim env (Either Nvim.NeovimException b)) -> 
-                    Nvim.Neovim env (Either Nvim.NeovimException b)
+bindNvimEither :: Neovim env (Either NeovimException a) -> 
+                    (a -> Neovim env (Either NeovimException b)) -> 
+                    Neovim env (Either NeovimException b)
 bindNvimEither x y = let f (Right r) = y r
                          f (Left l) = return . Left $ l
                            in x >>= f
 
 -- | bindNvimEither and discard result
-bindNvimEither_ :: Nvim.Neovim env (Either Nvim.NeovimException a) -> 
-                    (Nvim.Neovim env (Either Nvim.NeovimException b)) -> 
-                    Nvim.Neovim env (Either Nvim.NeovimException b)
+bindNvimEither_ :: Neovim env (Either NeovimException a) -> 
+                    (Neovim env (Either NeovimException b)) -> 
+                    Neovim env (Either NeovimException b)
 bindNvimEither_ x y = bindNvimEither x (\_ -> y)
 
 
 -- | fmap twice
 fmapNvimEither :: (a -> b) -> 
-                    Nvim.Neovim env (Either Nvim.NeovimException a) -> 
-                    Nvim.Neovim env (Either Nvim.NeovimException b)
+                    Neovim env (Either NeovimException a) -> 
+                    Neovim env (Either NeovimException b)
 fmapNvimEither x y = (fmap (fmap x)) y
 
-modifyBuffers_ :: Bufstack -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> STM.STM ()
+modifyBuffers_ :: Bufstack -> ([Buffer] -> [Buffer]) -> STM.STM ()
 modifyBuffers_ Bufstack {buffers= bufs} = STM.modifyTVar' bufs
 
 
 modifyBuffers :: Bufstack -> 
-                ([Nvim.Buffer] -> [Nvim.Buffer]) -> 
-                STM.STM [Nvim.Buffer]
+                ([Buffer] -> [Buffer]) -> 
+                STM.STM [Buffer]
 modifyBuffers b@Bufstack {buffers= bufs} f = 
         modifyBuffers_ b f >> STM.readTVar bufs
 
 
 modifyBuffersMImpl :: (Bufstack -> 
-                    ([Nvim.Buffer] -> [Nvim.Buffer]) -> 
-                    STM.STM a) -> ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM a
+                    ([Buffer] -> [Buffer]) -> 
+                    STM.STM a) -> ([Buffer] -> [Buffer]) -> BufstackM a
 modifyBuffersMImpl g f = let m x = atomically $ g x f
-                            in Nvim.ask >>= m
+                            in ask >>= m
 
-modifyBuffersM_ :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM ()
+modifyBuffersM_ :: ([Buffer] -> [Buffer]) -> BufstackM ()
 modifyBuffersM_ = modifyBuffersMImpl modifyBuffers_
 
 
-modifyBuffersM :: ([Nvim.Buffer] -> [Nvim.Buffer]) -> BufstackM [Nvim.Buffer]
+modifyBuffersM :: ([Buffer] -> [Buffer]) -> BufstackM [Buffer]
 modifyBuffersM = modifyBuffersMImpl modifyBuffers
 
-modifyBuffersMs :: ([Nvim.Buffer] -> (a, [Nvim.Buffer])) -> BufstackM a
+modifyBuffersMs :: ([Buffer] -> (a, [Buffer])) -> BufstackM a
 modifyBuffersMs f = let x (Bufstack {buffers = bufs}) = atomically $ stateTVar bufs f
-                        in Nvim.ask >>= x
+                        in ask >>= x
 
-wrapNvimEither :: Either Nvim.NeovimException (Nvim.Neovim env a) -> Nvim.Neovim env (Either Nvim.NeovimException a)
+wrapNvimEither :: Either NeovimException (Neovim env a) -> Neovim env (Either NeovimException a)
 wrapNvimEither (Left x) = return . Left $ x
 wrapNvimEither (Right x) = x >>= (\a -> return . Right $ a)
 
 -- prepend this key to the list of release keys
 addReleaseKey :: ReleaseKey -> BufstackM ()
-addReleaseKey k = Nvim.ask >>= (\(Bufstack{autocmds = releaseKeys}) -> 
+addReleaseKey k = ask >>= (\(Bufstack{autocmds = releaseKeys}) -> 
                         atomically $ STM.modifyTVar' releaseKeys (k :))
 
-newBuffer :: Nvim.Neovim env (Either Nvim.NeovimException Nvim.Buffer)
-newBuffer = Nvim.vim_command "new" `bindNvimEither_` 
-                    Nvim.vim_get_current_buffer
+newBuffer :: Neovim env (Either NeovimException Buffer)
+newBuffer = vim_command "new" `bindNvimEither_` 
+                    vim_get_current_buffer
 
 
-newBuffer' :: Nvim.Neovim env Nvim.Buffer
+newBuffer' :: Neovim env Buffer
 newBuffer' = newBuffer >>= \x -> 
-                case x of Left y -> Nvim.errOnInvalidResult (fmapNvimEither Nvim.toObject newBuffer)
+                case x of Left y -> errOnInvalidResult (fmapNvimEither toObject newBuffer)
                           Right y -> return y
 
 
