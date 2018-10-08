@@ -42,11 +42,11 @@ doTestWraparound :: BufstackM ()
 doTestWraparound = do
         startingBuf <- vim_get_current_buffer'
         startingBufstack <- getBuffers
-        bufs <- getNumberedBuffers
+        bufs <- getNumberedBuffers'
         
         let cmp f = f (compare `on` snd) bufs
-            highestBuf = cmp maximumBy 
-            lowestBuf = cmp minimumBy
+            highestBuf = fst $ cmp maximumBy 
+            lowestBuf = fst $ cmp minimumBy
 
         -- check that we wrap around from the highest buf to the lowest buf
         nvim_set_current_buf' highestBuf
@@ -57,7 +57,7 @@ doTestWraparound = do
         prevBufFunction 
         assertCurrentBufEquals highestBuf
         -- we should have popped 1 buffer off, leaving us where we started
-        assertBufstack startingBufstack
+        assertBufstackEquals startingBufstack
 
 
 -- | test that if we're currently at the highest numbered buffer that we'll

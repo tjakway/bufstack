@@ -11,7 +11,8 @@ module Bufstack.Util (
     addReleaseKey,
     newBuffer,
     newBuffer',
-    getNumberedBuffers
+    getNumberedBuffers,
+    getNumberedBuffers'
 ) where
 
 import qualified Control.Concurrent.STM as STM
@@ -25,6 +26,7 @@ import Data.Function (on)
 import Control.Monad.Trans.Resource
 
 import Bufstack.Core
+import Bufstack.Error
 import Bufstack.Class.HasNumber
 
 atomically :: STM.STM a -> Neovim env a
@@ -134,3 +136,6 @@ getNumberedBuffers =
                         foldM accEithers (Right []) . 
                         map (\x -> (x, getNumber x)) . 
                         nub)
+
+getNumberedBuffers' :: BufstackM [(Buffer, NvimNumber)]
+getNumberedBuffers' = handleErrorWithDefault [] getNumberedBuffers
