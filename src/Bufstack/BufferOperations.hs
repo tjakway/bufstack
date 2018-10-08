@@ -5,6 +5,7 @@ import Neovim
 import Neovim.API.String
 import Bufstack.Core
 import Bufstack.Util
+import Bufstack.Error
 import Bufstack.Class.HasNumber
 
 import Control.Monad (mapM, foldM)
@@ -34,8 +35,8 @@ replaceBufstack newBuffers = modifyBuffersM_ (const newBuffers)
 reverseBufstack :: BufstackM ()
 reverseBufstack = modifyBuffersM_ reverse
 
-nextBufFunction :: BufstackMEither ()
-nextBufFunction = do
+nextBufE :: BufstackMEither ()
+nextBufE = do
         let accEithers acc (buf, getNumF) = do
                         x <- getNumF
                         return $ case (acc, x) of (Left errs, Left e) -> Left (e : errs)
@@ -91,6 +92,9 @@ nextBufFunction = do
                   Right (Just nextBuf) -> pushBuffer nextBuf >> nvim_set_current_buf nextBuf
                   Left x -> return . Left $ x
 
+
+nextBufFunction :: BufstackM ()
+nextBufFunction = nextBufE >>= handleError
 
 -- | TODO: use the previous buffer (numerically) if the stack is empty
 -- (i.e. if popBuffer returns Nothing)
