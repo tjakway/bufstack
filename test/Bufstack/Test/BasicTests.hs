@@ -9,6 +9,7 @@ import Neovim
 import Neovim.API.String
 
 import Bufstack.Core
+import Bufstack.Util
 import Bufstack.BufferOperations
 import Bufstack.Test.Vim.Framework
 
@@ -35,6 +36,16 @@ bufPrevTest (_, _, buf) = do
         currentBuf <- vim_get_current_buffer'
         assertTrue "Buffer should have changed" (openBuf /= currentBuf)
         assertEqual "Should have switched back to the previous buffer" buf currentBuf
+
+
+bufNextTest :: BufstackTest
+bufNextTest (_, _, buf) = do
+        secondBuf <- newBuffer'
+        assertCurrentBufEquals secondBuf
+
+        -- test wraparound to the first buffer
+
+
 
 
 tests :: [BufstackTestCase]

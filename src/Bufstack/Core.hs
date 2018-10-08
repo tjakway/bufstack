@@ -1,3 +1,4 @@
+{-# LANGUAGE ExistentialQuantification #-}
 module Bufstack.Core where
 
 import Control.Concurrent.STM
@@ -6,10 +7,14 @@ import qualified Neovim.API.String as Nvim
 import Control.Monad (filterM)
 import Control.Monad.Trans.Resource
 
-data Config = 
+-- | datatype to hold instances of the Doc typeclass
+data DocData = forall a. Nvim.Doc a => DocData a
+
+data Config env = 
     Config {
         --to indicate their position on the stack
-        renameBuffers :: Bool
+        renameBuffers :: Bool,
+        onErrorF :: DocData -> Nvim.Neovim env ()
     }
 
 
@@ -43,3 +48,8 @@ discardBadBuffers =
 getBuffers :: BufstackM [Nvim.Buffer]
 getBuffers = Nvim.ask >>= (\(Bufstack{buffers = buf}) -> 
                 Nvim.liftIO . readTVarIO $ buf)
+
+onError :: Nvim.Doc a => Bufstack -> a -> Nvim.Neovim env ()
+onError = errF
+        where errF = f . onErrorF . config
+              f (DocData a) = a
