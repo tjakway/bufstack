@@ -50,7 +50,7 @@ nextBufE = do
                     | (length xs) > (i + 1) = Nothing
                     | otherwise = Just (xs !! i)
 
-            f :: Either NeovimException (Maybe Buffer)
+            f :: Either NeovimException (Buffer, Maybe Buffer)
             f = do -- Either monad
                sortedNumberedBufs <- sortedNumberedBufs'
                currentBuf' <- currentBuf
@@ -67,15 +67,15 @@ nextBufE = do
                    filterCurrentBuf Nothing = Nothing
 
 
-               return . filterCurrentBuf . fmap fst $ 
+               return . ((,) currentBuf') . filterCurrentBuf . fmap fst $ 
                     if nextBufIndex >= (length sortedNumberedBufs)
                         -- should never return Nothing, but just in case
                         then headMaybe sortedNumberedBufs 
                         else atMaybe sortedNumberedBufs nextBufIndex 
 
-        case f of Right (Nothing) -> return . return $ () -- there's only 1 buffer, do nothing
-                  Right (Just nextBuf) -> pushBuffer nextBuf >> nvim_set_current_buf nextBuf
-                  Left x -> return . Left $ x
+        case f of Right (_, Nothing) -> return . return $ () -- there's only 1 buffer, do nothing
+                  Right (currentBuf', Just nextBuf) -> pushBuffer currentBuf' >> nvim_set_current_buf nextBuf
+                  Left (x) -> return . Left $ x
 
 
 nextBufFunction :: BufstackM ()
