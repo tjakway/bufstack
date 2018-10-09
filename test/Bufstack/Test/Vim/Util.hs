@@ -1,6 +1,7 @@
 module Bufstack.Test.Vim.Util where
 
 import qualified Test.HUnit as HUnit
+import GHC.Stack
 
 import Neovim
 
@@ -9,22 +10,22 @@ import Bufstack.BufferOperations
 
 -- lifted hunit assertions
 
-assertEqual :: (Eq a, Show a) => String -> a -> a -> Neovim env ()
+assertEqual :: (HasCallStack, Eq a, Show a) => String -> a -> a -> Neovim env ()
 assertEqual a b = liftIO . HUnit.assertEqual a b
 
-assertTrue :: String -> Bool -> Neovim env ()
+assertTrue :: HasCallStack => String -> Bool -> Neovim env ()
 assertTrue a = liftIO . HUnit.assertBool a
 
-assertFailure :: String -> Neovim env ()
+assertFailure :: HasCallStack => String -> Neovim env ()
 assertFailure = liftIO . HUnit.assertFailure
 
-assertCurrentBufEquals :: Buffer -> Neovim env ()
+assertCurrentBufEquals :: HasCallStack => Buffer -> Neovim env ()
 assertCurrentBufEquals expected = do
         currentBuf <- vim_get_current_buffer'
         assertEqual "Assert current buf equals" expected currentBuf
 
 -- | check that the top of the bufstack is equal to expected
-assertPeekBufstack :: Buffer -> BufstackM ()
+assertPeekBufstack :: HasCallStack => Buffer -> BufstackM ()
 assertPeekBufstack expected = do
         let msg = "Assert top of bufstack == " ++ show expected
         top <- peekBuffer
@@ -32,7 +33,7 @@ assertPeekBufstack expected = do
                     Nothing -> assertFailure msg
 
 -- | check that the underlying bufstack is equal to expected
-assertBufstackEquals :: [Buffer] -> BufstackM ()
+assertBufstackEquals :: HasCallStack => [Buffer] -> BufstackM ()
 assertBufstackEquals expected = 
         let msg = "Check bufstack is equal to expected"
             in getBuffers >>= assertEqual msg expected
