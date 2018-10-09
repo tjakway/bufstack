@@ -1,4 +1,12 @@
-module Bufstack.Test.Vim.Util where
+module Bufstack.Test.Vim.Util (
+  assertEqual,
+  assertTrue,
+  assertFailure,
+  assertCurrentBufEquals,
+  assertPeekBufstack,
+  numBuffers,
+  mkBuffers
+) where
 
 import qualified Test.HUnit as HUnit
 import GHC.Stack
@@ -10,14 +18,17 @@ import Bufstack.BufferOperations
 
 -- lifted hunit assertions
 
+printStack :: HasCallStack => Bool -> Neovim env ()
+printStack cond = liftIO $ when cond (prettyCallStack callStack)
+
 assertEqual :: (HasCallStack, Eq a, Show a) => String -> a -> a -> Neovim env ()
-assertEqual a b = liftIO . HUnit.assertEqual a b
+assertEqual msg a b = printStack (a /= b) >> liftIO . HUnit.assertEqual msg a b 
 
 assertTrue :: HasCallStack => String -> Bool -> Neovim env ()
-assertTrue a = liftIO . HUnit.assertBool a
+assertTrue msg a = printStack (not a) >> liftIO . HUnit.assertBool msg a
 
 assertFailure :: HasCallStack => String -> Neovim env ()
-assertFailure = liftIO . HUnit.assertFailure
+assertFailure = printStack True >> liftIO . HUnit.assertFailure
 
 assertCurrentBufEquals :: HasCallStack => Buffer -> Neovim env ()
 assertCurrentBufEquals expected = do
