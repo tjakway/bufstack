@@ -57,7 +57,7 @@ Test-Suite test-bufstack
                     Bufstack.Test.BasicTests
 
 executable bufstack-exe
-  main-is:             Main.hs
+  main-is:             StandaloneExe.hs
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base, bufstack
