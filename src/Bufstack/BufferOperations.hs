@@ -87,3 +87,7 @@ prevBufFunction :: BufstackM ()
 prevBufFunction = popBuffer >>= f
     where f (Just buf) = nvim_set_current_buf' buf
           f _ = return ()
+
+printBufstack :: BufstackM (String)
+--              TODO: format better
+printBufstack = show <$> getBuffers
