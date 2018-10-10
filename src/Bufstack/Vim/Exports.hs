@@ -14,9 +14,9 @@ import Bufstack.BufferOperations
 import Bufstack.Vim.Autocmds
 
 exportedFunctions :: [Nvim.ExportedFunctionality Bufstack.Bufstack]
-exportedFunctions = [$(function' 'nextBufFunction) Async,
-          $(function' 'prevBufFunction) Async,
-          $(function' 'printBufstack) Sync]
+exportedFunctions = [$(function' "BufstackNextBufFunction" 'nextBufFunction) Async,
+          $(function' "BufstackPrevBufFunction" 'prevBufFunction) Async,
+          $(function' "BufstackPrintBufstack" 'printBufstack) Sync]
 
 plugin :: Neovim (StartupConfig NeovimConfig) NeovimPlugin
 plugin = do
