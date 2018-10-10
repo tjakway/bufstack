@@ -60,7 +60,7 @@ executable bufstack-exe
   main-is:             StandaloneExe.hs
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base, bufstack, nvim-hs
+  build-depends:       base, bufstack, nvim-hs, directory, filepath
   hs-source-dirs:      src/exe
   default-language:    Haskell2010
   build-tools:         happy
