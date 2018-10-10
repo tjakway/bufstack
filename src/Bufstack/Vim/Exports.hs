@@ -1,5 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Bufstack.Vim.Exports where
+module Bufstack.Vim.Exports (
+    plugin                            
+) where
 
 import Neovim
 
@@ -14,7 +16,7 @@ import Bufstack.Vim.Autocmds
 exportedFunctions :: [Nvim.ExportedFunctionality Bufstack.Bufstack]
 exportedFunctions = [$(function' 'nextBufFunction) Async,
           $(function' 'prevBufFunction) Async,
-          $(function' 'printBufstack) Async]
+          $(function' 'printBufstack) Sync]
 
 plugin :: Neovim (StartupConfig NeovimConfig) NeovimPlugin
 plugin = do
