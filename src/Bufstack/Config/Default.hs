@@ -4,4 +4,4 @@ import Bufstack.Config.Type
 import Bufstack.Error
 
 defaultConfig :: Config
-defaultConfig = Config False defaultOnError 
+defaultConfig = Config False True defaultOnError 

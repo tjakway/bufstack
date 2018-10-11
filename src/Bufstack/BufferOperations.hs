@@ -9,6 +9,7 @@ import Bufstack.Error
 import Bufstack.Class.HasNumber
 
 import Bufstack.Util
+import Bufstack.Config.Type
 import Control.Monad (mapM, foldM)
 import Data.List (nub, sortBy, findIndex)
 import Data.Function (on)
@@ -95,3 +96,14 @@ formatBufstack = show <$> getBuffers
 
 printBufstack :: BufstackM ()
 printBufstack = formatBufstack >>= liftIO . putStrLn 
+
+-- | collapse adjacent duplicate entries
+-- e.g: [A, B, B, B, C, D, D, E, A, A] -> [A, B, C, D, E, A]
+removeAdjacentDuplicates :: BufstackM ()
+removeAdjacentDuplicates = 
+        let f x [] = [x]
+            f x l@(y:_)
+                | x == y = l
+                | otherwise = x : l
+            in whenM (removeDuplicates . config <$> ask) $ 
+                modifyBuffersM_ (foldr f [])

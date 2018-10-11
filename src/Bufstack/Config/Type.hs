@@ -7,6 +7,6 @@ data Config =
         --to indicate their position on the stack
         --TODO: not implemented
         renameBuffers :: Bool,
-
+        removeDuplicates :: Bool,
         onErrorFIO :: NeovimException -> IO ()
     }
