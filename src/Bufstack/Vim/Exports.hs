@@ -16,7 +16,8 @@ import Bufstack.Vim.Autocmds
 exportedFunctions :: [Nvim.ExportedFunctionality Bufstack.Bufstack]
 exportedFunctions = [$(function "BufstackNextBufFunction" 'nextBufFunction) Sync,
           $(function "BufstackPrevBufFunction" 'prevBufFunction) Sync,
-          $(function "BufstackPrintBufstack" 'printBufstack) Sync]
+          $(function "BufstackPrintBufstack" 'printBufstack) Sync,
+          $(function "BufstackRemoveAdjacentDuplicates" 'removeAdjacentDuplicates) Sync]
 
 plugin :: Neovim (StartupConfig NeovimConfig) NeovimPlugin
 plugin = do
