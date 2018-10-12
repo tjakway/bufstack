@@ -11,7 +11,7 @@ import Bufstack.Class.HasNumber
 import Bufstack.Util
 import Bufstack.Config.Type
 import Control.Monad (mapM, foldM)
-import Data.List (nub, sortBy, findIndex)
+import Data.List (nub, sortBy, findIndex, elemIndex)
 import Data.Function (on)
 
 pushBuffer :: Buffer -> BufstackM ()
@@ -84,15 +84,37 @@ nextBufFunction = nextBufE >>= handleErrorE
 
 -- | TODO: use the previous buffer (numerically) if the stack is empty
 -- (i.e. if popBuffer returns Nothing)
+prevBufE :: BufstackMEither ()
+prevBufE = popBuffer >>= f
+    where f (Just buf) = nvim_set_current_buf buf
+          f _ = do
+              numberedBuffers <- getNumberedBuffers
+              currentBuf <- nvim_get_current_buf
+
+              let selectedBuffer = do -- Either Monad
+                        numberedBuffers' <- map fst <$> numberedBuffers
+                        currentBuf' <- currentBuf
+
+                        let errMsg = pretty "Could not find the index of the current buffer"
+                        currentBufIndex <- 
+                            case elemIndex currentBuf' numberedBuffers'
+                                of Just i -> Right i
+                                   Nothing -> Left $ ErrorMessage errMsg
+
+                        let previousBufIndex = currentBufIndex - 1
+                            wrapAroundMin x = if x < 0 then ((length numberedBuffers') - 1)
+                                                       else x
+                        return . (numberedBuffers' !! ) . wrapAroundMin $ previousBufIndex
+
+              case selectedBuffer of Right b -> nvim_set_current_buf b
+                                     Left e -> return $ Left e
+
 prevBufFunction :: BufstackM ()
-prevBufFunction = popBuffer >>= f
-    where f (Just buf) = nvim_set_current_buf' buf
-          f _ = return ()
+prevBufFunction = prevBufE >>= handleErrorE
 
-formatBufstack :: BufstackM (String)
---              TODO: format better
-formatBufstack = show <$> getBuffers
 
+formatBufstack :: BufstackM String
+formatBufstack = show <$> getBuffers --TODO
 
 printBufstack :: BufstackM ()
 printBufstack = formatBufstack >>= liftIO . putStrLn 
