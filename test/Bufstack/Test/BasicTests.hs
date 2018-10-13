@@ -72,7 +72,7 @@ bufTestWraparound (_, _, _) = do
 bufNextTest :: BufstackTest
 bufNextTest (_, _, buf) = do
         mkBuffers 10
-        sequence_ . take 50 . repeat $ (nextBufFunction >> assertNoAdjacentDuplicates)
+        sequence_ . take 50 . repeat $ (nextBufFunction >> doTestWraparound >> assertNoAdjacentDuplicates)
 
     where assertNoAdjacentDuplicates :: BufstackM ()
           assertNoAdjacentDuplicates = 
