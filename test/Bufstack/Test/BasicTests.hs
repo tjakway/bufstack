@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Bufstack.Test.BasicTests (tests) where
 
 import qualified Test.Framework as TF
@@ -5,6 +6,7 @@ import Test.Framework.Providers.HUnit
 
 import Data.List
 import Data.Function (on)
+import Control.Monad
 
 import Neovim
 import Neovim.API.String
@@ -67,6 +69,18 @@ bufTestWraparound (_, _, _) = do
         mkBuffers 10
         doTestWraparound
 
+bufNextTest :: BufstackTest
+bufNextTest (_, _, buf) = do
+        mkBuffers 10
+        return ()
+
+    where assertNoAdjacentDuplicates :: BufstackM ()
+          assertNoAdjacentDuplicates = 
+            let f (duplicates, Just prev) e = if e == prev then (e : duplicates, Just e)
+                                                           else (duplicates, Just e)
+                f (duplicates, Nothing) e = (duplicates, Just e)
+                check = assertEqual "Expected no duplicate buffers" []
+                in getBuffers >>= (check . reverse . fst . foldl' f ([], Nothing))
 
 
 
