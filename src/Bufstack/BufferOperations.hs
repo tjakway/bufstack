@@ -80,7 +80,7 @@ nextBufE = do
 
 
 nextBufFunction :: BufstackM ()
-nextBufFunction = nextBufE >>= handleErrorE
+nextBufFunction = withRemoveAdjacentDuplicates nextBufE >>= handleErrorE
 
 prevBufE :: BufstackMEither ()
 prevBufE = popBuffer >>= f
@@ -108,7 +108,7 @@ prevBufE = popBuffer >>= f
                                      Left e -> return $ Left e
 
 prevBufFunction :: BufstackM ()
-prevBufFunction = prevBufE >>= handleErrorE
+prevBufFunction = withRemoveAdjacentDuplicates prevBufE >>= handleErrorE
 
 
 formatBufstack :: BufstackM String
@@ -127,3 +127,6 @@ removeAdjacentDuplicates =
                 | otherwise = x : l
             in whenM (removeDuplicates . config <$> ask) $ 
                 modifyBuffersM_ (foldr f [])
+
+withRemoveAdjacentDuplicates :: BufstackMEither a -> BufstackMEither a
+withRemoveAdjacentDuplicates a = (Right <$> removeAdjacentDuplicates) >> a
