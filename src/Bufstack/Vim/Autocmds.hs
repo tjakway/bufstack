@@ -9,17 +9,18 @@ import Control.Monad.Trans.Resource
 
 import Bufstack.Core
 import Bufstack.Util
+import Bufstack.Error
 import Bufstack.BufferOperations
 
-onError :: Neovim env ()
-onError = undefined -- TODO
-
-bufEnterAutocmd :: BufstackM ()
-bufEnterAutocmd = vim_get_current_buffer' >>= pushBuffer
+bufLeaveAutocmd :: BufstackM ()
+bufLeaveAutocmd = (vim_get_current_buffer `bindNvimEither` (fmap Right . pushBuffer)) >>= 
+                    handleErrorE
 
 checkAutocmdRegister :: Maybe (Either (BufstackM ()) ReleaseKey) -> BufstackM ()
-checkAutocmdRegister Nothing = onError
-checkAutocmdRegister (Just (Left err)) = err >> onError
+checkAutocmdRegister Nothing = checkAutocmdRegister (Just . Left $ err)
+                    where err = handleError . ErrorMessage $ errMsg
+                          errMsg = "Failed to register autocmd (unknown error)"
+checkAutocmdRegister (Just (Left err)) = err
 checkAutocmdRegister (Just (Right key)) = addReleaseKey key
 
 addAutocmds :: BufstackM ()
@@ -29,6 +30,6 @@ addAutocmds =
                         acmdNested = False,
                         acmdGroup = Nothing
                         }
-            in addAutocmd "BufEnter" options bufEnterAutocmd >>= 
+            in addAutocmd "BufLeave" options bufLeaveAutocmd >>= 
                 checkAutocmdRegister
 
