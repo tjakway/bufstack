@@ -74,7 +74,7 @@ nextBufE = do
 
                return . ((,) currentBuf') . filterCurrentBuf . fmap fst $ 
                     if nextBufIndex >= (length sortedNumberedBufs)
-                        -- should never return Nothing, but just in case
+                        -- this should never return Nothing, but just in case
                         then headMaybe sortedNumberedBufs 
                         else atMaybe sortedNumberedBufs nextBufIndex 
 
