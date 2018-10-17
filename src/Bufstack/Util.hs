@@ -86,9 +86,10 @@ wrapNvimEither (Left x) = return . Left $ x
 wrapNvimEither (Right x) = x >>= (\a -> return . Right $ a)
 
 -- prepend this key to the list of release keys
-addReleaseKey :: ReleaseKey -> BufstackM ()
-addReleaseKey k = ask >>= (\(Bufstack{autocmds = releaseKeys}) -> 
-                        atomically $ STM.modifyTVar' releaseKeys (k :))
+addReleaseKey :: Bufstack -> ReleaseKey -> Neovim env ()
+addReleaseKey Bufstack{autocmds = releaseKeys} k = 
+                    atomically $ STM.modifyTVar' releaseKeys (k :)
+
 
 newBuffer :: Neovim env (Either NeovimException Buffer)
 newBuffer = vim_command "new" `bindNvimEither_` 

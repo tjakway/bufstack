@@ -8,6 +8,7 @@ import Data.Monoid
 import qualified Neovim
 
 import Bufstack.Core
+import Bufstack.Init
 import Bufstack.Config.Type
 import Bufstack.Config.Default
 import Bufstack.Test.Vim.Framework
@@ -22,13 +23,20 @@ testConfig = defaultConfig
 
 main :: IO ()
 main =     -- create a new context for each test
-       let testFunctionWithCleanup handles f = \input -> f input >> cleanupM >> exitNeovim handles
-           wrapTest testF = initBufstackIO testConfig >>= (\env -> 
+       let testFunctionWithCleanup env bufstackSetupFunction handles f = do
+                        bufstackSetupFunction env
+                        input <- genericTestSetup
+                        f input
+                        cleanupM
+                        exitNeovim handles
+
+           wrapTest testF = initBufstackIO testConfig >>= (\(env,setupFunction) -> 
                                 EmbeddedTest.testWithEmbeddedNeovim 
                                     Nothing 
                                     maxSecondsPerTest 
-                                    env
-                                    (\handles -> setup >>= testFunctionWithCleanup handles testF) )
+                                    env 
+                                    (\handles ->
+                                        testFunctionWithCleanup env setupFunction handles testF) )
 
            -- tests form a tree
            groupTests tests name = testGroup name $ map (\(t, n) -> testCase n (wrapTest t)) tests

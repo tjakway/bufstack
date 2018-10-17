@@ -9,6 +9,7 @@ import qualified Neovim.Plugin.Internal as Nvim
 
 import qualified Bufstack.Core as Bufstack
 import qualified Bufstack.Config.Default as Bufstack
+import qualified Bufstack.Init as Bufstack
 import Bufstack.Util
 import Bufstack.BufferOperations
 import Bufstack.Vim.Autocmds
@@ -21,7 +22,7 @@ exportedFunctions = [$(function "BufstackNextBufFunction" 'nextBufFunction) Sync
 
 plugin :: Neovim (StartupConfig NeovimConfig) NeovimPlugin
 plugin = do
-        env <- atomically $ Bufstack.initBufstack Bufstack.defaultConfig 
+        env <- Bufstack.initBufstack Bufstack.defaultConfig 
         wrapPlugin (Plugin
             { environment = env
             , exports     = exportedFunctions

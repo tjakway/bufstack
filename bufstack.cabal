@@ -25,6 +25,7 @@ Library
                         
   
   exposed-modules: Bufstack.Core, Bufstack.Error,
+                    Bufstack.Init,
                     Bufstack.Util, Bufstack.BufferOperations,
                     Bufstack.Config.Type, Bufstack.Config.Default,
                     Bufstack.Class.IsValid, Bufstack.Class.HasNumber,

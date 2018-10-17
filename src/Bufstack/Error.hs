@@ -22,6 +22,12 @@ handleErrorE :: Either NeovimException a -> BufstackM ()
 handleErrorE (Right _) = return ()
 handleErrorE (Left e) = handleError e
 
+handleErrorN :: Bufstack -> Either NeovimException a -> Neovim env ()
+handleErrorN b ex = let onErr = onErrorFIO . config $ b
+                        f (Right _) = return ()
+                        f (Left x) = liftIO . onErr $ x
+                            in f ex
+
 handleErrorME :: BufstackM (Either NeovimException a) -> BufstackM ()
 handleErrorME e = e >>= handleErrorE
 

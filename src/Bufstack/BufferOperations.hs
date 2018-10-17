@@ -10,12 +10,16 @@ import Bufstack.Class.HasNumber
 
 import Bufstack.Util
 import Bufstack.Config.Type
-import Control.Monad (mapM, foldM)
+import Control.Monad (mapM, foldM, void)
 import Data.List (nub, sortBy, findIndex, elemIndex)
 import Data.Function (on)
 
 pushBuffer :: Buffer -> BufstackM ()
 pushBuffer buf = modifyBuffersM_ (buf :)
+
+pushBufferN :: Bufstack -> Buffer -> Neovim env ()
+pushBufferN b buf = void . atomically . modifyBuffers b $ (buf :)
+
 
 popBuffer :: BufstackM (Maybe Buffer)
 popBuffer = modifyBuffersMs tailMaybeS 

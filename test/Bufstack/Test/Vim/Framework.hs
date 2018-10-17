@@ -78,8 +78,8 @@ checkTestEnvironment = checkLengths
                                 assertEqual (errMsg obj num) 1 num)
 
 -- | return the open tabpage, window, and buffer
-setup :: Neovim env (Tabpage, Window, Buffer)
-setup = do
+genericTestSetup :: Neovim env (Tabpage, Window, Buffer)
+genericTestSetup = do
         (thisTabpage, thisBuffer) <- newTabpage
         thisWindow <- tabpage_get_window' thisTabpage
 

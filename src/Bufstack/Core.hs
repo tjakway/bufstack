@@ -20,12 +20,6 @@ data Bufstack =
 type BufstackM a = Nvim.Neovim Bufstack a
 type BufstackMEither a = Nvim.Neovim Bufstack (Either Nvim.NeovimException a)
 
-initBufstack :: Config -> STM Bufstack
-initBufstack c = Bufstack c <$> newTVar [] <*> newTVar []
-
-initBufstackIO :: Config -> IO Bufstack
-initBufstackIO = atomically . initBufstack
-
 discardBadBuffers :: BufstackM ()
 discardBadBuffers = 
         Nvim.ask >>= (\Bufstack {buffers= bufs} ->
