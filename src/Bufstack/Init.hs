@@ -1,5 +1,6 @@
 module Bufstack.Init where
 
+import Control.Monad.Trans.Resource
 import Control.Concurrent.STM
 import Neovim
 
@@ -17,4 +18,15 @@ initBufstack c = initBufstack' >>= (\env -> addAutocmds env >> return env)
 initBufstackIO :: Config -> IO (Bufstack, Bufstack -> Neovim env ())
 initBufstackIO c = do
         bufstackData <- atomically . initBufstackData $ c
-        return (bufstackData, addAutocmds)
+        return (bufstackData, resetBufstack)
+
+resetBufstack :: Bufstack -> Neovim env ()
+resetBufstack env@Bufstack{buffers=b, autocmds=a} =
+        let stm = do
+                writeTVar b []
+                writeTVar a []
+            in do
+                autocmdKeys <- liftIO . readTVarIO $ a
+                mapM_ release autocmdKeys
+                liftIO . atomically $ stm
+                addAutocmds env
