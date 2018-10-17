@@ -15,6 +15,8 @@ initBufstack :: Config -> Neovim env Bufstack
 initBufstack c = initBufstack' >>= (\env -> addAutocmds env >> return env)
     where initBufstack' = liftIO . atomically . initBufstackData $ c
 
+-- | returns an uninitialized instance of bufstack and a function to
+-- finish the initialization in the Neovim monad
 initBufstackIO :: Config -> IO (Bufstack, Bufstack -> Neovim env ())
 initBufstackIO c = do
         bufstackData <- atomically . initBufstackData $ c
