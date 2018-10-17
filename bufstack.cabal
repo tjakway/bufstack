@@ -55,7 +55,8 @@ Test-Suite test-bufstack
   other-modules: Bufstack.Test.Vim.Framework, 
                     Bufstack.Test.Vim.EmbeddedTest,
                     Bufstack.Test.Vim.Util,
-                    Bufstack.Test.BasicTests
+                    Bufstack.Test.BasicTests,
+                    Bufstack.Test.Entry
 
 executable bufstack-exe
   main-is:             StandaloneExe.hs
