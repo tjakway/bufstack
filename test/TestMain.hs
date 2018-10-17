@@ -5,6 +5,8 @@ import Test.Framework
 import Test.Framework.Providers.HUnit
 import Data.Monoid
 
+import System.IO
+import Control.Exception (throwIO)
 import qualified Neovim
 
 import Bufstack.Core
@@ -19,7 +21,10 @@ maxSecondsPerTest :: EmbeddedTest.Seconds
 maxSecondsPerTest = EmbeddedTest.Seconds 60
 
 testConfig :: Config
-testConfig = defaultConfig
+testConfig = let onError ex = do
+                    hPutStrLn stderr (show ex)
+                    throwIO ex
+                in defaultConfig {onErrorFIO = onError}
 
 main :: IO ()
 main =     -- create a new context for each test
